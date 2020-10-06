@@ -1,1 +1,6 @@
-**/*.exe
+# Local settings
+**/.vscode
+**/.vs
+
+# Binaries
+bin
