@@ -10,11 +10,11 @@ BINARY_DIR = bin
 all: compile run
 
 compile:
-	@if not exist ${BINARY_DIR} mkdir ${BINARY_DIR}
-	@gcc -std=c99 -Wall -Wextra -Werror ${SOURCE_DIR}\${MAIN_FILENAME}.c -o ${BINARY_DIR}\${MAIN_FILENAME}
+	@mkdir -p ${BINARY_DIR}
+	@gcc -std=c99 -Wall -Wextra -Werror ${SOURCE_DIR}/${MAIN_FILENAME}.c -o ${BINARY_DIR}/${MAIN_FILENAME}
 
 clean:
 	# TODO: Clean bin directory (?)
 
 run:
-	@.\${BINARY_DIR}\${MAIN_FILENAME}
+	@./${BINARY_DIR}/${MAIN_FILENAME}
