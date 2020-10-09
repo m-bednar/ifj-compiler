@@ -1,16 +1,6 @@
 #include "symtable.h"
-#include <stdlib.h>
 
-void bintree_ctor(bintree_t* tree) {
-   tree->root = NULL;
-}
-
-void bintree_dtor(bintree_t* tree) {
-   if (tree->root != NULL) {
-      binitem_dtor(tree->root);
-      free(tree->root);
-   }
-}
+/* --- Binary tree item --- */
 
 void binitem_ctor(binitem_t* item, char* value) {
    // TODO: Copy value to item->value with malloc and strcpy
@@ -31,3 +21,28 @@ void binitem_dtor(binitem_t* item) {
       free(item->right);
    }
 }
+
+/* --- Binary tree --- */
+
+void bintree_ctor(bintree_t* tree) {
+   tree->root = NULL;
+}
+
+void bintree_dtor(bintree_t* tree) {
+   if (tree->root != NULL) {
+      binitem_dtor(tree->root);
+      free(tree->root);
+   }
+}
+
+void bintree_add(bintree_t* tree, char* str) {
+   // TODO: implement
+}
+
+bool bintree_has(bintree_t* tree, char* str) {
+   // TODO: implement
+   return true;
+}
+
+bool bintree_
+

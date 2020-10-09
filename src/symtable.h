@@ -1,6 +1,9 @@
 #ifndef SYMTABLE_H
 #define SYMTABLE_H
 
+#include <stdbool.h>
+#include <stdlib.h>
+
 typedef struct {
    const char* value;
    binitem_t* left;
@@ -10,6 +13,16 @@ typedef struct {
 typedef struct {
    binitem_t* root;
 } bintree_t;
+
+/**
+ * Initializes new item of binary tree.
+ */
+void binitem_ctor(binitem_t* item);
+
+/**
+ * Destructs item of binary tree.
+ */
+void binitem_dtor(binitem_t* item);
 
 /**
  * Initializes new binary tree structure.
@@ -22,13 +35,13 @@ void bintree_ctor(bintree_t* tree);
 void bintree_dtor(bintree_t* tree);
 
 /**
- * Initializes new item of binary tree.
+ * Adds new item to the tree. 
  */
-void binitem_ctor(binitem_t* item);
+void bintree_add(bintree_t* tree, char* str);
 
 /**
- * Destructs item of binary tree.
+ * Returns true, if tree has item of same value as string.
  */
-void binitem_dtor(binitem_t* item);
+bool bintree_has(bintree_t* tree, char* str);
 
 #endif
