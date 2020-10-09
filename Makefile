@@ -7,7 +7,7 @@ MAIN_FILENAME = main
 SOURCE_DIR = src
 BINARY_DIR = bin
 
-all: compile run
+all: clean compile run
 
 compile:
 	@mkdir -p ${BINARY_DIR}

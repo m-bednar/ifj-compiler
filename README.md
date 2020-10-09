@@ -5,6 +5,10 @@
 
 ### Struktura projektu
 ```
+├── src
+|   ├── main.c
+|   └── #zdrojové soubory (.c, .h)
+├── dokumentace.pdf (TODO)
 ├── README.md
 ├── .editorconfig
 └── .gitignore
