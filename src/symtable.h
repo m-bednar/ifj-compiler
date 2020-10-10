@@ -1,3 +1,11 @@
+/*
+ * IFJ20 Compiler
+ * file: symtable.h
+ * authors: 
+ *    Martin Bednář, xbedna77
+ */
+
+
 #ifndef SYMTABLE_H
 #define SYMTABLE_H
 
