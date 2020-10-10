@@ -1,8 +1,7 @@
-/*
+/**
  * IFJ20 Compiler
- * file: symtable.c
- * authors: 
- *    Martin Bednář, xbedna77
+ * @file symtable.c
+ * @authors Martin Bednář (xbedna77)
  */
 
 #include "symtable.h"
@@ -50,6 +49,3 @@ bool bintree_has(bintree_t* tree, char* str) {
    // TODO: implement
    return true;
 }
-
-bool bintree_
-

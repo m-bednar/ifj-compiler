@@ -1,8 +1,7 @@
-/*
+/**
  * IFJ20 Compiler
- * file: main.c
- * authors: 
- *    Martin Bednář, xbedna77
+ * @file main.c
+ * @authors Martin Bednář (xbedna77)
  */
 
 #include <stdlib.h>
