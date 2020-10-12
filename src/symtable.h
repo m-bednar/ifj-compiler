@@ -4,8 +4,7 @@
  * @authors Martin Bednář (xbedna77)
  */
 
-#ifndef SYMTABLE_H
-#define SYMTABLE_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -49,5 +48,3 @@ void bintree_add(bintree_t* tree, char* str);
  * Returns true, if tree has item of same value as string.
  */
 bool bintree_has(bintree_t* tree, char* str);
-
-#endif
