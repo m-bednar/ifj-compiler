@@ -11,12 +11,12 @@
 
 typedef struct {
    const char* value;
-   btreeitem_t* left;
-   btreeitem_t* right;
-} btreeitem_t;
+   btree_item_t* left;
+   btree_item_t* right;
+} btree_item_t;
 
 typedef struct {
-   btreeitem_t* root;
+   btree_item_t* root;
 } btree_t;
 
 /**

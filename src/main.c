@@ -9,7 +9,7 @@
 #include "symtable.h"
 
 int main() {
-   btree_t* tree = btreeitem_ctor();
+   btree_t* tree = btree_item_ctor();
 
    btree_add(tree, "hello world");
    btree_add(tree, "hello0");

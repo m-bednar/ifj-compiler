@@ -18,8 +18,8 @@ void* safe_alloc(size_t size) {
 
 /* --- Binary tree item --- */
 
-btreeitem_t* btreeitem_ctor(char* value) {
-   btreeitem_t* item = safe_alloc(sizeof(btreeitem_t));
+btree_item_t* btree_item_ctor(char* value) {
+   btree_item_t* item = safe_alloc(sizeof(btree_item_t));
    item->value = safe_alloc(strlen(value) + 1);
    item->right = NULL;
    item->left = NULL;
@@ -27,16 +27,16 @@ btreeitem_t* btreeitem_ctor(char* value) {
    return item;
 }
 
-void btreeitem_dtor(btreeitem_t* item) {
+void btree_item_dtor(btree_item_t* item) {
    if (item->value != NULL) {
       free(item->value);
    }
    if (item->left != NULL) {
-      btreeitem_dtor(item->left);
+      btree_item_dtor(item->left);
       free(item->left);
    }
    if (item->right != NULL) {
-      btreeitem_dtor(item->right);
+      btree_item_dtor(item->right);
       free(item->right);
    }
    item->value = NULL;
@@ -54,7 +54,7 @@ btree_t* btree_ctor() {
 
 void btree_dtor(btree_t* tree) {
    if (tree->root != NULL) {
-      btreeitem_dtor(tree->root);
+      btree_item_dtor(tree->root);
       free(tree->root);
    }
    tree->root = NULL;
@@ -65,7 +65,7 @@ void btree_add(btree_t* tree, char* value) {
       return;
    }
    
-   btreeitem_t* item = btreeitem_ctor(value);
+   btree_item_t* item = btree_item_ctor(value);
    
    if (tree->root == NULL) {
       tree->root = item;
