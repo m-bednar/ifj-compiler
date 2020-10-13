@@ -20,19 +20,9 @@ typedef struct {
 } bintree_t;
 
 /**
- * Initializes new item of binary tree.
- */
-void binitem_ctor(binitem_t* item);
-
-/**
- * Destructs item of binary tree.
- */
-void binitem_dtor(binitem_t* item);
-
-/**
  * Initializes new binary tree structure.
  */
-void bintree_ctor(bintree_t* tree);
+bintree_t* bintree_ctor();
 
 /**
  * Destructs binary tree structure.
@@ -40,11 +30,11 @@ void bintree_ctor(bintree_t* tree);
 void bintree_dtor(bintree_t* tree);
 
 /**
- * Adds new item to the tree. 
+ * Adds item to the tree.
  */
-void bintree_add(bintree_t* tree, char* str);
+void bintree_add(bintree_t* tree, char* value);
 
 /**
  * Returns true, if tree has item of same value as string.
  */
-bool bintree_has(bintree_t* tree, char* str);
+bool bintree_has(bintree_t* tree, char* value);
