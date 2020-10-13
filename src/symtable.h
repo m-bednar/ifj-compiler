@@ -38,3 +38,8 @@ void bintree_add(bintree_t* tree, char* value);
  * Returns true, if tree has item of same value as string.
  */
 bool bintree_has(bintree_t* tree, char* value);
+
+/**
+ * Debug function. Prints bintree on stdout.
+ */
+void bintree_print(bintree_t* tree);

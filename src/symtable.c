@@ -78,3 +78,7 @@ bool bintree_has(bintree_t* tree, char* value) {
    // TODO: implement
    return true;
 }
+
+void bintree_print(bintree_t* tree) {
+   // TODO: implement
+}
