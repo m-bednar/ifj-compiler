@@ -18,8 +18,8 @@ void* safe_alloc(size_t size) {
 
 /* --- Binary tree item --- */
 
-binitem_t* binitem_ctor(char* value) {
-   binitem_t* item = safe_alloc(sizeof(binitem_t));
+btreeitem_t* btreeitem_ctor(char* value) {
+   btreeitem_t* item = safe_alloc(sizeof(btreeitem_t));
    item->value = safe_alloc(strlen(value) + 1);
    item->right = NULL;
    item->left = NULL;
@@ -27,16 +27,16 @@ binitem_t* binitem_ctor(char* value) {
    return item;
 }
 
-void binitem_dtor(binitem_t* item) {
+void btreeitem_dtor(btreeitem_t* item) {
    if (item->value != NULL) {
       free(item->value);
    }
    if (item->left != NULL) {
-      binitem_dtor(item->left);
+      btreeitem_dtor(item->left);
       free(item->left);
    }
    if (item->right != NULL) {
-      binitem_dtor(item->right);
+      btreeitem_dtor(item->right);
       free(item->right);
    }
    item->value = NULL;
@@ -46,26 +46,26 @@ void binitem_dtor(binitem_t* item) {
 
 /* --- Binary tree --- */
 
-bintree_t* bintree_ctor() {
-   bintree_t* tree = safe_alloc(sizeof(bintree_t));
+btree_t* btree_ctor() {
+   btree_t* tree = safe_alloc(sizeof(btree_t));
    tree->root = NULL;
    return tree;
 }
 
-void bintree_dtor(bintree_t* tree) {
+void btree_dtor(btree_t* tree) {
    if (tree->root != NULL) {
-      binitem_dtor(tree->root);
+      btreeitem_dtor(tree->root);
       free(tree->root);
    }
    tree->root = NULL;
 }
 
-void bintree_add(bintree_t* tree, char* value) {
-   if (bintree_has(tree, value)) {
+void btree_add(btree_t* tree, char* value) {
+   if (btree_has(tree, value)) {
       return;
    }
    
-   binitem_t* item = binitem_ctor(value);
+   btreeitem_t* item = btreeitem_ctor(value);
    
    if (tree->root == NULL) {
       tree->root = item;
@@ -74,11 +74,11 @@ void bintree_add(bintree_t* tree, char* value) {
    // TODO: implement rest
 }
 
-bool bintree_has(bintree_t* tree, char* value) {
+bool btree_has(btree_t* tree, char* value) {
    // TODO: implement
    return true;
 }
 
-void bintree_print(bintree_t* tree) {
+void btree_print(btree_t* tree) {
    // TODO: implement
 }

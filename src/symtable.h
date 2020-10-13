@@ -11,35 +11,35 @@
 
 typedef struct {
    const char* value;
-   binitem_t* left;
-   binitem_t* right;
-} binitem_t;
+   btreeitem_t* left;
+   btreeitem_t* right;
+} btreeitem_t;
 
 typedef struct {
-   binitem_t* root;
-} bintree_t;
+   btreeitem_t* root;
+} btree_t;
 
 /**
  * Initializes new binary tree structure.
  */
-bintree_t* bintree_ctor();
+btree_t* btree_ctor();
 
 /**
  * Destructs binary tree structure.
  */
-void bintree_dtor(bintree_t* tree);
+void btree_dtor(btree_t* tree);
 
 /**
  * Adds item to the tree.
  */
-void bintree_add(bintree_t* tree, char* value);
+void btree_add(btree_t* tree, char* value);
 
 /**
  * Returns true, if tree has item of same value as string.
  */
-bool bintree_has(bintree_t* tree, char* value);
+bool btree_has(btree_t* tree, char* value);
 
 /**
- * Debug function. Prints bintree on stdout.
+ * Debug function. Prints btree on stdout.
  */
-void bintree_print(bintree_t* tree);
+void btree_print(btree_t* tree);
