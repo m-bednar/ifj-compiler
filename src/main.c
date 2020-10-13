@@ -9,15 +9,10 @@
 #include "symtable.h"
 
 int main() {
-   binitem_t *item = malloc(sizeof(binitem_t));
-   bintree_t *tree = malloc(sizeof(bintree_t));;
+   bintree_t *tree = binitem_ctor();
 
-   bintree_ctor(tree);
-   binitem_ctor(item, "hello world");
-
-   bintree_add(tree, item);
+   bintree_add(tree, "hello world");
    
    bintree_dtor(tree);
-
    return EXIT_SUCCESS;
 }
