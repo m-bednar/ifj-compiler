@@ -4,7 +4,11 @@
  * @authors Martin Bednář (xbedna77)
  */
 
+#include <string.h>
+#include <stdlib.h>
 #include "symtable.h"
+#include "../error.h"
+#include "../memory.h"
 
 bintree_t* bintree_ctor() {
    bintree_t* tree = safe_alloc(sizeof(bintree_t));
@@ -24,13 +28,14 @@ void bintree_dtor(bintree_t* tree) {
 void bintree_add(bintree_t* tree, symbol_t* value) {
    guard(tree != NULL);
    guard(value != NULL);
+   
    if (bintree_has(tree, value->identifier)) {
       return;
    }
    if (tree->root == NULL) {
       tree->root = binitem_ctor(value);
    } else {
-      
+      binitem_insert_child(tree->root, value);
    }
 }
 
@@ -46,6 +51,7 @@ symbol_t* bintree_get(bintree_t* tree, const char* identifier) {
    if (tree->root == NULL) {
       return NULL;
    }
+   // TODO: implement rest
    return NULL;
 }
 

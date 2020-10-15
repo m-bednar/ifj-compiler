@@ -7,12 +7,8 @@
 #pragma once
 
 #include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
 #include "symbol.h"
 #include "binitem.h"
-#include "../error.h"
-#include "../memory.h"
 
 typedef struct bintree_t {
    binitem_t* root;

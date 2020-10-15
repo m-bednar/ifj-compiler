@@ -12,8 +12,8 @@
 
 typedef struct binitem_t {
    symbol_t* value;
-   struct binitem* left;
-   struct binitem* right;
+   struct binitem_t* left;
+   struct binitem_t* right;
 } binitem_t;
 
 /**
@@ -27,6 +27,6 @@ binitem_t* binitem_ctor(symbol_t* value);
 void binitem_dtor(binitem_t* item);
 
 /**
- * Try to insert symbol to the item or one of it's child.
+ * Insert symbol to the one of item's child.
  */
-void binitem_insert(binitem_t* item, symbol_t* value);
+void binitem_insert_child(binitem_t* item, symbol_t* value);
