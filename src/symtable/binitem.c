@@ -40,3 +40,33 @@ void binitem_dtor(binitem_t* item) {
    }
    free(item);
 }
+
+void binitem_insert(binitem_t* item, symbol_t* value) {
+   guard(item != NULL);
+   guard(value != NULL);
+   guard(item->value == NULL);
+   item->value = value;
+}
+
+void binitem_insert_child(binitem_t* item, symbol_t* value) {
+   guard(item != NULL);
+   guard(value != NULL);
+   /*if (item->value == NULL) {
+      item->value = value;
+   } else {
+      int cmp = strcmp(item->value->identifier, value->identifier);
+      if (cmp == 0) {   // identifiers are equal
+         return;
+      }
+      if (cmp > 0) {
+         if (item->right == NULL) {
+            item->right = binitem_ctor(value);
+         } else {
+            binitem_insert(item->right, value);
+         }
+         
+      } else {
+         binitem_try_insert(item->left, value);
+      }
+   }*/
+}

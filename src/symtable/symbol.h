@@ -9,8 +9,8 @@
 #include <string.h>
 #include "../memory.h"
 
-typedef struct {
-   const char* identifier;
+typedef struct symbol_t {
+   char* identifier;
 } symbol_t;
 
 /**

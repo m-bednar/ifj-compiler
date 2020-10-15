@@ -8,19 +8,25 @@
 
 #include "symbol.h"
 #include "../memory.h"
+#include "../error.h"
 
-typedef struct {
+typedef struct binitem_t {
    symbol_t* value;
-   binitem_t* left;
-   binitem_t* right;
+   struct binitem* left;
+   struct binitem* right;
 } binitem_t;
 
 /**
- * Constucts new binitem with given value.
+ * Constuct new binitem with given value.
  */
 binitem_t* binitem_ctor(symbol_t* value);
 
 /**
- * Destructs binitem and frees it's resources.
+ * Destruct binitem and free it's resources.
  */
 void binitem_dtor(binitem_t* item);
+
+/**
+ * Try to insert symbol to the item or one of it's child.
+ */
+void binitem_insert(binitem_t* item, symbol_t* value);
