@@ -14,6 +14,14 @@
 └── .gitignore
 ```
 
+### TODO list
+- [ ] Tabulka symbolů
+- [ ] Lexikální analyzátor (scanner)
+- [ ] Syntaktický analyzátor (parser)
+- [ ] Sémantický analyzátor
+- [ ] Generátor vnitřního kódu (?)
+- [ ] Generátor konečného kódu
+
 ### Rozdělení práce
 - **Martin**
    -  úkoly
