@@ -9,6 +9,7 @@
 |   ├── main.c
 |   └── #zdrojové soubory (.c, .h)
 ├── dokumentace.pdf (TODO)
+├── Makefile
 ├── README.md
 ├── .editorconfig
 └── .gitignore
