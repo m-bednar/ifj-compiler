@@ -7,7 +7,7 @@
 ```
 ├── src
 |   ├── main.c
-|   └── #zdrojové soubory (.c, .h)
+|   └── # zdrojové soubory (.c, .h)
 ├── dokumentace.pdf (TODO)
 ├── Makefile
 ├── README.md
@@ -25,10 +25,12 @@
 
 ### Rozdělení práce
 - **Martin**
-   -  úkoly
+   - Tabulka symbolů
+   - Generátor konečného kódu
 - **Daniel**
-   -  úkoly
+   - Syntaktický analyzátor
 - **Franta**
-   -  úkoly
+   - Lexikální analyzátor
+   - Generátor vnitřního kódu (?)
 - **Michal**
-   -  úkoly
+   - Sémantický analyzátor
