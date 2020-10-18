@@ -18,4 +18,13 @@ typedef struct token_t {
    tokenid id;
 } token_t;
 
+/**
+ * Deallocates memory used by token.
+ */
+void token_dtor(token_t* token);
+
+
+/**
+ * Returns next token from stdin.
+ */
 token_t* get_next_token();
