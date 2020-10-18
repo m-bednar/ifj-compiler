@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include <stdlib.h>
+#include "memory.h"
+#include "error.h"
 
 /**
  * Allocates new memory block, or exits with non-zero value when allocation fails.
