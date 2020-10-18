@@ -9,5 +9,7 @@
 #include <stdio.h>
 #include "errcodes.h"
 
+#define ERRCODE_INTERNAL_ERROR 99
+
 #define error(msg) fprintf(stderr, "Error at %s:%d: %s\n", __FILE__, __LINE__, msg); exit(ERRCODE_INTERNAL_ERROR)
 #define guard(cond) if (!(cond)) { error("Guard failed."); }
