@@ -5,6 +5,7 @@
  */
 
 #include "memory.h"
+#include "error.h"
 
 void* safe_alloc(size_t size) {
    void* memory = malloc(size);
