@@ -41,25 +41,41 @@ void binitem_dtor(binitem_t* item) {
    free(item);
 }
 
+int binitem_compare(binitem_t* item, const char* identifier) {
+   guard(item != NULL);
+   guard(identifier != NULL);
+
+   int cmp = strcmp(item->value->identifier, identifier);
+   if (cmp == 0) {   // identifiers are equal
+      return ID_EQUAL;
+   }
+   if (cmp > 0) {
+      return ID_RIGHT;
+   } else {
+      return ID_LEFT;
+   }
+}
+
 void binitem_insert_child(binitem_t* item, symbol_t* value) {
    guard(item != NULL);
    guard(value != NULL);
 
-   int cmp = strcmp(item->value->identifier, value->identifier);
-   if (cmp == 0) {   // identifiers are equal
-      return;
-   }
-   if (cmp > 0) {
-      if (item->right == NULL) {
-         item->right = binitem_ctor(value);
-      } else {
-         binitem_insert_child(item->right, value);
-      }
-   } else {
-      if (item->left == NULL) {
-         item->left = binitem_ctor(value);
-      } else {
-         binitem_insert_child(item->left, value);
-      }
+   switch (binitem_compare(item, value->identifier)) {
+      case ID_EQUAL:
+         return;
+      case ID_RIGHT:
+         if (item->right == NULL) {
+            item->right = binitem_ctor(value);
+         } else {
+            binitem_insert_child(item->right, value);
+         }
+         break;
+      case ID_LEFT:
+         if (item->left == NULL) {
+            item->left = binitem_ctor(value);
+         } else {
+            binitem_insert_child(item->left, value);
+         }
+         break;
    }
 }

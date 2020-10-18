@@ -35,11 +35,6 @@ void bintree_add(bintree_t* tree, symbol_t* value);
 bool bintree_has(bintree_t* tree, const char* identifier);
 
 /**
- * Returns symbol, specified by identifier, if found, else NULL.
+ * Returns symbol, specified by identifier, if found, NULL if not found.
  */
 symbol_t* bintree_get(bintree_t* tree, const char* identifier);
-
-/**
- * Debug function. Prints bintree on stdout.
- */
-void bintree_print(bintree_t* tree);

@@ -5,6 +5,7 @@
  */
 
 #include "symbol.h"
+#include "../error.h"
 
 symbol_t* symbol_ctor(char* identifier) {
    symbol_t* symbol = safe_alloc(sizeof(symbol_t));
@@ -16,12 +17,12 @@ symbol_t* symbol_ctor(char* identifier) {
 }
 
 void symbol_dtor(symbol_t* symbol) {
-   if (symbol == NULL) {
-      return;
-   }
+   guard(symbol != NULL);
+
    if (symbol->identifier != NULL) {
       free(symbol->identifier);
       symbol->identifier = NULL;
    }
+
    free(symbol);
 }
