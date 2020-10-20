@@ -10,17 +10,10 @@ SOURCE_DIR = src
 BINARY_DIR = bin
 LIBS = memory.c $(wildcard symtable/*.c) $(wildcard scanner/*.c)
 
-# Mkdir command differs in windows/linux
-ifeq ($(OS),Windows_NT)
-	MKDIR_BIN = if not exist $(BINARY_DIR) mkdir $(BINARY_DIR)
-else
-	MKDIR_BIN = mkdir -p $(BINARY_DIR)
-endif
-
 all: compile run
 
 compile:
-	@$(MKDIR_BIN)
+	@mkdir -p $(BINARY_DIR)
 	@gcc $(GCC_ARGS) $(SOURCE_DIR)/$(MAIN_FILENAME).c $(foreach LIB,$(LIBS),$(SOURCE_DIR)/$(LIB)) -o $(BINARY_DIR)/$(MAIN_FILENAME)
 
 run:
