@@ -9,10 +9,10 @@
 #include "symbol.h"
 #include "../memory.h"
 
-typedef struct {
+typedef struct binitem_t {
    symbol_t* value;
-   binitem_t* left;
-   binitem_t* right;
+   struct binitem_t* left;
+   struct binitem_t* right;
 } binitem_t;
 
 /**
