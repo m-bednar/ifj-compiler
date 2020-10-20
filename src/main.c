@@ -6,8 +6,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "symtable/symtable.h"
-#include "scanner/scanner.h"
 
 int main() {
    return EXIT_SUCCESS;
