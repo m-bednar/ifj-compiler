@@ -6,11 +6,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "symtable/symtable.h"
+#include "scanner/scanner.h"
 
 int main() {
-   bintree_t* tree = bintree_ctor();
+   
+   token_t* token = get_next_token();
+   printf("%d", token);
+   token_dtor(token);
 
-   bintree_dtor(tree);
    return EXIT_SUCCESS;
 }

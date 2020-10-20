@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "scanner.h"
 #include "../memory.h"
+#include "../error.h"
 
 token_t* token_ctor(tokenid id) {
    token_t* token = safe_alloc(sizeof(token_t));
@@ -16,10 +17,11 @@ token_t* token_ctor(tokenid id) {
 }
 
 void token_dtor(token_t* token) {
+   guard(token != NULL);
    free(token);
 }
 
 token_t* get_next_token() {
-   getc(stdin);
+   return NULL;
 }
 

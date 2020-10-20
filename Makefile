@@ -7,11 +7,11 @@ MAIN_FILENAME = main
 SOURCE_DIR = src
 BINARY_DIR = bin
 
-all: clean compile run
+all: compile run
 
 compile:
 	@mkdir -p ${BINARY_DIR}
-	@gcc -std=c99 -Wall -Wextra -Werror ${SOURCE_DIR}/${MAIN_FILENAME}.c -o ${BINARY_DIR}/${MAIN_FILENAME}
+	@gcc -std=c99 -Wall -Wextra -Werror ${SOURCE_DIR}/scanner/scanner.c  ${SOURCE_DIR}/memory.c ${SOURCE_DIR}/${MAIN_FILENAME}.c -o ${BINARY_DIR}/${MAIN_FILENAME}
 
 clean:
 	# TODO: Clean bin directory (?)
