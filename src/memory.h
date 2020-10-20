@@ -7,7 +7,6 @@
 #pragma once
 
 #include <stdlib.h>
-#include "errcodes.h"
 
 /**
  * Allocates new memory block, or exits with non-zero value when allocation fails.
