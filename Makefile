@@ -8,7 +8,7 @@ GCC_ARGS = -std=c99 -Wall -Wextra -Werror
 MAIN_FILENAME = main
 SOURCE_DIR = src
 BINARY_DIR = bin
-LIBS = memory.c symtable/binitem.c symtable/symbol.c symtable/symtable.c
+LIBS = memory.c $(wildcard symtable/*.c) $(wildcard scanner/*.c)
 
 # Mkdir command differs in windows/linux
 ifeq ($(OS),Windows_NT)

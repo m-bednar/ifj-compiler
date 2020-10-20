@@ -7,10 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "symtable/symtable.h"
+#include "scanner/scanner.h"
 
 int main() {
-   bintree_t* tree = bintree_ctor();
-
-   bintree_dtor(tree);
    return EXIT_SUCCESS;
 }
