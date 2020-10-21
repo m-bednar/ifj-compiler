@@ -34,3 +34,10 @@
    - Generátor vnitřního kódu (?)
 - **Michal**
    - Sémantický analyzátor
+
+### Deadlines
+- Tabulka symbolů (31.10.)
+- Lexikální analyzátor (31.10.)  
+- Syntaktický analyzátor (8.11.)
+- Sémantický analyzátor (22.11.)
+- Generátor konečného kódu (27.11.)
