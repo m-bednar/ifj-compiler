@@ -41,7 +41,7 @@ void binitem_dtor(binitem_t* item) {
    free(item);
 }
 
-int binitem_compare(binitem_t* item, const char* identifier) {
+idcompare binitem_compare(binitem_t* item, const char* identifier) {
    guard(item != NULL);
    guard(identifier != NULL);
 
