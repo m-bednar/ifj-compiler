@@ -62,7 +62,7 @@ void binitem_insert_child(binitem_t* item, symbol_t* value) {
 
    switch (binitem_compare(item, value->identifier)) {
       case ID_EQUAL:
-         return;
+         error("Binitem with given identifier already exists.");
       case ID_RIGHT:
          if (item->right == NULL) {
             item->right = binitem_ctor(value);

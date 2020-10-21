@@ -29,9 +29,6 @@ void bintree_add(bintree_t* tree, symbol_t* value) {
    guard(tree != NULL);
    guard(value != NULL);
    
-   if (bintree_has(tree, value->identifier)) {
-      return;
-   }
    if (tree->root == NULL) {
       tree->root = binitem_ctor(value);
    } else {
