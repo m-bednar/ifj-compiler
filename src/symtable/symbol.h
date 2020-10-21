@@ -22,22 +22,31 @@ typedef enum vartype {
    VT_STRING
 } vartype;
 
-typedef union symbolval {
-   vartype var_type;
-   vartype fn_return;
-   symbol_t* fn_args;
-} symbolval;
+typedef struct symbolvalfn_t {
+   int arg_count;
+   vartype* arg_types;
+   vartype return_type;
+} symbolvalfn_t;
+
+typedef struct symbolvalvar_t {
+   vartype type;
+} symbolvalvar_t;
+
+typedef union symbolval_u {
+   symbolvalfn_t fn;
+   symbolvalvar_t var;
+} symbolval_u;
 
 typedef struct symbol_t {
    char* identifier;
    symboltype type;
-   symbolval value;
+   symbolval_u value;
 } symbol_t;
 
 /**
  * Constucts new symbol with given values.
  */
-symbol_t* symbol_ctor(char* identifier, symboltype type, symbolval value);
+symbol_t* symbol_ctor(char* identifier, symboltype type, symbolval_u value);
 
 /**
  * Destructs symbol and frees it's resources.
