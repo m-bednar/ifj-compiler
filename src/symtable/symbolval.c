@@ -5,21 +5,47 @@
  */
 
 #include <stdlib.h>
+#include "../memory.h"
+#include "../error.h"
 #include "symbolval.h"
 
-
-symbolvalfn_t* symbolvalfn_ctor(int arg_count, vartype* arg_types, vartype return_type) {
-   return NULL;
+symbolval_u symbolval_fn_ctor(int arg_count, vartype* arg_types, vartype return_type) {
+   guard((arg_count == 0 && arg_types == NULL) || (arg_count != 0 && arg_types != NULL));
+   symbolval_u symbolval;
+   symbolvalfn_t* fn = safe_alloc(sizeof(symbolvalfn_t));
+   
+   fn->arg_count = arg_count;
+   fn->arg_types = arg_types;
+   fn->return_type = return_type;
+   symbolval.fn = fn;
+   
+   return symbolval;
 }
 
-symbolvalvar_t* symbolvalvar_ctor(vartype type) {
-   return NULL;
+symbolval_u symbolval_var_ctor(vartype type) {
+   symbolval_u symbolval;
+   symbolvalvar_t* var = safe_alloc(sizeof(symbolvalvar_t));
+   
+   var->type = type;
+   symbolval.var = var;
+   
+   return symbolval;
 }
 
-void symbolvalfn_dtor(symbolvalfn_t* symbolval) {
-
+void symbolval_fn_dtor(symbolval_u symbolval) {
+   guard(symbolval.fn != NULL);
+   
+   if (symbolval.fn->arg_count > 0 && symbolval.fn->arg_types != NULL) {
+      free(symbolval.fn->arg_types);
+      symbolval.fn->arg_types = NULL;
+   }
+   
+   free(symbolval.fn);
+   symbolval.fn = NULL;
 }
 
-void symbolvalvar_dtor(symbolvalvar_t* symbolval) {
-
+void symbolval_var_dtor(symbolval_u symbolval) {
+   guard(symbolval.var != NULL);
+   free(symbolval.var);
+   symbolval.var = NULL;
 }

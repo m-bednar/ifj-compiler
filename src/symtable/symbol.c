@@ -25,8 +25,10 @@ void symbol_dtor(symbol_t* symbol) {
       free(symbol->identifier);
       symbol->identifier = NULL;
    }
-   if (symbol->type == ST_FUNCTION && symbol->value.fn.arg_count > 0) {
-      free(symbol->value.fn.arg_types);
+   if (symbol->type == ST_FUNCTION) {
+      symbolval_fn_dtor(symbol->value);
+   } else {
+      symbolval_var_dtor(symbol->value);
    }
 
    free(symbol);
