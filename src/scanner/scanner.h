@@ -11,11 +11,30 @@ typedef enum tokenid {
    TOKENID_NEWLINE,
    TOKENID_INDENT,
    TOKENID_IDENTIFIER,
-   TOKENID_KEYWORD
+   TOKENID_CONTROL_KEYWORD,
+   TOKENID_DECLARATION_KEYWORD,
+   TOKENID_DATATYPE,
+   TOKENID_NUM,
+   TOKENID_OPERATOR,
+   TOKENID_DECLARATION_OPERATOR,
+   TOKENID_ASSIGN_OPERATOR,
+   TOKENID_LEFT_PARENTHESES,
+   TOKENID_RIGHT_PARENTHESES,
+   TOKENID_LEFT_BRACKET,
+   ToKENID_RIGHT_BRACKET,
+   TOKENID_END_OF_FILE
 } tokenid;
+
+typedef union value_t {
+   char string_value[256];
+   int int_value;
+   float float_value;
+} value_t;
+
 
 typedef struct token_t {
    tokenid id;
+   value_t value;
 } token_t;
 
 /**
