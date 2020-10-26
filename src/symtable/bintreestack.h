@@ -36,3 +36,8 @@ bintree_t* bintreestack_pop(bintreestack_t* stack);
  * Returns element on specified index without removing it.
  */
 bintree_t* bintreestack_get(bintreestack_t* stack, int index);
+
+/**
+ * Returns length (number of elements) of the stack.
+ */
+int bintreestack_get_length(bintreestack_t* stack);
