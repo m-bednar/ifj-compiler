@@ -30,3 +30,8 @@ symbol_t* symbol_ctor(char* identifier, symboltype type, symbolval_u value);
  * Destructs symbol and frees it's resources.
  */
 void symbol_dtor(symbol_t* symbol);
+
+/**
+ * Prints symbol to the stderr.
+ */
+void symbol_print(symbol_t* symbol);
