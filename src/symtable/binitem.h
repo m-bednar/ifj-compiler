@@ -38,6 +38,11 @@ void binitem_dtor(binitem_t* item);
 void binitem_insert_child(binitem_t* item, symbol_t* value);
 
 /**
+ * Prints item and it's children to stderr.
+ */
+void binitem_print(binitem_t* item);
+
+/**
  * Compare identifier with item's identifier, returns ID_EQUAL when equal, ID_LEFT value when left item's
  * child should be next to check, ID_RIGHT value when right item should be next to check.
  */
