@@ -79,3 +79,17 @@ void binitem_insert_child(binitem_t* item, symbol_t* value) {
          break;
    }
 }
+
+void binitem_print(binitem_t* item) {
+   guard(item != NULL);
+
+   if (item->value != NULL) {
+      symbol_print(item->value);
+   }
+   if (item->left != NULL) {
+      binitem_print(item->left);
+   }
+   if (item->right != NULL) {
+      binitem_print(item->right);
+   }
+}
