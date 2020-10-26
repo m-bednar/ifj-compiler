@@ -29,11 +29,13 @@ void bintreestack_push(bintreestack_t* stack, bintree_t* tree);
 
 /**
  * Removes and returns top element. Does not deallocate the element.
+ * Throws error, when no element is found.
  */
 bintree_t* bintreestack_pop(bintreestack_t* stack);
 
 /**
  * Returns element on specified index without removing it.
+ * Throws error, when no element is found.
  */
 bintree_t* bintreestack_get(bintreestack_t* stack, int index);
 
