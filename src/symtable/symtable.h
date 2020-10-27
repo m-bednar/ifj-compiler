@@ -25,9 +25,9 @@ bintree_t* bintree_ctor();
 void bintree_dtor(bintree_t* tree);
 
 /**
- * Add item to the tree.
+ * Add item to the tree. Returns false, when item with same identifier exists already.
  */
-void bintree_add(bintree_t* tree, symbol_t* value);
+bool bintree_add(bintree_t* tree, symbol_t* value);
 
 /**
  * Returns true, if tree has item of the given identifier.
