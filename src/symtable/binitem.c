@@ -47,37 +47,40 @@ idcompare binitem_compare(binitem_t* item, const char* identifier) {
 
    int cmp = strcmp(item->value->identifier, identifier);
    if (cmp == 0) {   // identifiers are equal
-      return ID_EQUAL;
+      return IC_EQUAL;
    }
    if (cmp > 0) {
-      return ID_RIGHT;
+      return IC_RIGHT;
    } else {
-      return ID_LEFT;
+      return IC_LEFT;
    }
 }
 
-void binitem_insert_child(binitem_t* item, symbol_t* value) {
+bool binitem_insert_child(binitem_t* item, symbol_t* value) {
    guard(item != NULL);
    guard(value != NULL);
 
    switch (binitem_compare(item, value->identifier)) {
-      case ID_EQUAL:
-         error("Binitem with given identifier already exists.");
-      case ID_RIGHT:
+      case IC_EQUAL:
+         return false;
+      case IC_RIGHT:
          if (item->right == NULL) {
             item->right = binitem_ctor(value);
+            return true;
          } else {
-            binitem_insert_child(item->right, value);
+            return binitem_insert_child(item->right, value);
          }
          break;
-      case ID_LEFT:
-         if (item->left == NULL) {
+      case IC_LEFT:
+         if (item->left != NULL) {
             item->left = binitem_ctor(value);
+            return true;
          } else {
-            binitem_insert_child(item->left, value);
+            return binitem_insert_child(item->left, value);
          }
          break;
    }
+   return true;
 }
 
 void binitem_print(binitem_t* item) {

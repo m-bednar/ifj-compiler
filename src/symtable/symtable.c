@@ -25,14 +25,15 @@ void bintree_dtor(bintree_t* tree) {
    free(tree);
 }
 
-void bintree_add(bintree_t* tree, symbol_t* value) {
+bool bintree_add(bintree_t* tree, symbol_t* value) {
    guard(tree != NULL);
    guard(value != NULL);
    
    if (tree->root == NULL) {
       tree->root = binitem_ctor(value);
+      return true;
    } else {
-      binitem_insert_child(tree->root, value);
+      return binitem_insert_child(tree->root, value);
    }
 }
 
@@ -54,12 +55,12 @@ symbol_t* bintree_get(bintree_t* tree, const char* identifier) {
    binitem_t* item = tree->root;
    do {
       switch (binitem_compare(item, identifier)) {
-         case ID_EQUAL:
+         case IC_EQUAL:
             return item->value;
-         case ID_RIGHT:
+         case IC_RIGHT:
             item = item->right;
             break;
-         case ID_LEFT:
+         case IC_LEFT:
             item = item->left;
             break;
       }
