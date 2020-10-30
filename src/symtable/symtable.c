@@ -37,13 +37,6 @@ bool bintree_add(bintree_t* tree, symbol_t* value) {
    }
 }
 
-bool bintree_has(bintree_t* tree, const char* identifier) {
-   guard(tree != NULL);
-   guard(identifier != NULL);
-   
-   return bintree_get(tree, identifier) != NULL;
-}
-
 symbol_t* bintree_get(bintree_t* tree, const char* identifier) {
    guard(tree != NULL);
    guard(identifier != NULL);
