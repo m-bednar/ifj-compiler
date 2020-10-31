@@ -54,7 +54,7 @@ bintree_t* bintreestack_pop(bintreestack_t* stack) {
    bintree_t* last = stack->memory[stack->length - 1];
    stack->length--;
 
-   // Deallocates excessive memory, when 1/3 or less than 1/3 of the capacity is used
+   // Deallocates excessive memory, when less then DEALLOC_MIN_UNUSED_PERCENTAGE percent is used
    if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE) {
       stack->memory = safe_realloc(stack->memory, sizeof(bintree_t*) * (stack->length));
       stack->capacity = stack->length;
