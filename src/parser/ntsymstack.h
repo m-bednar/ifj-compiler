@@ -9,40 +9,40 @@
 #include "../memory.h"
 #include "ntsymbol.h"
 
-typedef struct ntsymstack {
+typedef struct ntsymstack_t {
    int length;
    int capacity;
    ntsymbol_t** memory;
-} ntsymstack;
+} ntsymstack_t;
 
 /**
  * Creates new stack.
  */
-ntsymstack* ntsymstack_ctor();
+ntsymstack_t* ntsymstack_ctor();
 
 /**
  * Deallocates stack and all its elements. 
  */
-void ntsymstack_dtor(ntsymstack* stack);
+void ntsymstack_dtor(ntsymstack_t* stack);
 
 /**
  * Pushes new element on top of the stack. 
  */
-void ntsymstack_push(ntsymstack* stack, ntsymbol_t* ntsymbol);
+void ntsymstack_push(ntsymstack_t* stack, ntsymbol_t* ntsymbol);
 
 /**
  * Removes and returns top element. Does not deallocate the element.
  * Throws error, when no element is found.
  */
-ntsymbol_t* ntsymstack_pop(ntsymstack* stack);
+ntsymbol_t* ntsymstack_pop(ntsymstack_t* stack);
 
 /**
  * Returns element on top of the stack without removing it.
  * Throws error, when no element is found.
  */
-ntsymbol_t* ntsymstack_top(ntsymstack* stack);
+ntsymbol_t* ntsymstack_top(ntsymstack_t* stack);
 
 /**
  * Returns length (number of elements) of the stack.
  */
-int ntsymstack_get_length(ntsymstack* stack);
+int ntsymstack_get_length(ntsymstack_t* stack);
