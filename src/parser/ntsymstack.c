@@ -1,5 +1,5 @@
 /**
  * IFJ20 Compiler
- * @file parserstack.c
+ * @file ntsymstack.c
  * @authors Daniel Havranek (xhavra18)
  */
