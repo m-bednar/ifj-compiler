@@ -8,6 +8,8 @@
 #include "../memory.h"
 #include "../error.h"
 
+static const float DEALLOC_MIN_UNUSED_PERCENTAGE = 0.5;
+static const int ALLOC_MIN_ELEMENTS_COUNT = 3;
 
 bintreestack_t* bintreestack_ctor() {
    bintreestack_t* stack = safe_alloc(sizeof(bintreestack_t));
@@ -38,8 +40,8 @@ void bintreestack_push(bintreestack_t* stack, bintree_t* tree) {
    
    // Allocates additional memory, when capacity is reached
    if (stack->capacity == stack->length) {
-      stack->memory = safe_realloc(stack->memory, sizeof(bintree_t*) * (stack->length + 1));
-      stack->capacity++;
+      stack->memory = safe_realloc(stack->memory, sizeof(bintree_t*) * (stack->length + ALLOC_MIN_ELEMENTS_COUNT));
+      stack->capacity += ALLOC_MIN_ELEMENTS_COUNT;
    }
 
    stack->memory[stack->length] = tree;
@@ -52,8 +54,8 @@ bintree_t* bintreestack_pop(bintreestack_t* stack) {
    bintree_t* last = stack->memory[stack->length - 1];
    stack->length--;
 
-   // Deallocates excessive memory, when half or less than half of the capacity is used
-   if (stack->length <= stack->capacity / 2) {
+   // Deallocates excessive memory, when 1/3 or less than 1/3 of the capacity is used
+   if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE) {
       stack->memory = safe_realloc(stack->memory, sizeof(bintree_t*) * (stack->length));
       stack->capacity = stack->length;
    }
