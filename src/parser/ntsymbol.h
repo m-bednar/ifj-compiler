@@ -28,7 +28,7 @@ typedef struct ntsymbol_t {
 /**
  * Constucts new terminal/nonterminal symbol with given id.
  */
-ntsymbol_t* ntsymbol_ctor(ntsymid_t id);
+ntsymbol_t* ntsymbol_ctor(ntsymid_u id);
 
 /**
  * Destructs terminal/nonterminal symbol and frees it's resources.
