@@ -10,12 +10,12 @@
 #include "../memory.h"
 #include "../scanner/scanner.h"
 
-typedef enum nonterminalid {
+typedef enum nonterminalid_e {
     // nonterminals
-} nonterminalid;
+} nonterminalid_e;
 
 typedef union ntsymid_u {
-    nonterminalid nonterminal;
+    nonterminalid_e nonterminal;
     tokenid terminal;
 } ntsymid_u;
 
