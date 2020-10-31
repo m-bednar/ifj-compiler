@@ -14,14 +14,14 @@ typedef enum nonterminalid {
     // nonterminals
 } nonterminalid;
 
-typedef union ntsymid_t {
+typedef union ntsymid_u {
     nonterminalid nonterminal;
     tokenid terminal;
-} ntsymid_t;
+} ntsymid_u;
 
 typedef struct ntsymbol_t {
     //bool is_terminal;
-    ntsymid_t id;
+    ntsymid_u id;
 } ntsymbol_t;
 
 
