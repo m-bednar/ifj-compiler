@@ -11,11 +11,11 @@
 #include "../memory.h"
 #include "../error.h"
 
-typedef enum idcompare {
+typedef enum idcompare_e {
    IC_EQUAL,
    IC_RIGHT,
    IC_LEFT
-} idcompare;
+} idcompare_e;
 
 typedef struct binitem_t {
    symbol_t* value;
@@ -48,4 +48,4 @@ void binitem_print(binitem_t* item);
  * Compare identifier with item's identifier, returns ID_EQUAL when equal, ID_LEFT value when left item's
  * child should be next to check, ID_RIGHT value when right item should be next to check.
  */
-idcompare binitem_compare(binitem_t* item, const char* identifier);
+idcompare_e binitem_compare(binitem_t* item, const char* identifier);
