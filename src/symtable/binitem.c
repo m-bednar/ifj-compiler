@@ -6,9 +6,6 @@
 
 #include "binitem.h"
 
-/**
- * Constucts new binitem with given value.
- */
 binitem_t* binitem_ctor(symbol_t* value) {
    binitem_t* item = safe_alloc(sizeof(binitem_t));
 
@@ -19,9 +16,6 @@ binitem_t* binitem_ctor(symbol_t* value) {
    return item;
 }
 
-/**
- * Destructs binitem and frees it's resources.
- */
 void binitem_dtor(binitem_t* item) {
    if (item == NULL) {
       return;
