@@ -6,23 +6,23 @@
 
 #pragma once
 
-typedef enum vartype {
+typedef enum vartype_e {
    VT_VOID,
    VT_BOOL,
    VT_INT,
    VT_FLOAT,
    VT_STRING
-} vartype;
+} vartype_e;
 
 typedef struct symbolvalfn_t {
    int arg_count;
    int ret_count;
-   vartype* arg_types;
-   vartype* ret_types;
+   vartype_e* arg_types;
+   vartype_e* ret_types;
 } symbolvalfn_t;
 
 typedef struct symbolvalvar_t {
-   vartype type;
+   vartype_e type;
 } symbolvalvar_t;
 
 typedef union symbolval_u {
@@ -34,12 +34,12 @@ typedef union symbolval_u {
 /**
  * Allocates and creates new symbol value for function.
  */
-symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype* arg_types, vartype* ret_types);
+symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype_e* arg_types, vartype_e* ret_types);
 
 /**
  * Allocates and creates new symbol value for variable.
  */
-symbolval_u symbolval_var_ctor(vartype type);
+symbolval_u symbolval_var_ctor(vartype_e type);
 
 /**
  * Deallocates symbol function value.

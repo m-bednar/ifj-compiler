@@ -9,7 +9,7 @@
 #include "../error.h"
 #include "symbolval.h"
 
-symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype* arg_types, vartype* ret_types) {
+symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype_e* arg_types, vartype_e* ret_types) {
    guard((arg_count == 0 && arg_types == NULL) || (arg_count != 0 && arg_types != NULL));
    guard((ret_count == 0 && ret_types == NULL) || (ret_count != 0 && ret_types != NULL));
    
@@ -25,7 +25,7 @@ symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype* arg_types, 
    return symbolval;
 }
 
-symbolval_u symbolval_var_ctor(vartype type) {
+symbolval_u symbolval_var_ctor(vartype_e type) {
    symbolval_u symbolval;
    symbolvalvar_t* var = safe_alloc(sizeof(symbolvalvar_t));
    
