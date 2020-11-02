@@ -6,7 +6,7 @@
 
 #pragma once
 
-//#include <stdbool.h>
+#include <stdbool.h>
 #include "../memory.h"
 #include "../error.h"
 #include "../scanner/scanner.h"
@@ -23,7 +23,7 @@ typedef union ntsymid_u {
 } ntsymid_u;
 
 typedef struct ntsymbol_t {
-    //bool is_terminal;
+    bool is_terminal;
     ntsymid_u id;
 } ntsymbol_t;
 
@@ -31,7 +31,7 @@ typedef struct ntsymbol_t {
 /**
  * Constucts new terminal/nonterminal symbol with given id.
  */
-ntsymbol_t* ntsymbol_ctor(ntsymid_u id);
+ntsymbol_t* ntsymbol_ctor(ntsymid_u id, bool is_terminal);
 
 /**
  * Destructs terminal/nonterminal symbol and frees it's resources.
