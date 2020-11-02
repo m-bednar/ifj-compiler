@@ -4,8 +4,6 @@
  * @authors Martin Bednář (xbedna77)
  */
 
-#include <string.h>
-#include <stdlib.h>
 #include "symtable.h"
 #include "../error.h"
 #include "../memory.h"
