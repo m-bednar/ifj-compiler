@@ -10,21 +10,21 @@
 #include "symbolval.h"
 #include "../memory.h"
 
-typedef enum symboltype {
+typedef enum symboltype_e {
    ST_FUNCTION,
    ST_VARIABLE
-} symboltype;
+} symboltype_e;
 
 typedef struct symbol_t {
    char* identifier;
-   symboltype type;
+   symboltype_e type;
    symbolval_u value;
 } symbol_t;
 
 /**
  * Constucts new symbol with given values.
  */
-symbol_t* symbol_ctor(char* identifier, symboltype type, symbolval_u value);
+symbol_t* symbol_ctor(char* identifier, symboltype_e type, symbolval_u value);
 
 /**
  * Destructs symbol and frees it's resources.

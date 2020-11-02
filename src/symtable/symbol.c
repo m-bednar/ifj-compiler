@@ -7,7 +7,7 @@
 #include "symbol.h"
 #include "../error.h"
 
-symbol_t* symbol_ctor(char* identifier, symboltype type, symbolval_u value) {
+symbol_t* symbol_ctor(char* identifier, symboltype_e type, symbolval_u value) {
    symbol_t* symbol = safe_alloc(sizeof(symbol_t));
    
    symbol->identifier = safe_alloc(strlen(identifier) + 1);
