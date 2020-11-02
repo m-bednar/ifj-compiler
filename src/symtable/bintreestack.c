@@ -39,7 +39,7 @@ void bintreestack_push(bintreestack_t* stack, bintree_t* tree) {
    guard(tree != NULL);
    
    // Allocates additional memory, when capacity is reached
-   if (stack->capacity == stack->length) {
+   if (stack->capacity == stack->length && stack->capacity > ALLOC_MIN_ELEMENTS_COUNT) {
       stack->memory = safe_realloc(stack->memory, sizeof(bintree_t*) * (stack->length + ALLOC_MIN_ELEMENTS_COUNT));
       stack->capacity += ALLOC_MIN_ELEMENTS_COUNT;
    }
