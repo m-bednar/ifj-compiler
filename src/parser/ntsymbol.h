@@ -12,7 +12,9 @@
 #include "../scanner/scanner.h"
 
 typedef enum nonterminalid_e {
-    // nonterminals
+    TEST_NONTERM1,
+    TEST_NONTERM2,
+    TEST_NONTERM3
 } nonterminalid_e;
 
 typedef union ntsymid_u {
