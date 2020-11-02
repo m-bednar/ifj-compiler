@@ -5,3 +5,6 @@
  */
 
 #pragma once
+
+#include "ntsymbol.h"
+#include "ntsymstack.h"
