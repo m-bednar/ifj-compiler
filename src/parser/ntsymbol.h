@@ -8,6 +8,7 @@
 
 //#include <stdbool.h>
 #include "../memory.h"
+#include "../error.h"
 #include "../scanner/scanner.h"
 
 typedef enum nonterminalid_e {

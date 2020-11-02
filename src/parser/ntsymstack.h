@@ -7,6 +7,7 @@
 #pragma once
 
 #include "../memory.h"
+#include "../error.h"
 #include "ntsymbol.h"
 
 typedef struct ntsymstack_t {
