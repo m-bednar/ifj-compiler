@@ -39,7 +39,7 @@ void bintreestack_push(bintreestack_t* stack, bintree_t* tree) {
    guard(tree != NULL);
    
    // Allocates additional memory, when capacity is reached
-   if (stack->capacity == stack->length && stack->capacity > ALLOC_MIN_ELEMENTS_COUNT) {
+   if (stack->capacity == stack->length) {
       stack->memory = safe_realloc(stack->memory, sizeof(bintree_t*) * (stack->length + ALLOC_MIN_ELEMENTS_COUNT));
       stack->capacity += ALLOC_MIN_ELEMENTS_COUNT;
    }
@@ -55,7 +55,7 @@ bintree_t* bintreestack_pop(bintreestack_t* stack) {
    stack->length--;
 
    // Deallocates excessive memory, when less then DEALLOC_MIN_UNUSED_PERCENTAGE percent is used
-   if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE) {
+   if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE && stack->capacity > ALLOC_MIN_ELEMENTS_COUNT) {
       stack->memory = safe_realloc(stack->memory, sizeof(bintree_t*) * (stack->length));
       stack->capacity = stack->length;
    }
