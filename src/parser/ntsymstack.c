@@ -57,7 +57,7 @@ ntsymbol_t* ntsymstack_pop(ntsymstack_t* stack) {
     stack->length--;
 
     // Deallocates excessive memory, when less than DEALLOC_MIN_UNUSED_PERCENTAGE percent is used
-    if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE) {
+    if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE && stack->capacity > ALLOC_MIN_ELEMENTS_COUNT) {
         stack->memory = safe_realloc(stack->memory, sizeof(ntsymbol_t*) * (stack->length));
         stack->capacity = stack->length;
     }
