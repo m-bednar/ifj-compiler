@@ -8,6 +8,7 @@
 #include "error.h"
 
 void* safe_alloc(size_t size) {
+   guard(size != 0);
    void* memory = malloc(size);
    if (memory == NULL) {
       exit(ERRCODE_INTERNAL_ERROR);
@@ -16,6 +17,7 @@ void* safe_alloc(size_t size) {
 }
 
 void* safe_realloc(void* ptr, size_t size) {
+   guard(size != 0);
    void* memory = realloc(ptr, size);
    if (memory == NULL) {
       exit(ERRCODE_INTERNAL_ERROR);
