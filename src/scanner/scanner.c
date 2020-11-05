@@ -109,6 +109,21 @@ char* insert_into_buffer(int c, char* buffer, int buffer_size) {
    buffer[buffer_size-2] = c; 
    return buffer;
 }
+
+/*
+ * Returns number indicating base (2, 8, 16), or 0 if none of the other apply
+ */
+int determine_base(int c) {
+   int base = 0;
+   if(c == 'b' || c == 'B') { // number is binary
+      base = 2;   
+   }else if (c == 'o' || c == 'O') { // number is octal
+      base = 8;
+   }else if (c == 'x' || c == 'X') { // number is hexadecimal
+      base = 16;
+   }
+   return base;
+}
 token_t* get_next_token() {
    token_t* token = token_ctor(0);
    int state = STATE_START;
