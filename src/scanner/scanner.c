@@ -230,6 +230,41 @@ token_t* get_next_token() {
             return token;
          }
          break;
+      case STATE_EXP_START:
+         buffer[buffer_size-1] = '\0';
+         char *pEnd;
+         num = (double) strtod(buffer, &pEnd);
+         free(buffer);
+         buffer_size = 1;
+         buffer = safe_alloc(buffer_size*sizeof(char));
+         if(c == '+') {
+            //do nothing
+         }else if (c == '-') {
+            buffer = insert_into_buffer(c, buffer, ++buffer_size);
+         }else if(isdigit(c) != 0) {
+            prev = c; // put number back to be read in the next state
+         }else {
+            //TODO: throw error
+            printf("error");
+         }
+         state = STATE_EXP;
+         break;
+      case STATE_EXP:
+         //TODO: ensure at least one digit
+         if(isdigit(c) != 0) {
+            buffer = insert_into_buffer(c, buffer, ++buffer_size);
+         }else{
+            buffer[buffer_size-1] = '\0';
+            if(strlen(buffer) == 0) { // No digits were read as an exponent
+               //TODO: throw an error - no nums in exp
+               printf("ERROR - NO DIGITS IN EXPONENT");
+            }
+            //TODO: NUM EXP
+            value.decimal_value = calculate_exponent(num, (double) strtod(buffer, &pEnd));
+            token = token_ctor(TOKENID_NUM_DECIMAL, value);
+            return token;
+         }
+         break;
       case STATE_OPERATOR:
          //ungetc(c, stdin);
          prev = c;
