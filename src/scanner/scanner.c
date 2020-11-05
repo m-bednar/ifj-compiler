@@ -138,17 +138,13 @@ token_t* get_next_token() {
          }
          break;
       case STATE_IDENTIFIER_KEYWORD:
-         if((isalpha(c) != 0) || (isdigit(c) != 0)) {
-            //buffer[i] = c;
-            token->value.string_value[i] = c;
-            i++;
+         if((isalpha(c) != 0) || c == '_' || (isdigit(c) != 0)) {
+            buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
          }else {
-            //buffer[i] = '\0';
-            //ungetc(c, stdin);
             prev = c;
-            token->value.string_value[i] = '\0';
-            token->id = TOKENID_IDENTIFIER;
-            state = STATE_START;
+            buffer[buffer_size-1] = '\0';
+            value.string_value = buffer;
+            token = token_ctor(is_keyword(value.string_value), value);
             return token;
          }
          break;
