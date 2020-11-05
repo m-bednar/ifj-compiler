@@ -139,6 +139,29 @@ int determine_base(int c) {
    }
    return base;
 }
+
+/**
+ * Determines whether c is a keyword or identifier.
+ */
+tokenid is_keyword(char *c){
+   for(int i = 0; i < 4; i++){
+      if((strcmp(c, control_keywords[i])) == 0){
+         return TOKENID_CONTROL_KEYWORD;
+      }
+   }
+   for(int i = 0; i < 2; i++){
+      if((strcmp(c, declaration_keywords[i])) == 0){
+         return TOKENID_DECLARATION_KEYWORD;
+      }
+   }
+   for(int i = 0; i < 4; i++){
+      if((strcmp(c, datatypes[i])) == 0){
+         return TOKENID_DATATYPE;
+      }
+   }
+   return TOKENID_IDENTIFIER;
+}
+
 token_t* get_next_token() {
    int state = STATE_START;
    int c = '\0';
