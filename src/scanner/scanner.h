@@ -14,11 +14,12 @@ typedef enum tokenid {
    TOKENID_CONTROL_KEYWORD,         // if, for, else, return
    TOKENID_DECLARATION_KEYWORD,     // package, func
    TOKENID_DATATYPE,                // float64, int, string, bool
+   TOKENID_STRING_LITERAL,          // "string literal"
    TOKENID_NUM,
    TOKENID_NUM_DECIMAL,
    TOKENID_OPERATOR_PLUS,           // +
    TOKENID_OPERATOR_MINUS,          // -
-   TOKENID_OPERATOR_MULT,           // *
+   TOKENID_OPERATOR_MUL,           // *
    TOKENID_OPERATOR_DIV,            // /
    TOKENID_OPERATOR_LESS,           // <
    TOKENID_OPERATOR_LESS_OR_EQUAL,  // <=
