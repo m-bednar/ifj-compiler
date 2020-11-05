@@ -100,31 +100,15 @@ token_t* get_next_token() {
       switch (state) {
       case STATE_START:
          i = 0;
-         if(isalpha(c) != 0) { // c is a character (a-z / A-Z)
-            //buffer[i] = c;
-            token->value.string_value[i] = c;
-            i++;
-            state = STATE_IDENTIFIER_KEYWORD;
-         }else if(isdigit(c) != 0) { // c is a digit
-            state = STATE_NUM;
-         }else if(c == '+') {
-            state = STATE_OPERATOR;
-         }else if(c == '-') {
-            state = STATE_OPERATOR;
-         }else if(c == '*') {
-            state = STATE_OPERATOR;
-         }else if(c == '/') {
-            state = STATE_OPERATOR;
-         }else if (c == ':') {
-            state = STATE_DECLARATION_OPERATOR; // Bylo nalezeno ':', očekáváme '=' pro deklaraci proměnné
-         }else if (c == '=') {
-            state = STATE_ASSIGN_OPERATOR;
-         }else if (c == ' ') {
-            state = STATE_SPACE;
-         }else if (c == '\n') {
-            state = STATE_NEWLINE;
-         }else if (c == EOF) {
-            state = STATE_EOF;
+         if((state = determine_next_state(c)) != 0) {
+            if(state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM_ZERO || state == STATE_NUM) {
+               buffer = safe_alloc(buffer_size*sizeof(char));
+               prev = c;
+            }else if(state == STATE_OPERATOR) {
+               prev = c;
+            }else if(state == STATE_QUOTATION_MARKS) {
+               buffer = safe_alloc(buffer_size*sizeof(char));
+            }
          }
          break;
       case STATE_IDENTIFIER_KEYWORD:
