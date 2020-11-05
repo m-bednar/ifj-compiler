@@ -352,7 +352,15 @@ token_t* get_next_token() {
          prev = c;
          token = token_ctor(TOKENID_ASSIGN_OPERATOR, value);
          return token;
+      case STATE_QUOTATION_MARKS:
+         if(c != '"') {
+            buffer = insert_into_buffer(c, buffer, ++buffer_size);
+         }else {
+            buffer[buffer_size-1] = '\0';
+            value.string_value = buffer;
+            token = token_ctor(TOKENID_STRING_LITERAL, value);
          return token;
+         }
          break;
       case STATE_LEFT_PARENTHESES:
          prev = c;
