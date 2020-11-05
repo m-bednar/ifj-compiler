@@ -216,6 +216,20 @@ token_t* get_next_token() {
             return token;
          }
          break;
+      case STATE_BASE:
+         if(isdigit(c) != 0 || c == '_' || (base == 16 && (toupper(c) > 34) && (toupper(c) < 71))) {
+            if(c != '_') {
+               buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+            }
+         }else {
+            buffer[buffer_size-1] = '\0';
+            prev = c;
+            char *pEnd;
+            value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
+            token = token_ctor(TOKENID_NUM, value);
+            return token;
+         }
+         break;
       case STATE_OPERATOR:
          //ungetc(c, stdin);
          prev = c;
