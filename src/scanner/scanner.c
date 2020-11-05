@@ -201,6 +201,21 @@ token_t* get_next_token() {
             return token;
          }
          break;
+      case STATE_DECIMAL:
+         if(isdigit(c) != 0) {
+            // TODO: at least one number must be present after decimal point
+            buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+         }else if (c == 'e' || c == 'E') { // exponent
+            state = STATE_EXP_START;
+         }else {
+            prev = c;
+            buffer[buffer_size-1] = '\0';
+            char *pEnd;
+            value.decimal_value = (double) strtod(buffer, &pEnd);
+            token = token_ctor(TOKENID_NUM_DECIMAL, value);
+            return token;
+         }
+         break;
       case STATE_OPERATOR:
          //ungetc(c, stdin);
          prev = c;
