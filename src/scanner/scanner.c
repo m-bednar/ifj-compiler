@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 #include "scanner.h"
 #include "../memory.h"
 #include "../error.h"
@@ -55,6 +56,9 @@ token_t* token_ctor(tokenid id, token_value_u value) {
 }
 
 void token_dtor(token_t* token) {
+   if((token->id >= 0 && token->id < 7)) {  
+      free(token->value.string_value);
+   }
    guard(token != NULL);
    free(token);
 }
@@ -63,7 +67,7 @@ void token_dtor(token_t* token) {
  * Determines next state from STATE_START
  */
 int determine_next_state(int c) {
-   if(isalpha(c) != 0 || c == '_') { // c is a character (a-z / A-Z)
+   if(isalpha(c) != 0 || c == '_') { // c is a character (a-z / A-Z) or _
       return STATE_IDENTIFIER_KEYWORD;
    }else if(isdigit(c) != 0) { // c is a digit
       if(c == '0') { // c is 0
@@ -125,6 +129,7 @@ int decide_operator(char c){
    }
    return id;
 }
+
 /*
  * Returns number indicating base (2, 8, 16), or 0 if none of the other apply
  */
@@ -316,7 +321,7 @@ token_t* get_next_token() {
          if(c == '=') {
             token = token_ctor(TOKENID_OPERATOR_LESS_OR_EQUAL, value);
          }else{
-         prev = c;
+            prev = c;
             token = token_ctor(TOKENID_OPERATOR_LESS, value);
          }
          return token;
@@ -358,7 +363,7 @@ token_t* get_next_token() {
             buffer[buffer_size-1] = '\0';
             value.string_value = buffer;
             token = token_ctor(TOKENID_STRING_LITERAL, value);
-         return token;
+            return token;
          }
          break;
       case STATE_LEFT_PARENTHESES:
@@ -395,7 +400,7 @@ token_t* get_next_token() {
          return token;
       case STATE_COMMENT:
          if(c == '\n') {
-         prev = c;
+            prev = c;
             state = STATE_START;
          }
          break;
@@ -410,37 +415,10 @@ token_t* get_next_token() {
          }else {
             state = STATE_BLOCK_COMMENT;
          }
-         break; 
+         break;
       default:
          break;
       }
    }
    return NULL;
 }
-
-/**
- * Determines whether c is a keyword or identifier.
- */
-tokenid is_keyword(char *c){
-   for(int i = 0; i < 4; i++){
-      if((strcmp(c, control_keywords[i])) == 0){
-         printf("it is control keyword!\n");
-         return 4;
-      }
-   }
-   for(int i = 0; i < 2; i++){
-      if((strcmp(c, declaration_keywords[i])) == 0){
-         printf("it is declaration keyword!\n");
-         return 5;
-      }
-   }
-   for(int i = 0; i < 4; i++){
-      if((strcmp(c, datatypes[i])) == 0){
-         printf("it is type keyword!\n");
-         return 6;
-      }
-   }
-   printf("it is identifier\n");
-   return 3;
-}
-
