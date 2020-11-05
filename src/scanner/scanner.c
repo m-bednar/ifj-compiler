@@ -155,6 +155,22 @@ token_t* get_next_token() {
          }
          break;
       case STATE_NUM:
+         if(isdigit(c) != 0) { // digit
+            buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+         }else if(c == '.') { // decimal
+            buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+            state = STATE_DECIMAL;
+         }else if((c == 'e') || (c == 'E')) {
+            state = STATE_EXP_START;
+         }else {  // end of num
+            prev = c;
+            buffer[buffer_size-1] = '\0';
+            char *pEnd;
+            value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
+            token = token_ctor(TOKENID_NUM, value);
+            return token;
+         }
+         break;
          break;
       case STATE_OPERATOR:
          //ungetc(c, stdin);
