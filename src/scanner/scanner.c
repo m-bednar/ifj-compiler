@@ -101,6 +101,14 @@ int determine_next_state(int c) {
    return 0;
 }
 
+/*
+ * Resizes buffer to fit one more character and inserts character c to the end.
+ */
+char* insert_into_buffer(int c, char* buffer, int buffer_size) {
+   buffer = safe_realloc(buffer, buffer_size*(sizeof(char)));
+   buffer[buffer_size-2] = c; 
+   return buffer;
+}
 token_t* get_next_token() {
    token_t* token = token_ctor(0);
    int state = STATE_START;
