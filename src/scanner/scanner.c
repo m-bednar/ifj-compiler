@@ -354,31 +354,55 @@ token_t* get_next_token() {
          return token;
          return token;
          break;
-      case STATE_SPACE:
-         //ungetc(c, stdin);
+      case STATE_LEFT_PARENTHESES:
          prev = c;
-         state = STATE_START;
-         token->id = TOKENID_SPACE;
-         token->value.string_value[i] = ' ';
-         token->value.string_value[i+1] = '\0';
+         token = token_ctor(TOKENID_LEFT_PARENTHESES, value);
          return token;
-         break;
+      case STATE_RIGHT_PARENTHESES:
+         prev = c;
+         token = token_ctor(TOKENID_RIGHT_PARENTHESES, value);
+         return token;
+      case STATE_LEFT_BRACKET:
+         prev = c;
+         token = token_ctor(TOKENID_LEFT_BRACKET, value);
+         return token;
+      case STATE_RIGHT_BRACKET:
+         prev = c;
+         token = token_ctor(TOKENID_RIGHT_BRACKET, value);
+         return token;
+      case STATE_SEMICOLON:
+         prev = c;
+         token = token_ctor(TOKENID_SEMICOLON, value);
+         return token;
+      case STATE_COMMA:
+         prev = c;
+         token = token_ctor(TOKENID_COMMA, value);
+         return token;
       case STATE_NEWLINE:
-         //ungetc(c, stdin);
          prev = c;
-         state = STATE_START;
-         token->id = TOKENID_NEWLINE;
-         token->value.string_value[i] = c;
-         token->value.string_value[i+1] = '\0';
+         token = token_ctor(TOKENID_NEWLINE, value);
          return token;
-         break;
       case STATE_EOF:
-         //ungetc(c, stdin);
-         prev = c;
-         token->id = TOKENID_END_OF_FILE;
-         token->value.string_value[i] = c;
-         token->value.string_value[i+1] = '\0';
+         //prev = c;
+         token = token_ctor(TOKENID_END_OF_FILE, value);
          return token;
+      case STATE_COMMENT:
+         if(c == '\n') {
+         prev = c;
+            state = STATE_START;
+         }
+         break;
+      case STATE_BLOCK_COMMENT:
+         if(c == '*') {
+            state = STATE_BLOCK_COMMENT_END;
+         }
+         break;
+      case STATE_BLOCK_COMMENT_END:
+         if(c == '/') {
+            state = STATE_START;
+         }else {
+            state = STATE_BLOCK_COMMENT;
+         }
          break; 
       default:
          break;
