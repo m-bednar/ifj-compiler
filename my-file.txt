@@ -1,0 +1,18 @@
+/*case STATE_POTENTIAL_BASE:
+         if((base = determine_base(c)) != 0) { // number will be read in different base
+            state = STATE_BASE;
+            i = 0;
+         }else if (isdigit(c) != 0) { // c is a nubmer again
+            buffer = safe_realloc(buffer, buffer_size*(sizeof(char)));
+            buffer[i] = '0';
+            buffer_size++;
+            i++;
+            prev = c;
+            state = STATE_NUM;
+         }else if (c == '.') { // 0. ->decimal
+            state = STATE_DECIMAL;
+         }else { // just 0
+            prev = c;
+            state = STATE_NUM;
+         }
+         break;*/
