@@ -171,6 +171,24 @@ token_t* get_next_token() {
             return token;
          }
          break;
+      case STATE_NUM_ZERO:
+         //TODO: FORMATING
+         if((base = determine_base(c)) != 0) { // number will be read in different base
+            state = STATE_BASE;
+         }else if(c == '.') { // 0. ->decimal
+            buffer = insert_into_buffer((char) c, buffer, ++buffer_size);
+            state = STATE_DECIMAL;
+         }else if(c == 'e' || c == 'E') {
+            buffer = insert_into_buffer((char) 0, buffer, ++buffer_size);
+            state = STATE_EXP_START;
+         }else if((isdigit(c) != 0) || (isalpha(c) != 0)) { // other digits or a-z/A-Z after 0 not allowed ->error
+            //TODO: error implementation
+         }else { //just 0
+            prev = c;
+            value.int_value = 0;
+            token = token_ctor(TOKENID_NUM, value);
+            return token;
+         }
          break;
       case STATE_OPERATOR:
          //ungetc(c, stdin);
