@@ -125,7 +125,6 @@ int determine_base(int c) {
    return base;
 }
 token_t* get_next_token() {
-   token_t* token = token_ctor(0);
    int state = STATE_START;
    int c = '\0';
    static int prev = '\0'; // previously read character
@@ -142,11 +141,8 @@ token_t* get_next_token() {
          c = prev;
          prev = '\0';
       }
-      //char buffer[20]; //TODO:
-      int i;
       switch (state) {
       case STATE_START:
-         i = 0;
          if((state = determine_next_state(c)) != 0) {
             if(state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM_ZERO || state == STATE_NUM) {
                buffer = safe_alloc(buffer_size*sizeof(char));
