@@ -36,16 +36,16 @@ typedef enum tokenid {
    TOKENID_END_OF_FILE              // EOF
 } tokenid;
 
-typedef union value_u {
+typedef union token_value_u {
    char* string_value;
    int64_t int_value;
-   double float_value;
-} value_u;
+   double decimal_value;
+} token_value_u;
 
 
 typedef struct token_t {
    tokenid id;
-   value_u value;
+   token_value_u value;
 } token_t;
 
 /**
