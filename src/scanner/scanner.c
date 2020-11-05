@@ -13,9 +13,9 @@
 #include "../error.h"
 #define KEYWORD_COUNT 10
 
-char control_keywords[4][6] = {"if", "for", "else", "return"} ;
-char declaration_keywords[2][7] = {"package", "func"};
-char datatypes[4][7] = {"float64", "int", "string", "bool"};
+const char *control_keywords[] = {"if", "for", "else", "return"};
+const char *declaration_keywords[] = {"package", "func"};
+const char *datatypes[] = {"float64", "int", "string", "bool"};
 
 typedef enum state {
    STATE_START,
