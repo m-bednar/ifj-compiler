@@ -112,8 +112,14 @@ char* insert_into_buffer(int c, char* buffer, int buffer_size) {
 token_t* get_next_token() {
    token_t* token = token_ctor(0);
    int state = STATE_START;
-   char c = '\0';
-   static char prev = '\0';
+   int c = '\0';
+   static int prev = '\0'; // previously read character
+   int buffer_size = 1;    // buffer_size starts at 1 to fit at least '\0'
+   char *buffer = NULL;
+   int base = 0;
+   double num; // used to store numerical value to free up space in buffer for exponent
+   token_value_u value;
+   token_t* token;
    while(1) {
       if(prev == '\0') {
          c = getchar();
