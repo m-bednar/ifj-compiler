@@ -297,8 +297,7 @@ token_t* get_next_token() {
                //TODO: throw an error - no nums in exp
                printf("ERROR - NO DIGITS IN EXPONENT");
             }
-            //TODO: NUM EXP
-            value.decimal_value = calculate_exponent(num, (double) strtod(buffer, &pEnd));
+            value.decimal_value = pow(num, (double) strtod(buffer, &pEnd));
             token = token_ctor(TOKENID_NUM_DECIMAL, value);
             return token;
          }
