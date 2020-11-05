@@ -98,7 +98,7 @@ int determine_next_state(int c) {
    }else if (c == EOF) { // end of file
       return STATE_EOF;
    }
-   return 0;
+   return STATE_START;
 }
 
 /*
