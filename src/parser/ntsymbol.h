@@ -12,14 +12,25 @@
 #include "../scanner/scanner.h"
 
 typedef enum nonterminalid_e {
-    TEST_NONTERM1,
-    TEST_NONTERM2,
-    TEST_NONTERM3
+    NONTERM_PROGRAM,
+    NONTERM_PACKAGES,
+    NONTERM_PACKAGE,
+    NONTERM_FUNCTIONS,
+    NONTERM_FUNCTION,
+    NONTERM_PARAMETERS,
+    NONTERM_PARAMETER,
+    NONTERM_PARAMETER_NEXT,
+    NONTERM_RETURN_TYPES,
+    NONTERM_TYPES,
+    NONTERM_TYPE,
+    NONTERM_TYPE_NEXT,
+    NONTERM_RETURN,
+    NONTERM_COMMANDS
 } nonterminalid_e;
 
 typedef union ntsymid_u {
     nonterminalid_e nonterminal;
-    tokenid terminal;
+    token_t terminal;
 } ntsymid_u;
 
 typedef struct ntsymbol_t {
