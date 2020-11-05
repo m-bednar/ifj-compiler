@@ -110,6 +110,21 @@ char* insert_into_buffer(int c, char* buffer, int buffer_size) {
    return buffer;
 }
 
+int decide_operator(char c){
+   int id;
+   switch(c) {
+      case '+' :
+         id = TOKENID_OPERATOR_PLUS;
+         break;
+      case '-' :
+         id = TOKENID_OPERATOR_MINUS;
+         break;
+      case '*' :
+         id = TOKENID_OPERATOR_MUL;
+         break;
+   }
+   return id;
+}
 /*
  * Returns number indicating base (2, 8, 16), or 0 if none of the other apply
  */
@@ -266,22 +281,54 @@ token_t* get_next_token() {
          }
          break;
       case STATE_OPERATOR:
-         //ungetc(c, stdin);
+         if(c == '<') {
+            state = STATE_OPERATOR_LESS;
+         }else if(c == '>') {
+            state = STATE_OPERATOR_MORE;
+         }else {
+            token = token_ctor(decide_operator(c), value);
+            return token;
+         }
+         break;
+      case STATE_OPERATOR_LESS:
+         if(c == '=') {
+            token = token_ctor(TOKENID_OPERATOR_LESS_OR_EQUAL, value);
+         }else{
          prev = c;
-         token->id = TOKENID_OPERATOR;
-         token->value.string_value[i] = c;
-         token->value.string_value[i+1] = '\0';
+            token = token_ctor(TOKENID_OPERATOR_LESS, value);
+         }
          return token;
+      case STATE_OPERATOR_MORE:
+         if(c == '=') {
+            token = token_ctor(TOKENID_OPERATOR_MORE_OR_EQUAL, value);
+         }else{
+            prev = c;
+            token = token_ctor(TOKENID_OPERATOR_MORE, value);
+         }
+         return token;
+      case STATE_OPERATOR_OR_COMMENT:
+         if(c == '/'){
+            state = STATE_COMMENT;
+         }else if(c == '*') {
+            state = STATE_BLOCK_COMMENT;
+         }else {
+            prev = c;
+            token = token_ctor(TOKENID_OPERATOR_DIV, value);
+            return token;
+         }
          break;
       case STATE_DECLARATION_OPERATOR:
+         if(c == '=') {
+            token = token_ctor(TOKENID_DECLARATION_OPERATOR, value);
+            return token;
+         }else {
+            //TODO: THROW ERROR
+         }
          break;
       case STATE_ASSIGN_OPERATOR:
-         //ungetc(c, stdin);
          prev = c;
-         state = STATE_START;
-         token->id = TOKENID_ASSIGN_OPERATOR;
-         token->value.string_value[i] = c;
-         token->value.string_value[i+1] = '\0';
+         token = token_ctor(TOKENID_ASSIGN_OPERATOR, value);
+         return token;
          return token;
          break;
       case STATE_SPACE:
