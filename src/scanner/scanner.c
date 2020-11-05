@@ -29,9 +29,10 @@ typedef enum state {
    STATE_EOF
 } state;
 
-token_t* token_ctor(tokenid id) {
+token_t* token_ctor(tokenid id, token_value_u value) {
    token_t* token = safe_alloc(sizeof(token_t));
    token->id = id;
+   token->value = value;
    return token;
 }
 
