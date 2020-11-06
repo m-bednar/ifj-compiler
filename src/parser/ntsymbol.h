@@ -28,10 +28,12 @@ typedef enum nonterminalid_e {
     NONTERM_COMMANDS
 } nonterminalid_e;
 
+/*
 typedef union ntsymid_u {
     nonterminalid_e nonterminal;
     tokenid terminal;
 } ntsymid_u;
+*/
 
 typedef struct ntsymbol_t {
     bool is_terminal;
