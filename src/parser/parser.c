@@ -5,3 +5,8 @@
  */
 
 #include "parser.h"
+
+void parse() {
+    
+    return;
+}
