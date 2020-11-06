@@ -114,20 +114,17 @@ char* insert_into_buffer(int c, char* buffer, int buffer_size) {
    return buffer;
 }
 
-int decide_operator(char c){
-   int id;
+tokenid_e decide_operator(char c){
    switch(c) {
       case '+' :
-         id = TOKENID_OPERATOR_PLUS;
-         break;
+         return TOKENID_OPERATOR_PLUS;
       case '-' :
-         id = TOKENID_OPERATOR_MINUS;
-         break;
+         return TOKENID_OPERATOR_MINUS;
       case '*' :
-         id = TOKENID_OPERATOR_MUL;
-         break;
+         return TOKENID_OPERATOR_MUL;
+      default :
+         exit(1);
    }
-   return id;
 }
 
 /*
