@@ -12,11 +12,6 @@
 #include "scanner.h"
 #include "../memory.h"
 #include "../error.h"
-#define KEYWORD_COUNT 10
-
-const char *control_keywords[] = {"if", "for", "else", "return"};
-const char *declaration_keywords[] = {"package", "func"};
-const char *datatypes[] = {"float64", "int", "string", "bool"};
 
 typedef enum state {
    STATE_START,
