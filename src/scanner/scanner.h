@@ -26,14 +26,14 @@ typedef enum tokenid_e {
    TOKENID_NUM_DECIMAL,
    TOKENID_OPERATOR_PLUS,           // +
    TOKENID_OPERATOR_MINUS,          // -
-   TOKENID_OPERATOR_MUL,           // *
+   TOKENID_OPERATOR_MUL,            // *
    TOKENID_OPERATOR_DIV,            // /
    TOKENID_OPERATOR_LESS,           // <
    TOKENID_OPERATOR_LESS_OR_EQUAL,  // <=
-   TOKENID_OPERATOR_MORE,           // >
-   TOKENID_OPERATOR_MORE_OR_EQUAL,  // >=
-   TOKENID_DECLARATION_OPERATOR,    // :=
-   TOKENID_ASSIGN_OPERATOR,         // =
+   TOKENID_OPERATOR_GREATER,           // >
+   TOKENID_OPERATOR_GREATER_OR_EQUAL,  // >=
+   TOKENID_OPERATOR_DECLARE,          // :=
+   TOKENID_OPERATOR_ASSIGN,         // =
    TOKENID_LEFT_PARENTHESES,        // (
    TOKENID_RIGHT_PARENTHESES,       // )
    TOKENID_LEFT_BRACKET,            // {

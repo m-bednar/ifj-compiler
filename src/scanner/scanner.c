@@ -327,10 +327,10 @@ token_t* get_next_token() {
          return token;
       case STATE_OPERATOR_MORE:
          if(c == '=') {
-            token = token_ctor(TOKENID_OPERATOR_MORE_OR_EQUAL, value);
+            token = token_ctor(TOKENID_OPERATOR_GREATER_OR_EQUAL, value);
          }else{
             prev = c;
-            token = token_ctor(TOKENID_OPERATOR_MORE, value);
+            token = token_ctor(TOKENID_OPERATOR_GREATER, value);
          }
          return token;
       case STATE_OPERATOR_OR_COMMENT:
@@ -346,7 +346,7 @@ token_t* get_next_token() {
          break;
       case STATE_DECLARATION_OPERATOR:
          if(c == '=') {
-            token = token_ctor(TOKENID_DECLARATION_OPERATOR, value);
+            token = token_ctor(TOKENID_OPERATOR_DECLARE, value);
             return token;
          }else {
             //TODO: THROW ERROR
@@ -354,7 +354,7 @@ token_t* get_next_token() {
          break;
       case STATE_ASSIGN_OPERATOR:
          prev = c;
-         token = token_ctor(TOKENID_ASSIGN_OPERATOR, value);
+         token = token_ctor(TOKENID_OPERATOR_ASSIGN, value);
          return token;
       case STATE_QUOTATION_MARKS:
          if(c != '"') {
