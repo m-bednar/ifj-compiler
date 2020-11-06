@@ -35,14 +35,14 @@ typedef union ntsymid_u {
 
 typedef struct ntsymbol_t {
     bool is_terminal;
-    ntsymid_u id;
+    int id;
 } ntsymbol_t;
 
 
 /**
  * Constucts new terminal/nonterminal symbol with given id.
  */
-ntsymbol_t* ntsymbol_ctor(ntsymid_u id, bool is_terminal);
+ntsymbol_t* ntsymbol_ctor(int id, bool is_terminal);
 
 /**
  * Destructs terminal/nonterminal symbol and frees it's resources.

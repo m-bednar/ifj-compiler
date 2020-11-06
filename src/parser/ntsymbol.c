@@ -6,7 +6,7 @@
 
 #include "ntsymbol.h"
 
-ntsymbol_t* ntsymbol_ctor(ntsymid_u id, bool is_terminal) {
+ntsymbol_t* ntsymbol_ctor(int id, bool is_terminal) {
     ntsymbol_t* ntsymbol = safe_alloc(sizeof(ntsymbol_t));
 
     ntsymbol->is_terminal = is_terminal;
