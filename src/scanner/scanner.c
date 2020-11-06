@@ -276,7 +276,7 @@ token_t* get_next_token() {
          if(c == '+') {
             //do nothing
          }else if (c == '-') {
-            buffer = insert_into_buffer(c, buffer);
+            buffer = insert_into_buffer((char)c, buffer);
          }else if(isdigit(c) != 0) {
             prev = c; // put number back to be read in the next state
          }else {
@@ -288,7 +288,7 @@ token_t* get_next_token() {
       case STATE_EXP:
          //TODO: ensure at least one digit
          if(isdigit(c) != 0) {
-            buffer = insert_into_buffer(c, buffer);
+            buffer = insert_into_buffer((char)c, buffer);
          }else{
             if(strlen(buffer) == 0) { // No digits were read as an exponent
                //TODO: throw an error - no nums in exp
@@ -350,7 +350,7 @@ token_t* get_next_token() {
          return token;
       case STATE_QUOTATION_MARKS:
          if(c != '"') {
-            buffer = insert_into_buffer(c, buffer);
+            buffer = insert_into_buffer((char)c, buffer);
          }else {
             value.string_value = buffer;
             token = token_ctor(TOKENID_STRING_LITERAL, value);
