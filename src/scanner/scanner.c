@@ -31,8 +31,8 @@ typedef enum state {
    STATE_OPERATOR_LESS,
    STATE_OPERATOR_MORE,
    STATE_OPERATOR_OR_COMMENT,
-   STATE_DECLARATION_OPERATOR,
-   STATE_ASSIGN_OPERATOR,
+   STATE_OPERATOR_DECLARE,
+   STATE_OPERATOR_ASSIGN,
    STATE_QUOTATION_MARKS,
    STATE_LEFT_PARENTHESES,
    STATE_RIGHT_PARENTHESES,
@@ -344,7 +344,7 @@ token_t* get_next_token() {
             return token;
          }
          break;
-      case STATE_DECLARATION_OPERATOR:
+      case STATE_OPERATOR_DECLARE:
          if(c == '=') {
             token = token_ctor(TOKENID_OPERATOR_DECLARE, value);
             return token;
@@ -352,7 +352,7 @@ token_t* get_next_token() {
             //TODO: THROW ERROR
          }
          break;
-      case STATE_ASSIGN_OPERATOR:
+      case STATE_OPERATOR_ASSIGN:
          prev = c;
          token = token_ctor(TOKENID_OPERATOR_ASSIGN, value);
          return token;
