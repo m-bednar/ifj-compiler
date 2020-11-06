@@ -48,7 +48,7 @@ typedef enum state {
    STATE_BLOCK_COMMENT_END
 } state;
 
-token_t* token_ctor(tokenid id, token_value_u value) {
+token_t* token_ctor(tokenid_e id, token_value_u value) {
    token_t* token = safe_alloc(sizeof(token_t));
    token->id = id;
    token->value = value;
@@ -148,7 +148,7 @@ int determine_base(int c) {
 /**
  * Determines whether c is a keyword or identifier.
  */
-tokenid is_keyword(char *c){
+tokenid_e is_keyword(char *c){
    for(int i = 0; i < 4; i++){
       if((strcmp(c, control_keywords[i])) == 0){
          return TOKENID_CONTROL_KEYWORD;

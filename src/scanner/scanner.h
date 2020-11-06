@@ -7,7 +7,7 @@
 #include <stdint.h>
 #pragma once
 
-typedef enum tokenid {
+typedef enum tokenid_e {
    //TOKENID_SPACE,
    //TOKENID_INDENT,               // \t
    TOKENID_IDENTIFIER,
@@ -35,7 +35,7 @@ typedef enum tokenid {
    TOKENID_COMMA,                   // ,
    TOKENID_NEWLINE,                 // \n
    TOKENID_END_OF_FILE              // EOF
-} tokenid;
+} tokenid_e;
 
 typedef union token_value_u {
    char* string_value;
@@ -45,7 +45,7 @@ typedef union token_value_u {
 
 
 typedef struct token_t {
-   tokenid id;
+   tokenid_e id;
    token_value_u value;
 } token_t;
 
