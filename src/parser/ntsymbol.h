@@ -45,6 +45,6 @@ typedef struct ntsymbol_t {
 ntsymbol_t* ntsymbol_ctor(ntsymid_u id, bool is_terminal);
 
 /**
- * Destructs terminal/nonterminal symbol and frees it's resources.
+ * Destructs terminal/nonterminal symbol and frees its resources.
  */
 void ntsymbol_dtor(ntsymbol_t* ntsymbol);
