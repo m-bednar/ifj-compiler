@@ -108,9 +108,11 @@ state determine_next_state(int c) {
 /*
  * Resizes buffer to fit one more character and inserts character c to the end.
  */
-char* insert_into_buffer(int c, char* buffer, int buffer_size) {
+char* insert_into_buffer(char c, char* buffer) {
+   int buffer_size = strlen(buffer)+2;
    buffer = safe_realloc(buffer, buffer_size*(sizeof(char)));
    buffer[buffer_size-2] = c; 
+   buffer[buffer_size-1] = '\0';
    return buffer;
 }
 
@@ -168,7 +170,6 @@ token_t* get_next_token() {
    int state = STATE_START;
    int c = '\0';
    static int prev = '\0'; // previously read character
-   int buffer_size = 1;    // buffer_size starts at 1 to fit at least '\0'
    char *buffer = NULL;
    int base = 0;
    double num; // used to store numerical value to free up space in buffer for exponent
@@ -185,18 +186,18 @@ token_t* get_next_token() {
       case STATE_START:
          if((state = determine_next_state(c)) != 0) {
             if(state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM_ZERO || state == STATE_NUM) {
-               buffer = safe_alloc(buffer_size*sizeof(char));
+               buffer = safe_alloc(1*sizeof(char));
                prev = c;
             }else if(state == STATE_OPERATOR) {
                prev = c;
             }else if(state == STATE_QUOTATION_MARKS) {
-               buffer = safe_alloc(buffer_size*sizeof(char));
+               buffer = safe_alloc(1*sizeof(char));
             }
          }
          break;
       case STATE_IDENTIFIER_KEYWORD:
          if((isalpha(c) != 0) || c == '_' || (isdigit(c) != 0)) {
-            buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+            buffer = insert_into_buffer((char)c, buffer);
          }else {
             prev = c;
             buffer[buffer_size-1] = '\0';
@@ -207,15 +208,14 @@ token_t* get_next_token() {
          break;
       case STATE_NUM:
          if(isdigit(c) != 0) { // digit
-            buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+            buffer = insert_into_buffer((char)c, buffer);
          }else if(c == '.') { // decimal
-            buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+            buffer = insert_into_buffer((char)c, buffer);
             state = STATE_DECIMAL;
          }else if((c == 'e') || (c == 'E')) {
             state = STATE_EXP_START;
          }else {  // end of num
             prev = c;
-            buffer[buffer_size-1] = '\0';
             char *pEnd;
             value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
             token = token_ctor(TOKENID_NUM, value);
@@ -227,10 +227,10 @@ token_t* get_next_token() {
          if((base = determine_base(c)) != 0) { // number will be read in different base
             state = STATE_BASE;
          }else if(c == '.') { // 0. ->decimal
-            buffer = insert_into_buffer((char) c, buffer, ++buffer_size);
+            buffer = insert_into_buffer((char) c, buffer);
             state = STATE_DECIMAL;
          }else if(c == 'e' || c == 'E') {
-            buffer = insert_into_buffer((char) 0, buffer, ++buffer_size);
+            buffer = insert_into_buffer((char) 0, buffer);
             state = STATE_EXP_START;
          }else if((isdigit(c) != 0) || (isalpha(c) != 0)) { // other digits or a-z/A-Z after 0 not allowed ->error
             //TODO: error implementation
@@ -244,12 +244,11 @@ token_t* get_next_token() {
       case STATE_DECIMAL:
          if(isdigit(c) != 0) {
             // TODO: at least one number must be present after decimal point
-            buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+            buffer = insert_into_buffer((char)c, buffer);
          }else if (c == 'e' || c == 'E') { // exponent
             state = STATE_EXP_START;
          }else {
             prev = c;
-            buffer[buffer_size-1] = '\0';
             char *pEnd;
             value.decimal_value = (double) strtod(buffer, &pEnd);
             token = token_ctor(TOKENID_NUM_DECIMAL, value);
@@ -259,10 +258,9 @@ token_t* get_next_token() {
       case STATE_BASE:
          if(isdigit(c) != 0 || c == '_' || (base == 16 && (toupper(c) > 34) && (toupper(c) < 71))) {
             if(c != '_') {
-               buffer = insert_into_buffer((char)c, buffer, ++buffer_size);
+               buffer = insert_into_buffer((char)c, buffer);
             }
          }else {
-            buffer[buffer_size-1] = '\0';
             prev = c;
             char *pEnd;
             value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
@@ -270,17 +268,15 @@ token_t* get_next_token() {
             return token;
          }
          break;
-      case STATE_EXP_START:
-         buffer[buffer_size-1] = '\0';
+      case STATE_EXP_START: ;
          char *pEnd;
          num = (double) strtod(buffer, &pEnd);
          free(buffer);
-         buffer_size = 1;
-         buffer = safe_alloc(buffer_size*sizeof(char));
+         buffer = safe_alloc(1*sizeof(char));
          if(c == '+') {
             //do nothing
          }else if (c == '-') {
-            buffer = insert_into_buffer(c, buffer, ++buffer_size);
+            buffer = insert_into_buffer(c, buffer);
          }else if(isdigit(c) != 0) {
             prev = c; // put number back to be read in the next state
          }else {
@@ -292,9 +288,8 @@ token_t* get_next_token() {
       case STATE_EXP:
          //TODO: ensure at least one digit
          if(isdigit(c) != 0) {
-            buffer = insert_into_buffer(c, buffer, ++buffer_size);
+            buffer = insert_into_buffer(c, buffer);
          }else{
-            buffer[buffer_size-1] = '\0';
             if(strlen(buffer) == 0) { // No digits were read as an exponent
                //TODO: throw an error - no nums in exp
                printf("ERROR - NO DIGITS IN EXPONENT");
@@ -355,9 +350,8 @@ token_t* get_next_token() {
          return token;
       case STATE_QUOTATION_MARKS:
          if(c != '"') {
-            buffer = insert_into_buffer(c, buffer, ++buffer_size);
+            buffer = insert_into_buffer(c, buffer);
          }else {
-            buffer[buffer_size-1] = '\0';
             value.string_value = buffer;
             token = token_ctor(TOKENID_STRING_LITERAL, value);
             return token;
