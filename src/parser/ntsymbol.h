@@ -30,7 +30,7 @@ typedef enum nonterminalid_e {
 
 typedef union ntsymid_u {
     nonterminalid_e nonterminal;
-    token_t terminal;
+    tokenid terminal;
 } ntsymid_u;
 
 typedef struct ntsymbol_t {
@@ -45,6 +45,6 @@ typedef struct ntsymbol_t {
 ntsymbol_t* ntsymbol_ctor(ntsymid_u id, bool is_terminal);
 
 /**
- * Destructs terminal/nonterminal symbol and frees its resources.
+ * Destructs terminal/nonterminal symbol and frees it's resources.
  */
 void ntsymbol_dtor(ntsymbol_t* ntsymbol);
