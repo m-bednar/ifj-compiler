@@ -66,10 +66,10 @@ void token_dtor(token_t* token) {
 /*
  * Determines next state from STATE_START
  */
-int determine_next_state(int c) {
-   if(isalpha(c) != 0 || c == '_') { // c is a character (a-z / A-Z) or _
+state determine_next_state(int c) {
+   if(isalpha(c) || c == '_') { // c is a character (a-z / A-Z) or _
       return STATE_IDENTIFIER_KEYWORD;
-   }else if(isdigit(c) != 0) { // c is a digit
+   }else if(isdigit(c)) { // c is a digit
       if(c == '0') { // c is 0
          return STATE_NUM_ZERO;
       }else { // c is digit other than 0
@@ -77,32 +77,37 @@ int determine_next_state(int c) {
       }
    }else if(c == '+' || c == '-' || c == '*' || c == '<' || c == '>') { // c is an operator (+, -, *, <, >)
       return STATE_OPERATOR;
-   }else if(c == '/') { // c is either and operator (/) or start of comment
+   }
+   switch(c) {
+      case '/' :  // c is either and operator (/) or start of comment
       return STATE_OPERATOR_OR_COMMENT;
-   }else if (c == ':') { // Start of varible declaration operator (:=)  
-      return STATE_DECLARATION_OPERATOR;
-   }else if (c == '=') { // c is assign operator (=)
-      return STATE_ASSIGN_OPERATOR;
-   }else if(c == '"') {
+      case ':' :  // Start of varible declaration operator (:=)  
+         return STATE_OPERATOR_DECLARE;
+      case '=' :  // c is assign operator (=)
+         return STATE_OPERATOR_ASSIGN;
+      case '"' :
       return STATE_QUOTATION_MARKS;
-   }else if (c == '('){
+      case '(' :
       return STATE_LEFT_PARENTHESES;
-   }else if (c == ')'){
+      case ')' :
       return STATE_RIGHT_PARENTHESES;
-   }else if (c == '{'){
+      case '{' :
       return STATE_LEFT_BRACKET;
-   }else if (c == '}'){
+      case '}' :
       return STATE_RIGHT_BRACKET;
-   }else if (c == ';') {
+      case ';' :
       return STATE_SEMICOLON;
-   }else if (c == ',') {
+      case ',' :
       return STATE_COMMA;
-   }else if (c == '\n') { // c is newline
+      case '\n' :
       return STATE_NEWLINE;
-   }else if (c == EOF) { // end of file
+      case EOF :
       return STATE_EOF;
    }
+   if(isspace(c)) {
    return STATE_START;
+}
+   exit(1);
 }
 
 /*
