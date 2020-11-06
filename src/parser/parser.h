@@ -8,3 +8,9 @@
 
 #include "ntsymbol.h"
 #include "ntsymstack.h"
+
+/**
+ * Parses tokens recieved from scanner.
+ * Returns AST.
+ */
+void parse();
