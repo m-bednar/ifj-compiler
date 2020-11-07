@@ -125,7 +125,7 @@ tokenid_e decide_operator(char c){
       case '*' :
          return TOKENID_OPERATOR_MUL;
       default :
-         exit(1);
+         exit(ERRCODE_LEXICAL_ERROR);
    }
 }
 
@@ -224,8 +224,8 @@ token_t* get_next_token() {
          }else if(c == 'e' || c == 'E') {
             buffer = insert_into_buffer((char) '0', buffer);
             state = STATE_EXP_START;
-         }else if((isdigit(c) != 0) || (isalpha(c) != 0)) { // other digits or a-z/A-Z after 0 not allowed ->error
-            //TODO: error implementation
+         }else if(isdigit(c)) { // other digits after 0 not allowed ->error
+            exit(ERRCODE_LEXICAL_ERROR);
          }else { //just 0
             prev = c;
             value.int_value = 0;

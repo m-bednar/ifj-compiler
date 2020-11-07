@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 // Error codes
+#define ERRCODE_LEXICAL_ERROR 1
 #define ERRCODE_INTERNAL_ERROR 99
 
 #define error(msg) fprintf(stderr, "Error at %s:%d: %s\n", __FILE__, __LINE__, msg); exit(ERRCODE_INTERNAL_ERROR)
