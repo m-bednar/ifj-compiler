@@ -56,7 +56,7 @@ token_t* token_ctor(tokenid_e id, token_value_u value) {
 
 void token_dtor(token_t* token) {
    guard(token != NULL);
-   if(token->id == TOKENID_IDENTIFIER || token->id == TOKENID_STRING_LITERAL ||token->id == TOKENID_NUM || token->id == TOKENID_NUM_DECIMAL) {
+   if(token->id == TOKENID_IDENTIFIER || token->id == TOKENID_STRING_LITERAL) {
       free(token->value.string_value);
    }
    free(token);
