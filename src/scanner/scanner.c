@@ -199,6 +199,7 @@ token_t* get_next_token() {
          state = determine_next_state(c);
          if(state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM|| state == STATE_OPERATOR) {
                prev = c;
+         }
          break;
       case STATE_IDENTIFIER_KEYWORD:
          if((isalpha(c) != 0) || c == '_' || (isdigit(c) != 0)) {
@@ -293,7 +294,7 @@ token_t* get_next_token() {
          }*/
          if(c == '-') {
             buffer = insert_into_buffer((char)c, buffer);
-         }else if(isdigit(c) != 0) {
+         }else if(isdigit(c)) {
             prev = c; // put number back to be read in the next state
          }else if(c != '+') {
             error(ERRCODE_LEXICAL_ERROR);
@@ -302,7 +303,7 @@ token_t* get_next_token() {
          break;
       case STATE_EXP:
          //TODO: ensure at least one digit
-         if(isdigit(c) != 0) {
+         if(isdigit(c)) {
             buffer = insert_into_buffer((char)c, buffer);
          }else{
             if(strlen(buffer) == 0) { // No digits were read as an exponent
