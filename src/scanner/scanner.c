@@ -43,6 +43,10 @@ typedef enum state_e {
    STATE_BLOCK_COMMENT_END
 } state_e;
 
+static const int BASE_BIN = 2;
+static const int BASE_OCT = 8;
+static const int BASE_HEX = 16;
+
 token_t* token_ctor(tokenid_e id, token_value_u value) {
    token_t* token = safe_alloc(sizeof(token_t));
    token->id = id;
@@ -135,11 +139,11 @@ tokenid_e decide_operator(char c){
 int determine_base(int c) {
    int base = 0;
    if(c == 'b' || c == 'B') { // number is binary
-      base = 2;   
+      base = BASE_BIN;   
    }else if (c == 'o' || c == 'O') { // number is octal
-      base = 8;
+      base = BASE_OCT;
    }else if (c == 'x' || c == 'X') { // number is hexadecimal
-      base = 16;
+      base = BASE_HEX;
    }
    return base;
 }
@@ -256,7 +260,7 @@ token_t* get_next_token() {
          }
          break;
       case STATE_BASE:
-         if(isdigit(c) != 0 || c == '_' || (base == 16 && (toupper(c) > 34) && (toupper(c) < 71))) {
+         if(isdigit(c) || c == '_' || (base == BASE_HEX && (toupper(c) >= 'A') && (toupper(c) <= 'F'))) {
             if(c != '_') {
                buffer = insert_into_buffer((char)c, buffer);
             }
