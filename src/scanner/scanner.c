@@ -109,8 +109,8 @@ state_e determine_next_state(int c) {
  * Resizes buffer to fit one more character and inserts character c to the end.
  */
 char* insert_into_buffer(char c, char* buffer) {
-   int buffer_size = strlen(buffer)+2;
-   buffer = safe_realloc(buffer, buffer_size*(sizeof(char)));
+   int buffer_size = buffer == NULL ? 2 : strlen(buffer)+2;
+   buffer = safe_realloc(buffer, buffer_size*sizeof(char));
    buffer[buffer_size-2] = c; 
    buffer[buffer_size-1] = '\0';
    return buffer;
@@ -184,23 +184,15 @@ token_t* get_next_token() {
       }
       switch (state) {
       case STATE_START:
-         if((state = determine_next_state(c)) != 0) {
-            if(state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM_ZERO || state == STATE_NUM) {
-               buffer = safe_alloc(1*sizeof(char));
+         state = determine_next_state(c);
+         if(state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM|| state == STATE_OPERATOR) {
                prev = c;
-            }else if(state == STATE_OPERATOR) {
-               prev = c;
-            }else if(state == STATE_QUOTATION_MARKS) {
-               buffer = safe_alloc(1*sizeof(char));
-            }
-         }
          break;
       case STATE_IDENTIFIER_KEYWORD:
          if((isalpha(c) != 0) || c == '_' || (isdigit(c) != 0)) {
             buffer = insert_into_buffer((char)c, buffer);
          }else {
             prev = c;
-            buffer[buffer_size-1] = '\0';
             value.string_value = buffer;
             token = token_ctor(is_keyword(value.string_value), value);
             return token;
@@ -230,7 +222,7 @@ token_t* get_next_token() {
             buffer = insert_into_buffer((char) c, buffer);
             state = STATE_DECIMAL;
          }else if(c == 'e' || c == 'E') {
-            buffer = insert_into_buffer((char) 0, buffer);
+            buffer = insert_into_buffer((char) '0', buffer);
             state = STATE_EXP_START;
          }else if((isdigit(c) != 0) || (isalpha(c) != 0)) { // other digits or a-z/A-Z after 0 not allowed ->error
             //TODO: error implementation
@@ -272,8 +264,9 @@ token_t* get_next_token() {
          char *pEnd;
          num = (double) strtod(buffer, &pEnd);
          free(buffer);
-         buffer = safe_alloc(1*sizeof(char));
-         if(c == '+') {
+         buffer = NULL;
+         //buffer = safe_alloc(1*sizeof(char));
+         /*if(c == '+') {
             //do nothing
          }else if (c == '-') {
             buffer = insert_into_buffer((char)c, buffer);
@@ -282,6 +275,13 @@ token_t* get_next_token() {
          }else {
             //TODO: throw error
             printf("error");
+         }*/
+         if(c == '-') {
+            buffer = insert_into_buffer((char)c, buffer);
+         }else if(isdigit(c) != 0) {
+            prev = c; // put number back to be read in the next state
+         }else if(c != '+') {
+            error(ERRCODE_LEXICAL_ERROR);
          }
          state = STATE_EXP;
          break;
