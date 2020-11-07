@@ -13,7 +13,7 @@
 #include "../memory.h"
 #include "../error.h"
 
-typedef enum state {
+typedef enum state_e {
    STATE_START,
    STATE_IDENTIFIER_KEYWORD,
    STATE_NUM,
@@ -41,7 +41,7 @@ typedef enum state {
    STATE_COMMENT,
    STATE_BLOCK_COMMENT,
    STATE_BLOCK_COMMENT_END
-} state;
+} state_e;
 
 token_t* token_ctor(tokenid_e id, token_value_u value) {
    token_t* token = safe_alloc(sizeof(token_t));
@@ -61,7 +61,7 @@ void token_dtor(token_t* token) {
 /*
  * Determines next state from STATE_START
  */
-state determine_next_state(int c) {
+state_e determine_next_state(int c) {
    if(isalpha(c) || c == '_') { // c is a character (a-z / A-Z) or _
       return STATE_IDENTIFIER_KEYWORD;
    }else if(isdigit(c)) { // c is a digit
