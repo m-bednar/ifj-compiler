@@ -306,8 +306,7 @@ token_t* get_next_token() {
             buffer = insert_into_buffer((char)c, buffer);
          }else{
             if(strlen(buffer) == 0) { // No digits were read as an exponent
-               //TODO: throw an error - no nums in exp
-               printf("ERROR - NO DIGITS IN EXPONENT");
+               exit(ERRCODE_LEXICAL_ERROR);
             }
             value.decimal_value = pow(num, (double) strtod(buffer, &pEnd));
             free(buffer);
@@ -357,7 +356,7 @@ token_t* get_next_token() {
             token = token_ctor(TOKENID_OPERATOR_DECLARE, value);
             return token;
          }else {
-            //TODO: THROW ERROR
+            exit(ERRCODE_LEXICAL_ERROR);
          }
          break;
       case STATE_OPERATOR_ASSIGN:
