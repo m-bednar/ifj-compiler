@@ -144,26 +144,34 @@ int determine_base(int c) {
    return base;
 }
 
-/**
- * Determines whether c is a keyword or identifier.
+/*
+ * If string passed as an argument matches a keyword, the keyword's id is returned.
+ * Otherwise identifier id is returned.
  */
-tokenid_e is_keyword(char *c){
-   for(int i = 0; i < 4; i++){
-      if((strcmp(c, control_keywords[i])) == 0){
-         return TOKENID_CONTROL_KEYWORD;
-      }
+tokenid_e compare_keywords(char* string) {
+   if(strcmp(string, "if") == 0) {
+      return TOKENID_KEYWORD_IF;
+   }else if (strcmp(string, "for") == 0) {
+      return TOKENID_KEYWORD_FOR;
+   }else if (strcmp(string, "else") == 0) {
+      return TOKENID_KEYWORD_ELSE;
+   }else if (strcmp(string, "return") == 0) {
+      return TOKENID_KEYWORD_RETURN;
+   }else if (strcmp(string, "package") == 0) {
+      return TOKENID_KEYWORD_PACKAGE;
+   }else if (strcmp(string, "func") == 0) {
+      return TOKENID_KEYWORD_FUNC;
+   }else if (strcmp(string, "float64") == 0) {
+      return TOKENID_KEYWORD_FLOAT64;
+   }else if (strcmp(string, "int") == 0) {
+      return TOKENID_KEYWORD_INT;
+   }else if (strcmp(string, "string") == 0) {
+      return TOKENID_KEYWORD_STRING;
+   }else if (strcmp(string, "bool") == 0) {
+      return TOKENID_KEYWORD_BOOL;
+   }else{
+      return TOKENID_IDENTIFIER;
    }
-   for(int i = 0; i < 2; i++){
-      if((strcmp(c, declaration_keywords[i])) == 0){
-         return TOKENID_DECLARATION_KEYWORD;
-      }
-   }
-   for(int i = 0; i < 4; i++){
-      if((strcmp(c, datatypes[i])) == 0){
-         return TOKENID_DATATYPE;
-      }
-   }
-   return TOKENID_IDENTIFIER;
 }
 
 token_t* get_next_token() {
@@ -194,7 +202,7 @@ token_t* get_next_token() {
          }else {
             prev = c;
             value.string_value = buffer;
-            token = token_ctor(is_keyword(value.string_value), value);
+            token = token_ctor(compare_keywords(value.string_value), value);
             return token;
          }
          break;
