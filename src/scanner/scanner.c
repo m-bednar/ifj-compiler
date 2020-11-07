@@ -222,6 +222,7 @@ token_t* get_next_token() {
             prev = c;
             char *pEnd;
             value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
+            free(buffer);
             token = token_ctor(TOKENID_NUM, value);
             return token;
          }
@@ -255,6 +256,7 @@ token_t* get_next_token() {
             prev = c;
             char *pEnd;
             value.decimal_value = (double) strtod(buffer, &pEnd);
+            free(buffer);
             token = token_ctor(TOKENID_NUM_DECIMAL, value);
             return token;
          }
@@ -268,6 +270,7 @@ token_t* get_next_token() {
             prev = c;
             char *pEnd;
             value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
+            free(buffer);
             token = token_ctor(TOKENID_NUM, value);
             return token;
          }
@@ -307,6 +310,7 @@ token_t* get_next_token() {
                printf("ERROR - NO DIGITS IN EXPONENT");
             }
             value.decimal_value = pow(num, (double) strtod(buffer, &pEnd));
+            free(buffer);
             token = token_ctor(TOKENID_NUM_DECIMAL, value);
             return token;
          }
