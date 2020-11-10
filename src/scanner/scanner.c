@@ -156,18 +156,18 @@ char* append(char c, char* buffer) {
   return buffer;
 }
 
-tokenid_e decide_operator(char c) {
-  switch (c) {
-    case '+':
-      return TOKENID_OPERATOR_PLUS;
-    case '-':
-      return TOKENID_OPERATOR_MINUS;
-    case '*':
-      return TOKENID_OPERATOR_MUL;
-    default:
-      exit(ERRCODE_LEXICAL_ERROR);
-  }
-}
+/**
+ * Resizes buffer to fit one more character and inserts character c to the beginning.
+ */
+/*char* prepend(char c, char* str) {
+   int str_size = str == NULL ? 2 : strlen(str) + 2;
+   str = safe_realloc(str, str_size * sizeof(char));
+   for(int i = strlen(str); i >= 0; i--) { // move all characters to the right
+      str[i+1] = str[i];
+   }
+   str[0] = c; // Finally append the first character to the string
+   return str;
+}*/
 
 /**
  * Returns number indicating base (2, 8, 16), or 0 if none of the other apply
@@ -326,7 +326,7 @@ token_t* get_next_token() {
         /*if(c == '+') {
            //do nothing
         }else if (c == '-') {
-           buffer = insert_into_buffer((char)c, buffer);
+           buffer = append((char)c, buffer);
         }else if(isdigit(c) != 0) {
            prev = c; // put number back to be read in the next state
         }else {
@@ -367,11 +367,11 @@ token_t* get_next_token() {
       case STATE_OPERATOR_SUB:
          if (c == '=') {
             token = token_ctor(TOKENID_OPERATOR_SUB_AND_ASSIGN, value);
-        } else {
+         } else {
             prev = c;
             token = token_ctor(TOKENID_OPERATOR_SUB, value);
         }
-          return token;
+        return token;
       case STATE_OPERATOR_MUL:
          if (c == '=') {
             token = token_ctor(TOKENID_OPERATOR_MUL_AND_ASSIGN, value);
