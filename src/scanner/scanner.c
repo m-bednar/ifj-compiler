@@ -81,17 +81,30 @@ state_e determine_next_state(int c) {
     } else {  // c is digit other than 0
       return STATE_NUM;
     }
-  } else if (c == '+' || c == '-' || c == '*' || c == '<' ||
-             c == '>') {  // c is an operator (+, -, *, <, >)
-    return STATE_OPERATOR;
   }
   switch (c) {
+    case '+':
+      return STATE_OPERATOR_ADD;
+    case '-':
+      return STATE_OPERATOR_SUB;
+    case '*':
+      return STATE_OPERATOR_MUL;
     case '/':  // c is either and operator (/) or start of comment
       return STATE_OPERATOR_OR_COMMENT;
+    case '<':
+      return STATE_OPERATOR_LESS;
+    case '>':
+      return STATE_OPERATOR_MORE;
     case ':':  // Start of varible declaration operator (:=)
       return STATE_OPERATOR_DECLARE;
     case '=':  // c is assign operator (=)
       return STATE_OPERATOR_ASSIGN;
+    case '!':
+      return STATE_OPERATOR_NOT;
+    case '&':
+      return STATE_OPERATOR_AND;
+    case '|':
+      return STATE_OPERATOR_OR;
     case '"':
       return STATE_QUOTATION_MARKS;
     case '(':
