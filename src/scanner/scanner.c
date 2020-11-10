@@ -9,6 +9,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <stdbool.h>
 #include "scanner.h"
 #include "../memory.h"
 #include "../error.h"
@@ -61,9 +62,23 @@ token_t* token_ctor(tokenid_e id, token_value_u value) {
   return token;
 }
 
+bool is_memory_allocated(tokenid_e id) {
+   const tokenid_e ids[] = {TOKENID_IDENTIFIER, TOKENID_STRING_LITERAL, TOKENID_KEYWORD_IF, 
+   TOKENID_KEYWORD_FOR, TOKENID_KEYWORD_ELSE, TOKENID_KEYWORD_RETURN, TOKENID_KEYWORD_PACKAGE,
+   TOKENID_KEYWORD_FUNC, TOKENID_KEYWORD_FLOAT64, TOKENID_KEYWORD_INT, TOKENID_KEYWORD_STRING,
+   TOKENID_KEYWORD_BOOL}; // Array of all ids that use memory
+   int size = sizeof(ids) / sizeof(ids[0]); // Returns number of elements in array.
+   for(int i = 0; i < size; i++){
+      if(ids[i] == id) {
+         return true;
+      }
+   }
+   return false;
+}
+
 void token_dtor(token_t* token) {
   guard(token != NULL);
-  if (token->id == TOKENID_IDENTIFIER || token->id == TOKENID_STRING_LITERAL) {
+  if (is_memory_allocated(token->id)) {
     free(token->value.string_value);
   }
   free(token);
