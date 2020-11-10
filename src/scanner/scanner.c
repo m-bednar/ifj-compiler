@@ -303,7 +303,7 @@ token_t* get_next_token() {
         } else if (isdigit(c)) {
           prev = c;  // put number back to be read in the next state
         } else if (c != '+') {
-          error(ERRCODE_LEXICAL_ERROR);
+          exit(ERRCODE_LEXICAL_ERROR);
         }
         state = STATE_EXP;
         break;
@@ -429,7 +429,7 @@ token_t* get_next_token() {
         }
         break;
       default:
-        break;
+        exit(ERRCODE_LEXICAL_ERROR);
     }
   }
   return NULL;
