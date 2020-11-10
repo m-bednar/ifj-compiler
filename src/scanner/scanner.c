@@ -205,6 +205,7 @@ token_t* get_next_token() {
   int c = '\0';
   static int prev = '\0';  // previously read character
   char* buffer = NULL;
+  char *temp = NULL; // temporary varaible to store and later determine escape sequence
   int base = 0;
   double num;  // used to store numerical value to free up space in buffer for
                // exponent
@@ -426,6 +427,9 @@ token_t* get_next_token() {
          }
          return token;
       case STATE_QUOTATION_MARKS:
+         if(c == '\\') {
+            state = STATE_ESCAPE_SEQUENCE;
+         }else if (c != '"') {
           buffer = append((char)c, buffer);
         } else {
           value.string_value = buffer;
@@ -433,6 +437,46 @@ token_t* get_next_token() {
           return token;
         }
         break;
+      case STATE_ESCAPE_SEQUENCE:
+         switch(c) {
+            case 'x':
+               state = STATE_HEXADECIMAL_ESCAPE_SEQUENCE;
+               break;
+            case '"':
+               buffer = append('"', buffer);
+               state = STATE_QUOTATION_MARKS;
+               break;
+            case 'n':
+               buffer = append('\n', buffer);
+               state = STATE_QUOTATION_MARKS;
+               break;
+            case 't':
+               buffer = append('\t', buffer);
+               state = STATE_QUOTATION_MARKS;
+               break;
+            case '\\':
+               buffer = append('\\', buffer);
+               state = STATE_QUOTATION_MARKS;
+               break;
+            default:
+               exit(ERRCODE_LEXICAL_ERROR);
+         }
+         break;
+      case STATE_HEXADECIMAL_ESCAPE_SEQUENCE:
+         if(isdigit(c) || ((toupper(c) >= 'A') && (toupper(c) <= 'F'))) {
+            temp = append((char)c, temp);
+         }else {
+            exit(ERRCODE_LEXICAL_ERROR);
+         }
+         if(strlen(temp) == 2) {
+            //temp = prepend('x', temp);
+            //temp = prepend('0', temp);
+            char *pEnd;
+            buffer = append((char) strtol(temp, &pEnd, BASE_HEX), buffer);
+            free(temp);
+            state = STATE_QUOTATION_MARKS;
+         }
+         break;
       case STATE_LEFT_PARENTHESES:
         prev = c;
         token = token_ctor(TOKENID_LEFT_PARENTHESES, value);
