@@ -69,7 +69,7 @@ void token_dtor(token_t* token) {
   free(token);
 }
 
-/*
+/**
  * Determines next state from STATE_START
  */
 state_e determine_next_state(int c) {
@@ -117,7 +117,7 @@ state_e determine_next_state(int c) {
   exit(1);
 }
 
-/*
+/**
  * Resizes buffer to fit one more character and inserts character c to the end.
  */
 char* append(char c, char* buffer) {
@@ -141,7 +141,7 @@ tokenid_e decide_operator(char c) {
   }
 }
 
-/*
+/**
  * Returns number indicating base (2, 8, 16), or 0 if none of the other apply
  */
 int determine_base(int c) {
@@ -156,7 +156,7 @@ int determine_base(int c) {
   return base;
 }
 
-/*
+/**
  * If string passed as an argument matches a keyword, the keyword's id is
  * returned.
  * Otherwise identifier id is returned.
