@@ -113,7 +113,7 @@ state_e determine_next_state(int c) {
 /*
  * Resizes buffer to fit one more character and inserts character c to the end.
  */
-char* insert_into_buffer(char c, char* buffer) {
+char* append(char c, char* buffer) {
   int buffer_size = buffer == NULL ? 2 : strlen(buffer) + 2;
   buffer = safe_realloc(buffer, buffer_size * sizeof(char));
   buffer[buffer_size - 2] = c;
@@ -207,7 +207,7 @@ token_t* get_next_token() {
         break;
       case STATE_IDENTIFIER_KEYWORD:
         if ((isalpha(c) != 0) || c == '_' || (isdigit(c) != 0)) {
-          buffer = insert_into_buffer((char)c, buffer);
+          buffer = append((char)c, buffer);
         } else {
           prev = c;
           value.string_value = buffer;
@@ -217,9 +217,9 @@ token_t* get_next_token() {
         break;
       case STATE_NUM:
         if (isdigit(c) != 0) {  // digit
-          buffer = insert_into_buffer((char)c, buffer);
+          buffer = append((char)c, buffer);
         } else if (c == '.') {  // decimal
-          buffer = insert_into_buffer((char)c, buffer);
+          buffer = append((char)c, buffer);
           state = STATE_DECIMAL;
         } else if ((c == 'e') || (c == 'E')) {
           state = STATE_EXP_START;
@@ -238,10 +238,10 @@ token_t* get_next_token() {
             0) {  // number will be read in different base
           state = STATE_BASE;
         } else if (c == '.') {  // 0. ->decimal
-          buffer = insert_into_buffer((char)c, buffer);
+          buffer = append((char)c, buffer);
           state = STATE_DECIMAL;
         } else if (c == 'e' || c == 'E') {
-          buffer = insert_into_buffer((char)'0', buffer);
+          buffer = append((char)'0', buffer);
           state = STATE_EXP_START;
         } else if (isdigit(c)) {  // other digits after 0 not allowed ->error
           exit(ERRCODE_LEXICAL_ERROR);
@@ -255,7 +255,7 @@ token_t* get_next_token() {
       case STATE_DECIMAL:
         if (isdigit(c) != 0) {
           // TODO: at least one number must be present after decimal point
-          buffer = insert_into_buffer((char)c, buffer);
+          buffer = append((char)c, buffer);
         } else if (c == 'e' || c == 'E') {  // exponent
           state = STATE_EXP_START;
         } else {
@@ -271,7 +271,7 @@ token_t* get_next_token() {
         if (isdigit(c) || c == '_' ||
             (base == BASE_HEX && (toupper(c) >= 'A') && (toupper(c) <= 'F'))) {
           if (c != '_') {
-            buffer = insert_into_buffer((char)c, buffer);
+            buffer = append((char)c, buffer);
           }
         } else {
           prev = c;
@@ -299,7 +299,7 @@ token_t* get_next_token() {
            printf("error");
         }*/
         if (c == '-') {
-          buffer = insert_into_buffer((char)c, buffer);
+          buffer = append((char)c, buffer);
         } else if (isdigit(c)) {
           prev = c;  // put number back to be read in the next state
         } else if (c != '+') {
@@ -310,7 +310,7 @@ token_t* get_next_token() {
       case STATE_EXP:
         // TODO: ensure at least one digit
         if (isdigit(c)) {
-          buffer = insert_into_buffer((char)c, buffer);
+          buffer = append((char)c, buffer);
         } else {
           if (strlen(buffer) == 0) {  // No digits were read as an exponent
             exit(ERRCODE_LEXICAL_ERROR);
@@ -371,8 +371,7 @@ token_t* get_next_token() {
         token = token_ctor(TOKENID_OPERATOR_ASSIGN, value);
         return token;
       case STATE_QUOTATION_MARKS:
-        if (c != '"') {
-          buffer = insert_into_buffer((char)c, buffer);
+          buffer = append((char)c, buffer);
         } else {
           value.string_value = buffer;
           token = token_ctor(TOKENID_STRING_LITERAL, value);
