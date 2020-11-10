@@ -220,8 +220,7 @@ token_t* get_next_token() {
     switch (state) {
       case STATE_START:
         state = determine_next_state(c);
-        if (state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM ||
-            state == STATE_OPERATOR) {
+        if (state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM) {
           prev = c;
         }
         break;
@@ -341,16 +340,30 @@ token_t* get_next_token() {
           return token;
         }
         break;
-      case STATE_OPERATOR:
-        if (c == '<') {
-          state = STATE_OPERATOR_LESS;
-        } else if (c == '>') {
-          state = STATE_OPERATOR_MORE;
-        } else {
-          token = token_ctor(decide_operator(c), value);
-          return token;
+      case STATE_OPERATOR_ADD:
+         if (c == '=') {
+            token = token_ctor(TOKENID_OPERATOR_ADD_AND_ASSIGN, value);
+         } else {
+            prev = c;
+            token = token_ctor(TOKENID_OPERATOR_ADD, value);
         }
-        break;
+        return token;
+      case STATE_OPERATOR_SUB:
+         if (c == '=') {
+            token = token_ctor(TOKENID_OPERATOR_SUB_AND_ASSIGN, value);
+        } else {
+            prev = c;
+            token = token_ctor(TOKENID_OPERATOR_SUB, value);
+        }
+          return token;
+      case STATE_OPERATOR_MUL:
+         if (c == '=') {
+            token = token_ctor(TOKENID_OPERATOR_MUL_AND_ASSIGN, value);
+         } else {
+            prev = c;
+            token = token_ctor(TOKENID_OPERATOR_MUL, value);
+        }
+        return token;
       case STATE_OPERATOR_LESS:
         if (c == '=') {
           token = token_ctor(TOKENID_OPERATOR_LESS_OR_EQUAL, value);
@@ -390,6 +403,28 @@ token_t* get_next_token() {
         prev = c;
         token = token_ctor(TOKENID_OPERATOR_ASSIGN, value);
         return token;
+      case STATE_OPERATOR_NOT:
+         if (c == '=') {
+          token = token_ctor(TOKENID_OPERATOR_NOT_EQUAL, value);
+         } else {
+          prev = c;
+          token = token_ctor(TOKENID_OPERATOR_NOT, value);
+         }
+         return token;
+      case STATE_OPERATOR_AND:
+         if(c == '&') {
+            token = token_ctor(TOKENID_OPERATOR_AND, value);
+         }else {
+            exit(ERRCODE_LEXICAL_ERROR);
+         }
+         return token;
+      case STATE_OPERATOR_OR:
+         if(c == '|') {
+            token = token_ctor(TOKENID_OPERATOR_OR, value);
+         }else {
+            exit(ERRCODE_LEXICAL_ERROR);
+         }
+         return token;
       case STATE_QUOTATION_MARKS:
           buffer = append((char)c, buffer);
         } else {
