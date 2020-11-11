@@ -455,6 +455,9 @@ token_t* get_next_token() {
             state = STATE_ESCAPE_SEQUENCE;
          }else if (c != '"') {
           buffer = append((char)c, buffer);
+          if(c == EOF) {
+             exit(ERRCODE_LEXICAL_ERROR);
+          }
         } else {
           value.string_value = buffer;
           token = token_ctor(TOKENID_STRING_LITERAL, value);
