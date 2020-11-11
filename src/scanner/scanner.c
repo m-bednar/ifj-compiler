@@ -141,7 +141,7 @@ state_e determine_next_state(int c) {
   if (isspace(c)) {
     return STATE_START;
   }
-  exit(1);
+  exit(ERRCODE_LEXICAL_ERROR);
 }
 
 /**
