@@ -216,8 +216,8 @@ tokenid_e compare_keywords(char* string) {
   }
 }
 
-bool true_or_false(token_t* token) {
-   return strcmp(token->value.string_value, "true") == 0 ? true : false;
+bool true_or_false(char* str) {
+   return strcmp(str, "true") == 0 ? true : false;
 }
 
 token_t* get_next_token() {
