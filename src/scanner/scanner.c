@@ -190,10 +190,10 @@ bool decimal_numbers_present(char* buffer) {
    char* pch = strchr(buffer, '.'); // find "."
    unsigned int pos = pch-buffer+1;
    if(pos == strlen(buffer)) { // "." is at the end of a string
+      return false;
+   }
       return true;
    }
-   return false;
-}
 
 /**
  * If string passed as an argument matches a keyword, the keyword's id is
