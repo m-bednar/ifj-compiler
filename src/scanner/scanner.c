@@ -352,11 +352,10 @@ token_t* get_next_token() {
         state = STATE_EXP;
         break;
       case STATE_EXP:
-        // TODO: ensure at least one digit
         if (isdigit(c)) {
           buffer = append((char)c, buffer);
         } else {
-          if (strlen(buffer) == 0) {  // No digits were read as an exponent
+          if (strlen(buffer) == 0 || (strlen(buffer) == 1 && buffer[0] == '-')) {  // No digits were read as an exponent
             exit(ERRCODE_LEXICAL_ERROR);
           }
           value.decimal_value = pow(num, (double)strtod(buffer, &pEnd));
