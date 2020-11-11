@@ -184,6 +184,18 @@ int determine_base(int c) {
 }
 
 /**
+ * Checks if there are any characters after decimal point
+ */
+int decial_numbers_present(char* buffer) {
+   char* pch = strchr(buffer, '.'); // find "."
+   unsigned int pos = pch-buffer+1;
+   if(pos == strlen(buffer)) { // "." is at the end of a string
+      return 0;
+   }
+   return 1;
+}
+
+/**
  * If string passed as an argument matches a keyword, the keyword's id is
  * returned.
  * Otherwise identifier id is returned.
@@ -297,12 +309,17 @@ token_t* get_next_token() {
         break;
       case STATE_DECIMAL:
         if (isdigit(c) != 0) {
-          // TODO: at least one number must be present after decimal point
           buffer = append((char)c, buffer);
-        else if (c == 'e' || c == 'E') {  // exponent
+        } else if (c == 'e' || c == 'E') {  // exponent
+          if(decial_numbers_present(buffer) == 0) {
+             exit(ERRCODE_LEXICAL_ERROR);
+          }
           buffer = append(c, buffer);
           state = STATE_EXP_START;
         } else {
+          if(decial_numbers_present(buffer) == 0) {
+             exit(ERRCODE_LEXICAL_ERROR);
+          }
           prev = c;
           char* pEnd;
           value.decimal_value = (double)strtod(buffer, &pEnd);
