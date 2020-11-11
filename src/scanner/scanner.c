@@ -157,19 +157,6 @@ char* append(char c, char* buffer) {
 }
 
 /**
- * Resizes buffer to fit one more character and inserts character c to the beginning.
- */
-/*char* prepend(char c, char* str) {
-   int str_size = str == NULL ? 2 : strlen(str) + 2;
-   str = safe_realloc(str, str_size * sizeof(char));
-   for(int i = strlen(str); i >= 0; i--) { // move all characters to the right
-      str[i+1] = str[i];
-   }
-   str[0] = c; // Finally append the first character to the string
-   return str;
-}*/
-
-/**
  * Returns number indicating base (2, 8, 16), or 0 if none of the other apply
  */
 int determine_base(int c) {
@@ -507,8 +494,6 @@ token_t* get_next_token() {
             exit(ERRCODE_LEXICAL_ERROR);
          }
          if(strlen(temp) == 2) {
-            //temp = prepend('x', temp);
-            //temp = prepend('0', temp);
             char *pEnd;
             buffer = append((char) strtol(temp, &pEnd, BASE_HEX), buffer);
             free(temp);
