@@ -210,9 +210,15 @@ tokenid_e compare_keywords(char* string) {
     return TOKENID_KEYWORD_STRING;
   } else if (strcmp(string, "bool") == 0) {
     return TOKENID_KEYWORD_BOOL;
-  } else {
+  } else if (strcmp(string, "true") == 0 || strcmp(string, "false") == 0) {
+     return TOKENID_BOOL_LITERAL;
+  }else {
     return TOKENID_IDENTIFIER;
   }
+}
+
+bool true_or_false(token_t* token) {
+   return strcmp(token->value.string_value, "true") == 0 ? true : false;
 }
 
 token_t* get_next_token() {
@@ -247,6 +253,9 @@ token_t* get_next_token() {
           prev = c;
           value.string_value = buffer;
           token = token_ctor(compare_keywords(value.string_value), value);
+          if(token->id == TOKENID_BOOL_LITERAL) {
+             token->value.bool_value  = true_or_false(token);
+          }
           return token;
         }
         break;

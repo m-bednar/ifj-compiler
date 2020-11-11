@@ -5,6 +5,7 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 #pragma once
 
 typedef enum tokenid_e {
@@ -20,6 +21,7 @@ typedef enum tokenid_e {
    TOKENID_KEYWORD_STRING,             //string
    TOKENID_KEYWORD_BOOL,               //bool
    TOKENID_STRING_LITERAL,             // "string literal"
+   TOKENID_BOOL_LITERAL,               // true / false
    TOKENID_NUM,
    TOKENID_NUM_DECIMAL,
    TOKENID_OPERATOR_ADD,               // +
@@ -54,6 +56,7 @@ typedef union token_value_u {
    char* string_value;
    int64_t int_value;
    double decimal_value;
+   bool bool_value;
 } token_value_u;
 
 
