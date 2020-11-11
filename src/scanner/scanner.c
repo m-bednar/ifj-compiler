@@ -66,7 +66,7 @@ bool is_memory_allocated(tokenid_e id) {
    const tokenid_e ids[] = {TOKENID_IDENTIFIER, TOKENID_STRING_LITERAL, TOKENID_KEYWORD_IF, 
    TOKENID_KEYWORD_FOR, TOKENID_KEYWORD_ELSE, TOKENID_KEYWORD_RETURN, TOKENID_KEYWORD_PACKAGE,
    TOKENID_KEYWORD_FUNC, TOKENID_KEYWORD_FLOAT64, TOKENID_KEYWORD_INT, TOKENID_KEYWORD_STRING,
-   TOKENID_KEYWORD_BOOL}; // Array of all ids that use memory
+   TOKENID_KEYWORD_BOOL, TOKENID_BOOL_LITERAL}; // Array of all ids that use memory
    int size = sizeof(ids) / sizeof(ids[0]); // Returns number of elements in array.
    for(int i = 0; i < size; i++){
       if(ids[i] == id) {
