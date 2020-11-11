@@ -186,7 +186,7 @@ int determine_base(int c) {
 /**
  * Checks if there are any characters after decimal point
  */
-int decial_numbers_present(char* buffer) {
+int decimal_numbers_present(char* buffer) {
    char* pch = strchr(buffer, '.'); // find "."
    unsigned int pos = pch-buffer+1;
    if(pos == strlen(buffer)) { // "." is at the end of a string
@@ -311,13 +311,13 @@ token_t* get_next_token() {
         if (isdigit(c) != 0) {
           buffer = append((char)c, buffer);
         } else if (c == 'e' || c == 'E') {  // exponent
-          if(decial_numbers_present(buffer) == 0) {
+          if(decimal_numbers_present(buffer) == 0) {
              exit(ERRCODE_LEXICAL_ERROR);
           }
           buffer = append(c, buffer);
           state = STATE_EXP_START;
         } else {
-          if(decial_numbers_present(buffer) == 0) {
+          if(decimal_numbers_present(buffer) == 0) {
              exit(ERRCODE_LEXICAL_ERROR);
           }
           prev = c;
