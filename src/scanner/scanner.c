@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
 #include <stdbool.h>
 #include "scanner.h"
 #include "../memory.h"
@@ -228,8 +227,6 @@ token_t* get_next_token() {
   char* buffer = NULL;
   char *temp = NULL; // temporary varaible to store and later determine escape sequence
   int base = 0;
-  double num;  // used to store numerical value to free up space in buffer for
-               // exponent
   token_value_u value;
   token_t* token;
   while (1) {
@@ -266,6 +263,7 @@ token_t* get_next_token() {
           buffer = append((char)c, buffer);
           state = STATE_DECIMAL;
         } else if ((c == 'e') || (c == 'E')) {
+           buffer = append(c, buffer);
           state = STATE_EXP_START;
         } else {  // end of num
           prev = c;
@@ -286,6 +284,7 @@ token_t* get_next_token() {
           state = STATE_DECIMAL;
         } else if (c == 'e' || c == 'E') {
           buffer = append((char)'0', buffer);
+          buffer = append(c, buffer);
           state = STATE_EXP_START;
         } else if (isdigit(c)) {  // other digits after 0 not allowed ->error
           exit(ERRCODE_LEXICAL_ERROR);
@@ -300,7 +299,8 @@ token_t* get_next_token() {
         if (isdigit(c) != 0) {
           // TODO: at least one number must be present after decimal point
           buffer = append((char)c, buffer);
-        } else if (c == 'e' || c == 'E') {  // exponent
+        else if (c == 'e' || c == 'E') {  // exponent
+          buffer = append(c, buffer);
           state = STATE_EXP_START;
         } else {
           prev = c;
@@ -328,20 +328,6 @@ token_t* get_next_token() {
         break;
       case STATE_EXP_START:;
         char* pEnd;
-        num = (double)strtod(buffer, &pEnd);
-        free(buffer);
-        buffer = NULL;
-        // buffer = safe_alloc(1*sizeof(char));
-        /*if(c == '+') {
-           //do nothing
-        }else if (c == '-') {
-           buffer = append((char)c, buffer);
-        }else if(isdigit(c) != 0) {
-           prev = c; // put number back to be read in the next state
-        }else {
-           //TODO: throw error
-           printf("error");
-        }*/
         if (c == '-') {
           buffer = append((char)c, buffer);
         } else if (isdigit(c)) {
@@ -358,7 +344,7 @@ token_t* get_next_token() {
           if (strlen(buffer) == 0 || (strlen(buffer) == 1 && buffer[0] == '-')) {  // No digits were read as an exponent
             exit(ERRCODE_LEXICAL_ERROR);
           }
-          value.decimal_value = pow(num, (double)strtod(buffer, &pEnd));
+          value.decimal_value = strtod(buffer, &pEnd);
           free(buffer);
           token = token_ctor(TOKENID_NUM_DECIMAL, value);
           return token;
