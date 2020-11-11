@@ -35,7 +35,8 @@ typedef enum state_e {
   STATE_OPERATOR_OR,
   STATE_QUOTATION_MARKS,
   STATE_ESCAPE_SEQUENCE,
-  STATE_HEXADECIMAL_ESCAPE_SEQUENCE,
+  STATE_HEXADECIMAL_ESCAPE_SEQUENCE_START,
+  STATE_HEXADECIMAL_ESCAPE_SEQUENCE_END,
   STATE_LEFT_PARENTHESES,
   STATE_RIGHT_PARENTHESES,
   STATE_LEFT_BRACKET,
@@ -469,7 +470,7 @@ token_t* get_next_token() {
       case STATE_ESCAPE_SEQUENCE:
          switch(c) {
             case 'x':
-               state = STATE_HEXADECIMAL_ESCAPE_SEQUENCE;
+               state = STATE_HEXADECIMAL_ESCAPE_SEQUENCE_START;
                break;
             case '"':
                buffer = append('"', buffer);
@@ -491,7 +492,15 @@ token_t* get_next_token() {
                exit(ERRCODE_LEXICAL_ERROR);
          }
          break;
-      case STATE_HEXADECIMAL_ESCAPE_SEQUENCE:
+      case STATE_HEXADECIMAL_ESCAPE_SEQUENCE_START:
+         if(isdigit(c) || ((toupper(c) >= 'A') && (toupper(c) <= 'F'))) {
+            temp = append((char)c, temp);
+            state = STATE_HEXADECIMAL_ESCAPE_SEQUENCE_END;
+         }else {
+            exit(ERRCODE_LEXICAL_ERROR);
+         }
+         break;
+      case STATE_HEXADECIMAL_ESCAPE_SEQUENCE_END:
          if(isdigit(c) || ((toupper(c) >= 'A') && (toupper(c) <= 'F'))) {
             temp = append((char)c, temp);
          }else {
