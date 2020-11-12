@@ -160,15 +160,14 @@ char* append(char c, char* str) {
  * Returns number indicating base (2, 8, 16), or 0 if none of the other apply
  */
 int determine_base(int c) {
-   int base = 0;
-   if (c == 'b' || c == 'B') { // number is binary
-      base = BASE_BIN;
-   } else if (c == 'o' || c == 'O') { // number is octal
-      base = BASE_OCT;
-   } else if (c == 'x' || c == 'X') { // number is hexadecimal
-      base = BASE_HEX;
+   if (c == 'b' || c == 'B') { 
+      return BASE_BIN;
+   } else if (c == 'o' || c == 'O') {
+      return BASE_OCT;
+   } else if (c == 'x' || c == 'X') { 
+      return BASE_HEX;
    }
-   return base;
+   return 0;
 }
 
 /**
@@ -221,7 +220,7 @@ bool str_to_bool(char* str) {
 }
 
 token_t* get_next_token() {
-   int state = STATE_START;
+   state_e state = STATE_START;
    int c = '\0';
    static int prev = '\0'; // previously read character
    char* buffer = NULL;
