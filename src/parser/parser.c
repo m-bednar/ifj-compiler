@@ -215,10 +215,7 @@ void parse() {
     ntsymstack_dtor(stack);
 
     if(error) {
-        // fail
-    }
-    else {
-        // success
+        exit(ERRCODE_SYNTAX_ERROR);
     }
    
     return;
