@@ -6,8 +6,16 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include "symbol.h"
 #include "../memory.h"
+#include "../error.h"
+
+typedef enum idcompare_e {
+   IC_EQUAL,
+   IC_RIGHT,
+   IC_LEFT
+} idcompare_e;
 
 typedef struct binitem_t {
    symbol_t* value;
@@ -16,11 +24,28 @@ typedef struct binitem_t {
 } binitem_t;
 
 /**
- * Constucts new binitem with given value.
+ * Constuct new binitem with given value.
  */
 binitem_t* binitem_ctor(symbol_t* value);
 
 /**
- * Destructs binitem and frees it's resources.
+ * Destruct binitem and free it's resources.
  */
 void binitem_dtor(binitem_t* item);
+
+/**
+ * Insert symbol to the one of item's child. 
+ * Returns false, when symbol with same identifier already exists.
+ */
+bool binitem_insert_child(binitem_t* item, symbol_t* value);
+
+/**
+ * Prints item and it's children to stderr.
+ */
+void binitem_print(binitem_t* item);
+
+/**
+ * Compare identifier with item's identifier, returns ID_EQUAL when equal, ID_LEFT value when left item's
+ * child should be next to check, ID_RIGHT value when right item should be next to check.
+ */
+idcompare_e binitem_compare(binitem_t* item, const char* identifier);
