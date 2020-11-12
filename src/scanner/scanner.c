@@ -268,7 +268,7 @@ token_t* get_next_token() {
             buffer = append((char) c, buffer);
             state = STATE_DECIMAL;
          } else if ((c == 'e') || (c == 'E')) {
-            buffer = append(c, buffer);
+            buffer = append((char)c, buffer);
             state = STATE_EXP_START;
          } else { // end of num
             prev = c;
@@ -286,9 +286,8 @@ token_t* get_next_token() {
             buffer = append((char) c, buffer);
             state = STATE_DECIMAL;
          } else if (c == 'e' || c == 'E') {
-            buffer = append((char)
-               '0', buffer);
-            buffer = append(c, buffer);
+            buffer = append((char)'0', buffer);
+            buffer = append((char)c, buffer);
             state = STATE_EXP_START;
          } else if (isdigit(c)) { // other digits after 0 not allowed ->error
             exit(ERRCODE_LEXICAL_ERROR);
@@ -306,7 +305,7 @@ token_t* get_next_token() {
             if (decimal_numbers_present(buffer) == false) {
                exit(ERRCODE_LEXICAL_ERROR);
             }
-            buffer = append(c, buffer);
+            buffer = append((char)c, buffer);
             state = STATE_EXP_START;
          } else {
             if (decimal_numbers_present(buffer) == false) {
