@@ -12,18 +12,18 @@ typedef enum tokenid_e {
    TOKENID_IDENTIFIER,
    TOKENID_KEYWORD_IF,                 // if
    TOKENID_KEYWORD_FOR,                // for
-   TOKENID_KEYWORD_ELSE,               //else
-   TOKENID_KEYWORD_RETURN,             //return
-   TOKENID_KEYWORD_PACKAGE,            //package
+   TOKENID_KEYWORD_ELSE,               // else
+   TOKENID_KEYWORD_RETURN,             // return
+   TOKENID_KEYWORD_PACKAGE,            // package
    TOKENID_KEYWORD_FUNC,               // func
    TOKENID_KEYWORD_FLOAT64,            // flaot64
    TOKENID_KEYWORD_INT,                // int
-   TOKENID_KEYWORD_STRING,             //string
-   TOKENID_KEYWORD_BOOL,               //bool
+   TOKENID_KEYWORD_STRING,             // string
+   TOKENID_KEYWORD_BOOL,               // bool
    TOKENID_STRING_LITERAL,             // "string literal"
    TOKENID_BOOL_LITERAL,               // true / false
-   TOKENID_NUM,
-   TOKENID_NUM_DECIMAL,
+   TOKENID_NUM,                        // integer number
+   TOKENID_NUM_DECIMAL,                // decimal number
    TOKENID_OPERATOR_ADD,               // +
    TOKENID_OPERATOR_ADD_AND_ASSIGN,    // +=
    TOKENID_OPERATOR_SUB,               // -
