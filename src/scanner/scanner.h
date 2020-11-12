@@ -31,7 +31,7 @@ typedef enum tokenid_e {
    TOKENID_OPERATOR_MUL,               // *
    TOKENID_OPERATOR_MUL_AND_ASSIGN,    // *=
    TOKENID_OPERATOR_DIV,               // /
-   TOKENID_OPERATOR_DIV_AND_ASSIGN,    // -=
+   TOKENID_OPERATOR_DIV_AND_ASSIGN,    // /=
    TOKENID_OPERATOR_LESS,              // <
    TOKENID_OPERATOR_LESS_OR_EQUAL,     // <=
    TOKENID_OPERATOR_GREATER,           // >
