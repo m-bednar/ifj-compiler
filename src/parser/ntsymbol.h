@@ -44,13 +44,6 @@ typedef enum nonterminalid_e {
     NONTERM_EXPRESSION_NEXT
 } nonterminalid_e;
 
-/*
-typedef union ntsymid_u {
-    nonterminalid_e nonterminal;
-    tokenid terminal;
-} ntsymid_u;
-*/
-
 typedef struct ntsymbol_t {
     bool is_terminal;
     int id;
