@@ -404,6 +404,9 @@ token_t* get_next_token() {
             state = STATE_COMMENT;
          } else if (c == '*') {
             state = STATE_BLOCK_COMMENT;
+         } else if (c == '=') {
+            token = token_ctor(TOKENID_OPERATOR_DIV_AND_ASSIGN, value);
+            return token;
          } else {
             prev = c;
             token = token_ctor(TOKENID_OPERATOR_DIV, value);
