@@ -197,7 +197,6 @@ token_t* get_next_token() {
    char* buffer = NULL;
    int base = 0;
    token_value_u value;
-   token_t* token;
    while (1) {
       if (prev == '\0') {
          c = getchar();
@@ -226,8 +225,7 @@ token_t* get_next_token() {
                } else {
                   free(buffer);
                }
-               token = token_ctor(id, value);
-               return token;
+               return token_ctor(id, value);
             }
             break;
          case STATE_NUM:
@@ -244,8 +242,7 @@ token_t* get_next_token() {
                char* pEnd;
                value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
                free(buffer);
-               token = token_ctor(TOKENID_NUM, value);
-               return token;
+               return token_ctor(TOKENID_NUM, value);
             }
             break;
          case STATE_NUM_ZERO:
@@ -263,8 +260,7 @@ token_t* get_next_token() {
             } else { // just 0
                prev = c;
                value.int_value = 0;
-               token = token_ctor(TOKENID_NUM, value);
-               return token;
+               return token_ctor(TOKENID_NUM, value);
             }
             break;
          case STATE_DECIMAL:
@@ -284,8 +280,7 @@ token_t* get_next_token() {
                char* pEnd;
                value.decimal_value = (double) strtod(buffer, &pEnd);
                free(buffer);
-               token = token_ctor(TOKENID_NUM_DECIMAL, value);
-               return token;
+               return token_ctor(TOKENID_NUM_DECIMAL, value);
             }
             break;
          case STATE_BASE:
@@ -299,8 +294,7 @@ token_t* get_next_token() {
                char* pEnd;
                value.int_value = (int64_t) strtoll(buffer, & pEnd, base);
                free(buffer);
-               token = token_ctor(TOKENID_NUM, value);
-               return token;
+               return token_ctor(TOKENID_NUM, value);
             }
             break;
          case STATE_EXP_START:
@@ -324,98 +318,85 @@ token_t* get_next_token() {
                }
                value.decimal_value = strtod(buffer, &pEnd);
                free(buffer);
-               token = token_ctor(TOKENID_NUM_DECIMAL, value);
-               return token;
+               return token_ctor(TOKENID_NUM_DECIMAL, value);
             }
             break;
          case STATE_OPERATOR_ADD:
             if (c == '=') {
-               token = token_ctor(TOKENID_OPERATOR_ADD_AND_ASSIGN, value);
+               return token_ctor(TOKENID_OPERATOR_ADD_AND_ASSIGN, value);
             } else {
                prev = c;
-               token = token_ctor(TOKENID_OPERATOR_ADD, value);
+               return token_ctor(TOKENID_OPERATOR_ADD, value);
             }
-            return token;
          case STATE_OPERATOR_SUB:
             if (c == '=') {
-               token = token_ctor(TOKENID_OPERATOR_SUB_AND_ASSIGN, value);
+               return token_ctor(TOKENID_OPERATOR_SUB_AND_ASSIGN, value);
             } else {
                prev = c;
-               token = token_ctor(TOKENID_OPERATOR_SUB, value);
+               return token_ctor(TOKENID_OPERATOR_SUB, value);
             }
-            return token;
          case STATE_OPERATOR_MUL:
             if (c == '=') {
-               token = token_ctor(TOKENID_OPERATOR_MUL_AND_ASSIGN, value);
+               return token_ctor(TOKENID_OPERATOR_MUL_AND_ASSIGN, value);
             } else {
                prev = c;
-               token = token_ctor(TOKENID_OPERATOR_MUL, value);
+               return token_ctor(TOKENID_OPERATOR_MUL, value);
             }
-            return token;
          case STATE_OPERATOR_LESS:
             if (c == '=') {
-               token = token_ctor(TOKENID_OPERATOR_LESS_OR_EQUAL, value);
+               return token_ctor(TOKENID_OPERATOR_LESS_OR_EQUAL, value);
             } else {
                prev = c;
-               token = token_ctor(TOKENID_OPERATOR_LESS, value);
+               return token_ctor(TOKENID_OPERATOR_LESS, value);
             }
-            return token;
          case STATE_OPERATOR_MORE:
             if (c == '=') {
-               token = token_ctor(TOKENID_OPERATOR_GREATER_OR_EQUAL, value);
+               return token_ctor(TOKENID_OPERATOR_GREATER_OR_EQUAL, value);
             } else {
                prev = c;
-               token = token_ctor(TOKENID_OPERATOR_GREATER, value);
+               return token_ctor(TOKENID_OPERATOR_GREATER, value);
             }
-            return token;
          case STATE_OPERATOR_OR_COMMENT:
             if (c == '/') {
                state = STATE_COMMENT;
             } else if (c == '*') {
                state = STATE_BLOCK_COMMENT;
             } else if (c == '=') {
-               token = token_ctor(TOKENID_OPERATOR_DIV_AND_ASSIGN, value);
-               return token;
+               return token_ctor(TOKENID_OPERATOR_DIV_AND_ASSIGN, value);
             } else {
                prev = c;
-               token = token_ctor(TOKENID_OPERATOR_DIV, value);
-               return token;
+               return token_ctor(TOKENID_OPERATOR_DIV, value);
             }
             break;
          case STATE_OPERATOR_DECLARE:
             if (c == '=') {
-               token = token_ctor(TOKENID_OPERATOR_DECLARE, value);
-               return token;
+               return token_ctor(TOKENID_OPERATOR_DECLARE, value);
             } else {
                exit(ERRCODE_LEXICAL_ERROR);
             }
             break;
          case STATE_OPERATOR_ASSIGN:
             prev = c;
-            token = token_ctor(TOKENID_OPERATOR_ASSIGN, value);
-            return token;
+            return token_ctor(TOKENID_OPERATOR_ASSIGN, value);
          case STATE_OPERATOR_NOT:
             if (c == '=') {
-               token = token_ctor(TOKENID_OPERATOR_NOT_EQUAL, value);
+               return token_ctor(TOKENID_OPERATOR_NOT_EQUAL, value);
             } else {
                prev = c;
-               token = token_ctor(TOKENID_OPERATOR_NOT, value);
+               return token_ctor(TOKENID_OPERATOR_NOT, value);
             }
-            return token;
          case STATE_OPERATOR_AND:
             if (c == '&') {
-               token = token_ctor(TOKENID_OPERATOR_AND, value);
+               return token_ctor(TOKENID_OPERATOR_AND, value);
             } else {
                exit(ERRCODE_LEXICAL_ERROR);
             }
-            return token;
          case STATE_OPERATOR_OR:
             if (c == '|') {
-               token = token_ctor(TOKENID_OPERATOR_OR, value);
+               return token_ctor(TOKENID_OPERATOR_OR, value);
             } else {
                exit(ERRCODE_LEXICAL_ERROR);
             }
-            return token;
          case STATE_QUOTATION_MARKS:
             if (c == '\\') {
                state = STATE_ESCAPE_SEQUENCE;
@@ -426,8 +407,7 @@ token_t* get_next_token() {
                }
             } else {
                value.string_value = buffer;
-               token = token_ctor(TOKENID_STRING_LITERAL, value);
-               return token;
+               return token_ctor(TOKENID_STRING_LITERAL, value);
             }
             break;
          case STATE_ESCAPE_SEQUENCE:
@@ -479,36 +459,28 @@ token_t* get_next_token() {
             break;
          case STATE_LEFT_PARENTHESES:
             prev = c;
-            token = token_ctor(TOKENID_LEFT_PARENTHESES, value);
-            return token;
+            return token_ctor(TOKENID_LEFT_PARENTHESES, value);
          case STATE_RIGHT_PARENTHESES:
             prev = c;
-            token = token_ctor(TOKENID_RIGHT_PARENTHESES, value);
-            return token;
+            return token_ctor(TOKENID_RIGHT_PARENTHESES, value);
          case STATE_LEFT_BRACKET:
             prev = c;
-            token = token_ctor(TOKENID_LEFT_BRACKET, value);
-            return token;
+            return token_ctor(TOKENID_LEFT_BRACKET, value);
          case STATE_RIGHT_BRACKET:
             prev = c;
-            token = token_ctor(TOKENID_RIGHT_BRACKET, value);
-            return token;
+            return token_ctor(TOKENID_RIGHT_BRACKET, value);
          case STATE_SEMICOLON:
             prev = c;
-            token = token_ctor(TOKENID_SEMICOLON, value);
-            return token;
+            return token_ctor(TOKENID_SEMICOLON, value);
          case STATE_COMMA:
             prev = c;
-            token = token_ctor(TOKENID_COMMA, value);
-            return token;
+            return token_ctor(TOKENID_COMMA, value);
          case STATE_NEWLINE:
             prev = c;
-            token = token_ctor(TOKENID_NEWLINE, value);
-            return token;
+            return token_ctor(TOKENID_NEWLINE, value);
          case STATE_EOF:
             // prev = c;
-            token = token_ctor(TOKENID_END_OF_FILE, value);
-            return token;
+            return token_ctor(TOKENID_END_OF_FILE, value);
          case STATE_COMMENT:
             if (c == '\n') {
                prev = c;
