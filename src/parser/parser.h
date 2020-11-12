@@ -8,6 +8,7 @@
 
 #include "ntsymbol.h"
 #include "ntsymstack.h"
+#include "../scanner/scanner.h"
 
 /**
  * Parses tokens recieved from scanner.

@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include "../memory.h"
 #include "../error.h"
-#include "../scanner/scanner.h"
+#include "../scanner/token.h"
 
 typedef enum nonterminalid_e {
     NONTERMINAL_PROGRAM,
