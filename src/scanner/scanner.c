@@ -174,7 +174,7 @@ int determine_base(int c) {
 /**
  * Checks if there are any characters after decimal point
  */
-bool decimal_numbers_present(char* str) {
+bool are_decimal_numbers_present(char* str) {
    char* pch = strchr(str, '.'); // find "."
    unsigned int pos = pch - str + 1;
    if (pos == strlen(str)) { // "." is at the end of a string
@@ -216,7 +216,7 @@ tokenid_e compare_keywords(char* string) {
    }
 }
 
-bool true_or_false(char* str) {
+bool str_to_bool(char* str) {
    return strcmp(str, "true") == 0 ? true : false;
 }
 
@@ -251,7 +251,7 @@ token_t* get_next_token() {
                if (id == TOKENID_IDENTIFIER) {
                   value.string_value = buffer;
                } else if (id == TOKENID_BOOL_LITERAL) {
-                  value.bool_value = true_or_false(buffer);
+                  value.bool_value = str_to_bool(buffer);
                   free(buffer);
                } else {
                   free(buffer);
@@ -301,13 +301,13 @@ token_t* get_next_token() {
             if (isdigit(c)) {
                buffer = append((char) c, buffer);
             } else if (c == 'e' || c == 'E') { // exponent
-               if (!decimal_numbers_present(buffer)) {
+               if (!are_decimal_numbers_present(buffer)) {
                   exit(ERRCODE_LEXICAL_ERROR);
                }
                buffer = append((char)c, buffer);
                state = STATE_EXP_START;
             } else {
-               if (!decimal_numbers_present(buffer)) {
+               if (!are_decimal_numbers_present(buffer)) {
                   exit(ERRCODE_LEXICAL_ERROR);
                }
                prev = c;
