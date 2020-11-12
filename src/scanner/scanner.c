@@ -486,7 +486,8 @@ token_t* get_next_token() {
             exit(ERRCODE_LEXICAL_ERROR);
          }
          break;
-      case STATE_HEXADECIMAL_ESCAPE_SEQUENCE_START:
+      case STATE_HEXADECIMAL_ESCAPE_SEQUENCE_START:;
+         char* temp = NULL; // temporary varaible to store and later determine escape sequence
          if (isdigit(c) || ((toupper(c) >= 'A') && (toupper(c) <= 'F'))) {
             temp = append((char) c, temp);
             state = STATE_HEXADECIMAL_ESCAPE_SEQUENCE_END;
