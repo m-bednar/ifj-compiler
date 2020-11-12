@@ -56,8 +56,8 @@ static const int BASE_BIN = 2;
 static const int BASE_OCT = 8;
 static const int BASE_HEX = 16;
 
-token_t * token_ctor(tokenid_e id, token_value_u value) {
-   token_t * token = safe_alloc(sizeof(token_t));
+token_t* token_ctor(tokenid_e id, token_value_u value) {
+   token_t* token = safe_alloc(sizeof(token_t));
    token -> id = id;
    token -> value = value;
    return token;
@@ -77,7 +77,7 @@ bool is_memory_allocated(tokenid_e id) {
    return false;
 }
 
-void token_dtor(token_t * token) {
+void token_dtor(token_t* token) {
    guard(token != NULL);
    if (is_memory_allocated(token -> id)) {
       free(token -> value.string_value);
@@ -149,9 +149,9 @@ state_e determine_next_state(int c) {
 /**
  * Resizes str to fit one more character and inserts character c to the end.
  */
-char * append(char c, char * str) {
+char* append(char c, char* str) {
    int str_size = str == NULL ? 2 : strlen(str) + 2;
-   str = safe_realloc(str, str_size * sizeof(char));
+   str = safe_realloc(str, str_size* sizeof(char));
    str[str_size - 2] = c;
    str[str_size - 1] = '\0';
    return str;
@@ -175,8 +175,8 @@ int determine_base(int c) {
 /**
  * Checks if there are any characters after decimal point
  */
-bool decimal_numbers_present(char * str) {
-   char * pch = strchr(str, '.'); // find "."
+bool decimal_numbers_present(char* str) {
+   char* pch = strchr(str, '.'); // find "."
    unsigned int pos = pch - str + 1;
    if (pos == strlen(str)) { // "." is at the end of a string
       return false;
@@ -189,7 +189,7 @@ bool decimal_numbers_present(char * str) {
  * returned.
  * Otherwise identifier id is returned.
  */
-tokenid_e compare_keywords(char * string) {
+tokenid_e compare_keywords(char* string) {
    if (strcmp(string, "if") == 0) {
       return TOKENID_KEYWORD_IF;
    } else if (strcmp(string, "for") == 0) {
@@ -217,19 +217,18 @@ tokenid_e compare_keywords(char * string) {
    }
 }
 
-bool true_or_false(char * str) {
+bool true_or_false(char* str) {
    return strcmp(str, "true") == 0 ? true : false;
 }
 
-token_t * get_next_token() {
+token_t* get_next_token() {
    int state = STATE_START;
    int c = '\0';
    static int prev = '\0'; // previously read character
-   char * buffer = NULL;
-   char * temp = NULL; // temporary varaible to store and later determine escape sequence
+   char* buffer = NULL;
    int base = 0;
    token_value_u value;
-   token_t * token;
+   token_t* token;
    while (1) {
       if (prev == '\0') {
          c = getchar();
@@ -273,7 +272,7 @@ token_t * get_next_token() {
             state = STATE_EXP_START;
          } else { // end of num
             prev = c;
-            char * pEnd;
+            char* pEnd;
             value.int_value = (int64_t) strtoll(buffer, & pEnd, base);
             free(buffer);
             token = token_ctor(TOKENID_NUM, value);
@@ -316,7 +315,7 @@ token_t * get_next_token() {
                exit(ERRCODE_LEXICAL_ERROR);
             }
             prev = c;
-            char * pEnd;
+            char* pEnd;
             value.decimal_value = (double) strtod(buffer, & pEnd);
             free(buffer);
             token = token_ctor(TOKENID_NUM_DECIMAL, value);
@@ -331,7 +330,7 @@ token_t * get_next_token() {
             }
          } else {
             prev = c;
-            char * pEnd;
+            char* pEnd;
             value.int_value = (int64_t) strtoll(buffer, & pEnd, base);
             free(buffer);
             token = token_ctor(TOKENID_NUM, value);
@@ -340,7 +339,7 @@ token_t * get_next_token() {
          break;
       case STATE_EXP_START:
          ;
-         char * pEnd;
+         char* pEnd;
          if (c == '-') {
             buffer = append((char) c, buffer);
          } else if (isdigit(c)) {
@@ -502,7 +501,7 @@ token_t * get_next_token() {
             exit(ERRCODE_LEXICAL_ERROR);
          }
          if (strlen(temp) == 2) {
-            char * pEnd;
+            char* pEnd;
             buffer = append((char) strtol(temp, & pEnd, BASE_HEX), buffer);
             free(temp);
             state = STATE_QUOTATION_MARKS;
