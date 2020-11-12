@@ -280,9 +280,7 @@ token_t* get_next_token() {
          }
          break;
       case STATE_NUM_ZERO:
-         // TODO: FORMATING
-         if ((base = determine_base(c)) !=
-            0) { // number will be read in different base
+         if ((base = determine_base(c)) != 0) { // number will be read in different base
             state = STATE_BASE;
          } else if (c == '.') { // 0. ->decimal
             buffer = append((char) c, buffer);
