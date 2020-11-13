@@ -376,8 +376,12 @@ token_t* get_next_token() {
             }
             break;
          case STATE_OPERATOR_ASSIGN:
-            prev = c;
-            return token_ctor(TOKENID_OPERATOR_ASSIGN, value);
+            if(c == '=') {
+               return token_ctor(TOKENID_OPERATOR_EQUALS, value);
+            } else {
+               prev = c;
+               return token_ctor(TOKENID_OPERATOR_ASSIGN, value);
+            }
          case STATE_OPERATOR_NOT:
             if (c == '=') {
                return token_ctor(TOKENID_OPERATOR_NOT_EQUAL, value);

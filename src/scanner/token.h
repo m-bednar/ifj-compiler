@@ -39,6 +39,7 @@ typedef enum tokenid_e {
    TOKENID_OPERATOR_GREATER_OR_EQUAL,  // >=
    TOKENID_OPERATOR_DECLARE,           // :=
    TOKENID_OPERATOR_ASSIGN,            // =
+   TOKENID_OPERATOR_EQUALS,            // ==
    TOKENID_OPERATOR_NOT,               // !
    TOKENID_OPERATOR_NOT_EQUAL,         // !=
    TOKENID_OPERATOR_AND,               // &&
