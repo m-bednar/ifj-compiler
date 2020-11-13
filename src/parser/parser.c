@@ -6,6 +6,8 @@
 
 #include "parser.h"
 
+#define EOL_FLAG true
+
 bool nonterminal_ids_derivation(ntsymstack_t *stack, int token_id) {
     if(token_id == TOKENID_IDENTIFIER) {
         ntsymbol_dtor(ntsymstack_pop(stack));
@@ -512,7 +514,18 @@ void parse() {
         
         stack_top = ntsymstack_top(stack);
 
-        if(stack_top->is_terminal && stack_top->id == TOKENID_END_OF_FILE) {
+        if(token->id == TOKENID_NEWLINE) {
+            if(EOL_FLAG == true) {
+                token = token_next;
+                if(token->id != TOKENID_END_OF_FILE) {
+                    token_next = get_next_token();
+                }
+            }
+            else {
+                error = true;
+            }
+        }
+        else if(stack_top->is_terminal && stack_top->id == TOKENID_END_OF_FILE) {
             if(token->id == TOKENID_END_OF_FILE) {
                 ntsymbol_dtor(ntsymstack_pop(stack));
                 break;
