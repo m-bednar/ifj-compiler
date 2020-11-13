@@ -522,7 +522,7 @@ void parse() {
             }
         }
         else if(stack_top->is_terminal) {
-            if(stack_top->id == token->id) {
+            if((tokenid_e)stack_top->id == token->id) {
                 ntsymbol_dtor(ntsymstack_pop(stack));
                 token = token_next;
                 if(token->id != TOKENID_END_OF_FILE) {
