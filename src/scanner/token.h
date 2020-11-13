@@ -1,7 +1,7 @@
 /**
  * IFJ20 Compiler
  * @file token.h
- * @authors Martin Bednář (xbedna77)
+ * @authors Martin Bednář (xbedna77), František Lukeš (xlukes07)
  */
 
 #pragma once
