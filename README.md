@@ -1,7 +1,7 @@
 
 # IFJ Project compiler
 
-[Zadání](https://wis.fit.vutbr.cz/FIT/st/cfs.php?file=/course/IFJ-IT/projects/ifj2020.pdf) (Varianta I)
+**[IFJ Wiki](https://wis.fit.vutbr.cz/FIT/st/cwk.php?id=13981&csid=735505), [Zadání](https://wis.fit.vutbr.cz/FIT/st/cfs.php?file=/course/IFJ-IT/projects/ifj2020.pdf) (Varianta I)**
 
 ### Struktura projektu
 ```
@@ -17,7 +17,7 @@
 
 ### TODO list
 - [x] Tabulka symbolů
-- [ ] Lexikální analyzátor (scanner)
+- [x] Lexikální analyzátor (scanner)
 - [ ] Syntaktický analyzátor (parser)
 - [ ] Sémantický analyzátor
 - [ ] Generátor vnitřního kódu (?)
@@ -38,9 +38,20 @@
 ### Deadlines
 - Tabulka symbolů (31.10.)
 - Lexikální analyzátor (31.10.)  
-- Syntaktický analyzátor (15.11.)
+- Syntaktický analyzátor (18.11.)
 - Sémantický analyzátor (22.11.)
 - Generátor konečného kódu (27.11.)
+
+### Makefile příkazy
+
+##### make
+- Zkompiluje projekt
+- Spustí */bin/main* bez vstupu
+
+##### make try FILE=*vstupni_soubor*
+- Zkompiluje projekt
+- Spustí */bin/main* se standartním vstupem ze souboru *vstupni_soubor*
+- Po skončení vypíše návratový kód kompilátoru
 
 ### Registrovaná rozšíření
 
