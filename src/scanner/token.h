@@ -1,7 +1,7 @@
 /**
  * IFJ20 Compiler
  * @file token.h
- * @authors Martin Bednář (xbedna77)
+ * @authors Martin Bednář (xbedna77), František Lukeš (xlukes07)
  */
 
 #pragma once
@@ -39,6 +39,7 @@ typedef enum tokenid_e {
    TOKENID_OPERATOR_GREATER_OR_EQUAL,  // >=
    TOKENID_OPERATOR_DECLARE,           // :=
    TOKENID_OPERATOR_ASSIGN,            // =
+   TOKENID_OPERATOR_EQUALS,            // ==
    TOKENID_OPERATOR_NOT,               // !
    TOKENID_OPERATOR_NOT_EQUAL,         // !=
    TOKENID_OPERATOR_AND,               // &&
