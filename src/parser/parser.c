@@ -551,70 +551,70 @@ void parse() {
                     error = nonterminal_function_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_PARAMETERS:
-                
+                    error = nonterminal_parameters_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_PARAMETER:
-                
+                    error = nonterminal_parameter_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_PARAMETER_NEXT:
-                
+                    error = nonterminal_parameter_next_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_RETURN_TYPES:
-                
+                    error = nonterminal_return_types_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_TYPES:
-                
+                    error = nonterminal_types_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_TYPE:
-                
+                    error = nonterminal_type_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_TYPE_NEXT:
-                
+                    error = nonterminal_type_next_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_RETURN:
-                
+                    error = nonterminal_return_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_DEFINITION:
-                
+                    error = nonterminal_definition_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_FOR_DEFINITION:
-                
+                    error = nonterminal_for_definition_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_ASSIGNMENT:
-                
+                    error = nonterminal_assignment_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_FOR_ASSIGNMENT:
-                
+                    error = nonterminal_for_assignment_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_ASSIGNMENT_RIGHT:
-                
+                    error = nonterminal_assignment_right_derivation(stack, token->id, token_next->id);
                     break;
                 case NONTERMINAL_FOR_ASSIGNMENT_RIGHT:
-                
+                    error = nonterminal_for_assignment_right_derivation(stack, token->id, token_next->id);
                     break;
                 case NONTERMINAL_ID_NEXT:
-                
+                    error = nonterminal_id_next_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_COMMANDS:
-                
+                    error = nonterminal_commands_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_COMMAND:
-                
+                    error = nonterminal_command_derivation(stack, token->id, token_next->id);
                     break;
                 case NONTERMINAL_IF:
-                
+                    error = nonterminal_if_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_ELSE:
-                
+                    error = nonterminal_else_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_FOR:
-                
+                    error = nonterminal_for_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_CALL:
-                
+                    error = nonterminal_call_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_IDS:
-                
+                    error = nonterminal_ids_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_EXPRESSIONS:
                 
