@@ -6,28 +6,183 @@
 
 #include "parser.h"
 
+bool nonterminal_ids_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_IDENTIFIER) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_ID_NEXT, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_IDENTIFIER, true));
+        return false;
+    }
+    else if(token_id == TOKENID_RIGHT_PARENTHESES) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
 
-/**
- *  Redundant function. It may be removed later.
- */
+bool nonterminal_call_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_IDENTIFIER) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_PARENTHESES, true));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_IDS, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_PARENTHESES, true));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_IDENTIFIER, true));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool nonterminal_for_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_KEYWORD_FOR) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_BRACKET, true));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_COMMANDS, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_BRACKET, true));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_FOR_ASSIGNMENT, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_SEMICOLON, true));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_SEMICOLON, true));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_FOR_DEFINITION, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_KEYWORD_FOR, true));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool nonterminal_else_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_IDENTIFIER || token_id == TOKENID_KEYWORD_IF || token_id == TOKENID_KEYWORD_FOR || 
+    token_id == TOKENID_KEYWORD_RETURN || token_id == TOKENID_RIGHT_BRACKET) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        return false;
+    }
+    else if(token_id == TOKENID_KEYWORD_ELSE) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_BRACKET, true));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_COMMANDS, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_BRACKET, true));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_KEYWORD_ELSE, true));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool nonterminal_if_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_KEYWORD_IF) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_ELSE, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_BRACKET, true));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_COMMANDS, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_BRACKET, true));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_KEYWORD_IF, true));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool nonterminal_command_derivation(ntsymstack_t *stack, int token_id, int token_next_id) {
+    if(token_id == TOKENID_IDENTIFIER) {
+        if(token_next_id == TOKENID_OPERATOR_DECLARE) {
+            ntsymbol_dtor(ntsymstack_pop(stack));
+            ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_DEFINITION, false));
+            return false;
+        }
+        else if(token_next_id == TOKENID_COMMA || token_next_id == TOKENID_OPERATOR_ASSIGN) {
+            ntsymbol_dtor(ntsymstack_pop(stack));
+            ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_ASSIGNMENT, false));
+            return false;
+        }
+        else if(token_next_id == TOKENID_LEFT_PARENTHESES) {
+            ntsymbol_dtor(ntsymstack_pop(stack));
+            ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_CALL, false));
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    else if(token_id == TOKENID_KEYWORD_IF) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_IF, false));
+        return false;
+    }
+    else if(token_id == TOKENID_KEYWORD_FOR) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_FOR, false));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool nonterminal_commands_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_IDENTIFIER || token_id == TOKENID_KEYWORD_IF || token_id == TOKENID_KEYWORD_FOR) {
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_COMMAND, false));
+        return false;
+    }
+    else if(token_id == TOKENID_KEYWORD_RETURN || token_id == TOKENID_RIGHT_BRACKET) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool nonterminal_id_next_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_OPERATOR_ASSIGN || token_id == TOKENID_RIGHT_PARENTHESES) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        return false;
+    }
+    else if(token_id == TOKENID_COMMA) {
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_IDENTIFIER, true));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_COMMA, true));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
 
 bool nonterminal_for_assignment_right_derivation(ntsymstack_t *stack, int token_id, int token_next_id) {
     if(token_id == TOKENID_IDENTIFIER) {
         if(token_next_id == TOKENID_LEFT_PARENTHESES) {
             ntsymbol_dtor(ntsymstack_pop(stack));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_CALL, false));
+            return false;
         }
-        else {
+        else if(token_next_id == TOKENID_LEFT_BRACKET || token_next_id == TOKENID_COMMA || token_next_id == TOKENID_OPERATOR_OR || 
+        token_next_id == TOKENID_OPERATOR_AND || token_next_id == TOKENID_OPERATOR_NOT_EQUAL || token_next_id == TOKENID_OPERATOR_EQUALS || 
+        token_next_id == TOKENID_OPERATOR_LESS || token_next_id == TOKENID_OPERATOR_LESS_OR_EQUAL || token_next_id == TOKENID_OPERATOR_GREATER || 
+        token_next_id == TOKENID_OPERATOR_GREATER_OR_EQUAL || token_next_id == TOKENID_OPERATOR_ADD || token_next_id == TOKENID_OPERATOR_SUB || 
+        token_next_id == TOKENID_OPERATOR_MUL || token_next_id == TOKENID_OPERATOR_DIV) {
             ntsymbol_dtor(ntsymstack_pop(stack));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+            // switch to expression analysis
+            return false;
         }
-        return false;
+        else {
+            return true;
+        }
     }
-    else if(token_id == TOKENID_STRING_LITERAL || token_id == TOKENID_LEFT_PARENTHESES || token_id == TOKENID_OPERATOR_NOT || token_id == TOKENID_NUM || token_id == TOKENID_NUM_DECIMAL || token_id == TOKENID_STRING_LITERAL) {
+    else if(token_id == TOKENID_LEFT_PARENTHESES || token_id == TOKENID_OPERATOR_NOT || token_id == TOKENID_NUM || 
+    token_id == TOKENID_NUM_DECIMAL || token_id == TOKENID_STRING_LITERAL || token_id == TOKENID_BOOL_LITERAL) {
         ntsymbol_dtor(ntsymstack_pop(stack));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+        // switch to expression analysis
         return false;
     }
     else {
@@ -40,18 +195,29 @@ bool nonterminal_assignment_right_derivation(ntsymstack_t *stack, int token_id, 
         if(token_next_id == TOKENID_LEFT_PARENTHESES) {
             ntsymbol_dtor(ntsymstack_pop(stack));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_CALL, false));
+            return false;
         }
-        else {
+        else if(token_next_id == TOKENID_NEWLINE || token_next_id == TOKENID_COMMA || token_next_id == TOKENID_OPERATOR_OR || 
+        token_next_id == TOKENID_OPERATOR_AND || token_next_id == TOKENID_OPERATOR_NOT_EQUAL || token_next_id == TOKENID_OPERATOR_EQUALS || 
+        token_next_id == TOKENID_OPERATOR_LESS || token_next_id == TOKENID_OPERATOR_LESS_OR_EQUAL || token_next_id == TOKENID_OPERATOR_GREATER || 
+        token_next_id == TOKENID_OPERATOR_GREATER_OR_EQUAL || token_next_id == TOKENID_OPERATOR_ADD || token_next_id == TOKENID_OPERATOR_SUB || 
+        token_next_id == TOKENID_OPERATOR_MUL || token_next_id == TOKENID_OPERATOR_DIV) {
             ntsymbol_dtor(ntsymstack_pop(stack));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+            // switch to expression analysis
+            return false;
         }
-        return false;
+        else {
+            return true;
+        }
     }
-    else if(token_id == TOKENID_STRING_LITERAL || token_id == TOKENID_LEFT_PARENTHESES || token_id == TOKENID_OPERATOR_NOT || token_id == TOKENID_NUM || token_id == TOKENID_NUM_DECIMAL || token_id == TOKENID_STRING_LITERAL) {
+    else if(token_id == TOKENID_LEFT_PARENTHESES || token_id == TOKENID_OPERATOR_NOT || token_id == TOKENID_NUM || 
+    token_id == TOKENID_NUM_DECIMAL || token_id == TOKENID_STRING_LITERAL || token_id == TOKENID_BOOL_LITERAL) {
         ntsymbol_dtor(ntsymstack_pop(stack));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+        // switch to expression analysis
         return false;
     }
     else {
@@ -153,7 +319,8 @@ bool nonterminal_type_next_derivation(ntsymstack_t *stack, int token_id) {
 }
 
 bool nonterminal_types_derivation(ntsymstack_t *stack, int token_id) {
-    if(token_id == TOKENID_KEYWORD_INT || token_id == TOKENID_KEYWORD_FLOAT64 || token_id == TOKENID_KEYWORD_STRING || token_id == TOKENID_KEYWORD_BOOL) {
+    if(token_id == TOKENID_KEYWORD_INT || token_id == TOKENID_KEYWORD_FLOAT64 || token_id == TOKENID_KEYWORD_STRING ||
+    token_id == TOKENID_KEYWORD_BOOL) {
         ntsymbol_dtor(ntsymstack_pop(stack));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_TYPE_NEXT, false));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_TYPE, false));
@@ -328,8 +495,8 @@ bool nonterminal_program_derivation(ntsymstack_t *stack, int token_id) {
 
 void parse() {
     ntsymstack_t *stack = ntsymstack_ctor();
-    token_t *token;
-    token_t *token_next = get_next_token();
+    token_t *token = get_next_token();
+    token_t *token_next = token;
     ntsymbol_t *stack_top;
 
     bool error = false;
@@ -337,12 +504,12 @@ void parse() {
     ntsymstack_push(stack, ntsymbol_ctor(TOKENID_END_OF_FILE, true));
     ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_PROGRAM, false));
 
+    if(token->id != TOKENID_END_OF_FILE) {
+        token_next = get_next_token();
+    }
+
     while(!error) {
         
-        token = token_next;
-        if(token->id != TOKENID_END_OF_FILE) {
-            token_next = get_next_token();
-        }
         stack_top = ntsymstack_top(stack);
 
         if(stack_top->is_terminal && stack_top->id == TOKENID_END_OF_FILE) {
@@ -357,6 +524,10 @@ void parse() {
         else if(stack_top->is_terminal) {
             if(stack_top->id == token->id) {
                 ntsymbol_dtor(ntsymstack_pop(stack));
+                token = token_next;
+                if(token->id != TOKENID_END_OF_FILE) {
+                    token_next = get_next_token();
+                }
             }
             else {
                 error = true;
