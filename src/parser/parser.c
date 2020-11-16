@@ -186,7 +186,6 @@ bool nonterminal_for_assignment_right_derivation(ntsymstack_t *stack, int token_
             ntsymbol_dtor(ntsymstack_pop(stack));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
-            // switch to expression analysis
             return false;
         }
         else {
@@ -198,7 +197,6 @@ bool nonterminal_for_assignment_right_derivation(ntsymstack_t *stack, int token_
         ntsymbol_dtor(ntsymstack_pop(stack));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
-        // switch to expression analysis
         return false;
     }
     else {
@@ -221,7 +219,6 @@ bool nonterminal_assignment_right_derivation(ntsymstack_t *stack, int token_id, 
             ntsymbol_dtor(ntsymstack_pop(stack));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
             ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
-            // switch to expression analysis
             return false;
         }
         else {
@@ -233,7 +230,6 @@ bool nonterminal_assignment_right_derivation(ntsymstack_t *stack, int token_id, 
         ntsymbol_dtor(ntsymstack_pop(stack));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
-        // switch to expression analysis
         return false;
     }
     else {
@@ -507,6 +503,11 @@ bool nonterminal_program_derivation(ntsymstack_t *stack, int token_id) {
     else {
         return true;
     }
+}
+
+void precedence_parser(int token_id) {
+
+    return;
 }
 
 void parse() {
