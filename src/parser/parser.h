@@ -8,6 +8,9 @@
 
 #include "ntsymbol.h"
 #include "ntsymstack.h"
+#include "ntposymbol.h"
+#include "ntposymstack.h"
+#include "precedencetable.h"
 #include "../scanner/scanner.h"
 
 /**
