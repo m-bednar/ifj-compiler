@@ -8,6 +8,42 @@
 
 #define EOL_FLAG true
 
+bool nonterminal_expression_next_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_IDENTIFIER || token_id == TOKENID_KEYWORD_IF || token_id == TOKENID_KEYWORD_FOR || 
+    token_id == TOKENID_KEYWORD_RETURN || token_id == TOKENID_RIGHT_BRACKET || token_id == TOKENID_LEFT_BRACKET) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        return false;
+    }
+    else if(token_id == TOKENID_COMMA) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_COMMA, true));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool nonterminal_expressions_derivation(ntsymstack_t *stack, int token_id) {
+    if(token_id == TOKENID_IDENTIFIER || token_id == TOKENID_NUM || token_id == TOKENID_NUM_DECIMAL || 
+    token_id == TOKENID_STRING_LITERAL || token_id == TOKENID_BOOL_LITERAL || token_id == TOKENID_OPERATOR_NOT ||
+    token_id == TOKENID_LEFT_PARENTHESES) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+        return false;
+    }
+    else if(token_id == TOKENID_RIGHT_BRACKET) {
+        ntsymbol_dtor(ntsymstack_pop(stack));
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 bool nonterminal_ids_derivation(ntsymstack_t *stack, int token_id) {
     if(token_id == TOKENID_IDENTIFIER) {
         ntsymbol_dtor(ntsymstack_pop(stack));
@@ -647,13 +683,13 @@ void parse() {
                     error = nonterminal_ids_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_EXPRESSIONS:
-                
+                    error = nonterminal_expressions_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_EXPRESSION:
-                
+                    // pop and switch to precedence parser
                     break;
                 case NONTERMINAL_EXPRESSION_NEXT:
-                
+                    error = nonterminal_expression_next_derivation(stack, token->id);
                     break;
                 default:
                     error = true;
