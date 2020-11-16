@@ -510,7 +510,7 @@ void parse() {
         token_next = get_next_token();
     }
 
-    while(!error) {
+    while(!error && ntsymstack_get_length(stack) != 0) {
         
         stack_top = ntsymstack_top(stack);
 
@@ -530,7 +530,6 @@ void parse() {
             if(token->id == TOKENID_END_OF_FILE) {
                 ntsymbol_dtor(ntsymstack_pop(stack));
                 token_dtor(token);
-                break;
             }
             else {
                 error = true;
