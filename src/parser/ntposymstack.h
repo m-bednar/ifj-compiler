@@ -29,7 +29,7 @@ void ntposymstack_dtor(ntposymstack_t* stack);
 /**
  * Pushes new element on top of the stack. 
  */
-void ntposymstack_push(ntposymstack_t* stack, ntposymbol_t* ntsymbol);
+void ntposymstack_push(ntposymstack_t* stack, ntposymbol_t* ntposymbol);
 
 /**
  * Removes and returns top element. Does not deallocate the element.
