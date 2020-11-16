@@ -57,19 +57,33 @@ bool nonterminal_for_derivation(ntsymstack_t *stack, int token_id) {
     }
 }
 
-bool nonterminal_else_derivation(ntsymstack_t *stack, int token_id) {
+bool nonterminal_else_if_derivation(ntsymstack_t *stack, int token_id, int token_next_id) {
     if(token_id == TOKENID_IDENTIFIER || token_id == TOKENID_KEYWORD_IF || token_id == TOKENID_KEYWORD_FOR || 
     token_id == TOKENID_KEYWORD_RETURN || token_id == TOKENID_RIGHT_BRACKET) {
         ntsymbol_dtor(ntsymstack_pop(stack));
         return false;
     }
     else if(token_id == TOKENID_KEYWORD_ELSE) {
-        ntsymbol_dtor(ntsymstack_pop(stack));
-        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_BRACKET, true));
-        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_COMMANDS, false));
-        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_BRACKET, true));
-        ntsymstack_push(stack, ntsymbol_ctor(TOKENID_KEYWORD_ELSE, true));
-        return false;
+        if(token_next_id == TOKENID_KEYWORD_IF) {
+            ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_BRACKET, true));
+            ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_COMMANDS, false));
+            ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_BRACKET, true));
+            ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
+            ntsymstack_push(stack, ntsymbol_ctor(TOKENID_KEYWORD_IF, true));
+            ntsymstack_push(stack, ntsymbol_ctor(TOKENID_KEYWORD_ELSE, true));
+            return false;
+        }
+        else if(token_next_id == TOKENID_LEFT_BRACKET) {
+            ntsymbol_dtor(ntsymstack_pop(stack));
+            ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_BRACKET, true));
+            ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_COMMANDS, false));
+            ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_BRACKET, true));
+            ntsymstack_push(stack, ntsymbol_ctor(TOKENID_KEYWORD_ELSE, true));
+            return false;
+        }
+        else {
+            return true;
+        }
     }
     else {
         return true;
@@ -79,7 +93,7 @@ bool nonterminal_else_derivation(ntsymstack_t *stack, int token_id) {
 bool nonterminal_if_derivation(ntsymstack_t *stack, int token_id) {
     if(token_id == TOKENID_KEYWORD_IF) {
         ntsymbol_dtor(ntsymstack_pop(stack));
-        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_ELSE, false));
+        ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_ELSE_IF, false));
         ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_BRACKET, true));
         ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_COMMANDS, false));
         ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_BRACKET, true));
@@ -619,8 +633,8 @@ void parse() {
                 case NONTERMINAL_IF:
                     error = nonterminal_if_derivation(stack, token->id);
                     break;
-                case NONTERMINAL_ELSE:
-                    error = nonterminal_else_derivation(stack, token->id);
+                case NONTERMINAL_ELSE_IF:
+                    error = nonterminal_else_if_derivation(stack, token->id, token_next->id);
                     break;
                 case NONTERMINAL_FOR:
                     error = nonterminal_for_derivation(stack, token->id);
