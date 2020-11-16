@@ -12,6 +12,8 @@
 #include "../scanner/token.h"
 #include "ntsymbol.h"
 
+#define OPERATOR 0
+
 typedef enum symtype_e {
     NONTERMINAL,
     TERMINAL,
