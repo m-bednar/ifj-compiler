@@ -45,6 +45,13 @@ typedef enum nonterminalid_e {
     NONTERMINAL_EXPRESSION_NEXT
 } nonterminalid_e;
 
+typedef enum precedenceoperatorid_e {
+    PRECEDENCE_OPERATOR_EQUALS,
+    PRECEDENCE_OPERATOR_GREATER,
+    PRECEDENCE_OPERATOR_LESS,
+    PRECEDENCE_OPERATOR_EOE     // end of expression
+} precedenceoperatorid_e;
+
 typedef struct ntsymbol_t {
     bool is_terminal;
     int id;
