@@ -686,7 +686,8 @@ void parse() {
                     error = nonterminal_expressions_derivation(stack, token->id);
                     break;
                 case NONTERMINAL_EXPRESSION:
-                    // pop and switch to precedence parser
+                    ntsymbol_dtor(ntsymstack_pop(stack));
+                    precedence_parser(token->id);
                     break;
                 case NONTERMINAL_EXPRESSION_NEXT:
                     error = nonterminal_expression_next_derivation(stack, token->id);
