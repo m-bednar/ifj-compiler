@@ -73,6 +73,22 @@ ntposymbol_t* ntposymstack_top(ntposymstack_t* stack) {
     return top; 
 }
 
+ntposymbol_t* ntposymstack_top(ntposymstack_t* stack) {
+    guard(stack != NULL);
+    guard(stack->length != 0);
+
+    ntposymbol_t* top_terminal = NULL;
+
+    for(int i = stack->length - 1; i >= 0; i--) {
+        if(stack->memory[i]->type == TERMINAL) {
+            top_terminal = stack->memory[i];
+            break;
+        }
+    }
+
+    return top_terminal; 
+}
+
 int ntposymstack_get_length(ntposymstack_t* stack) {
     return stack->length;
 }

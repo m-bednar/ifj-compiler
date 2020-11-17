@@ -44,6 +44,12 @@ ntposymbol_t* ntposymstack_pop(ntposymstack_t* stack);
 ntposymbol_t* ntposymstack_top(ntposymstack_t* stack);
 
 /**
+ * Returns terminal element closest to top of the stack without removing it.
+ * Throws error, when no element is found.
+ */
+ntposymbol_t* ntposymstack_top_terminal(ntposymstack_t* stack);
+
+/**
  * Returns length (number of elements) of the stack.
  */
 int ntposymstack_get_length(ntposymstack_t* stack);
