@@ -9,10 +9,10 @@
 #include "../scanner/token.h"
 
 typedef enum ptablesymbol_e {
-    G,  // >
-    L,  // <
-    E,  // =
-    N   // none
+    PT_G,  // >
+    PT_L,  // <
+    PT_E,  // =
+    PT_N   // none
 } ptablesymbol_e;
 
 typedef enum terminalid_e {
@@ -39,7 +39,7 @@ typedef enum terminalid_e {
    TERMINAL_END_OF_FILE                 // EOF
 } terminalid_e;
 
-extern const int precedence_table;
+extern const int **precedence_table;
 
 /**
  * Returns terminal ID of given token ID.
