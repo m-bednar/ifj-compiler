@@ -73,7 +73,7 @@ ntposymbol_t* ntposymstack_top(ntposymstack_t* stack) {
     return top; 
 }
 
-ntposymbol_t* ntposymstack_top(ntposymstack_t* stack) {
+ntposymbol_t* ntposymstack_top_terminal(ntposymstack_t* stack) {
     guard(stack != NULL);
     guard(stack->length != 0);
 
