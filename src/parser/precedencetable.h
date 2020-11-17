@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "../scanner/token.h"
+
 typedef enum ptablesymbol_e {
     G,  // >
     L,  // <
@@ -14,7 +16,7 @@ typedef enum ptablesymbol_e {
 } ptablesymbol_e;
 
 typedef enum terminalid_e {
-   TERMINAL_OPERATOR_OR = 0,            // ||
+   TERMINAL_OPERATOR_OR,            // ||
    TERMINAL_OPERATOR_AND,               // &&
    TERMINAL_OPERATOR_EQUALS,            // ==
    TERMINAL_OPERATOR_NOT_EQUAL,         // !=
