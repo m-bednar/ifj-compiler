@@ -494,11 +494,16 @@ token_t* get_next_token() {
          case STATE_BLOCK_COMMENT:
             if (c == '*') {
                state = STATE_BLOCK_COMMENT_END;
+            } else if (c == EOF) {
+               exit(ERRCODE_LEXICAL_ERROR);
             }
             break;
          case STATE_BLOCK_COMMENT_END:
             if (c == '/') {
                state = STATE_START;
+            } else if (c == EOF) {
+               exit(ERRCODE_LEXICAL_ERROR);
+
             } else {
                state = STATE_BLOCK_COMMENT;
             }
