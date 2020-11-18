@@ -6,8 +6,6 @@
 
 #include "precedencetable.h"
 
-#define TABLE_SIZE 21
-
 const int precedence_table[TABLE_SIZE][TABLE_SIZE] = {
     {PT_G, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_G, PT_L, PT_L, PT_L, PT_L, PT_L, PT_G},
     {PT_G, PT_G, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_L, PT_G, PT_L, PT_L, PT_L, PT_L, PT_L, PT_G},
