@@ -713,12 +713,79 @@ bool precedence_parser(token_t **token, token_t **token_next) {
     return error;
 }
 
+bool find_derivation(int stack_top_id, ntsymstack_t *stack, token_t **token, token_t **token_next) {
+    switch(stack_top_id) {
+        case NONTERMINAL_PROGRAM:
+            return nonterminal_program_derivation(stack, (*token)->id);
+        case NONTERMINAL_PACKAGES:
+            return nonterminal_packages_derivation(stack, (*token)->id);
+        case NONTERMINAL_PACKAGE:
+            return nonterminal_package_derivation(stack, (*token)->id);
+        case NONTERMINAL_FUNCTIONS:
+            return nonterminal_functions_derivation(stack, (*token)->id);
+        case NONTERMINAL_FUNCTION:
+            return nonterminal_function_derivation(stack, (*token)->id);
+        case NONTERMINAL_PARAMETERS:
+            return nonterminal_parameters_derivation(stack, (*token)->id);
+        case NONTERMINAL_PARAMETER:
+            return nonterminal_parameter_derivation(stack, (*token)->id);
+        case NONTERMINAL_PARAMETER_NEXT:
+            return nonterminal_parameter_next_derivation(stack, (*token)->id);
+        case NONTERMINAL_RETURN_TYPES:
+            return nonterminal_return_types_derivation(stack, (*token)->id);
+        case NONTERMINAL_TYPES:
+            return nonterminal_types_derivation(stack, (*token)->id);
+        case NONTERMINAL_TYPE:
+            return nonterminal_type_derivation(stack, (*token)->id);
+        case NONTERMINAL_TYPE_NEXT:
+            return nonterminal_type_next_derivation(stack, (*token)->id);
+        case NONTERMINAL_RETURN:
+            return nonterminal_return_derivation(stack, (*token)->id);
+        case NONTERMINAL_DEFINITION:
+            return nonterminal_definition_derivation(stack, (*token)->id);
+        case NONTERMINAL_FOR_DEFINITION:
+            return nonterminal_for_definition_derivation(stack, (*token)->id);
+        case NONTERMINAL_ASSIGNMENT:
+            return nonterminal_assignment_derivation(stack, (*token)->id);
+        case NONTERMINAL_FOR_ASSIGNMENT:
+            return nonterminal_for_assignment_derivation(stack, (*token)->id);
+        case NONTERMINAL_ASSIGNMENT_RIGHT:
+            return nonterminal_assignment_right_derivation(stack, (*token)->id, (*token_next)->id);
+        case NONTERMINAL_FOR_ASSIGNMENT_RIGHT:
+            return nonterminal_for_assignment_right_derivation(stack, (*token)->id, (*token_next)->id);
+        case NONTERMINAL_ID_NEXT:
+            return nonterminal_id_next_derivation(stack, (*token)->id);
+        case NONTERMINAL_COMMANDS:
+            return nonterminal_commands_derivation(stack, (*token)->id);
+        case NONTERMINAL_COMMAND:
+            return nonterminal_command_derivation(stack, (*token)->id, (*token_next)->id);
+        case NONTERMINAL_IF:
+            return nonterminal_if_derivation(stack, (*token)->id);
+        case NONTERMINAL_ELSE_IF:
+            return nonterminal_else_if_derivation(stack, (*token)->id, (*token_next)->id);
+        case NONTERMINAL_FOR:
+            return nonterminal_for_derivation(stack, (*token)->id);
+        case NONTERMINAL_CALL:
+            return nonterminal_call_derivation(stack, (*token)->id);
+        case NONTERMINAL_IDS:
+            return nonterminal_ids_derivation(stack, (*token)->id);
+        case NONTERMINAL_EXPRESSIONS:
+            return nonterminal_expressions_derivation(stack, (*token)->id);
+        case NONTERMINAL_EXPRESSION:
+            ntsymbol_dtor(ntsymstack_pop(stack));
+            return precedence_parser(token, token_next);
+        case NONTERMINAL_EXPRESSION_NEXT:
+            return nonterminal_expression_next_derivation(stack, (*token)->id);
+        default:
+            return true;
+    }
+}
+
 void parse() {
     ntsymstack_t *stack = ntsymstack_ctor();
     token_t *token = get_next_token();
     token_t *token_next = token;
     ntsymbol_t *stack_top;
-
     bool error = false;
 
     ntsymstack_push(stack, ntsymbol_ctor(TOKENID_END_OF_FILE, true));
@@ -729,9 +796,7 @@ void parse() {
     }
 
     while(!error && ntsymstack_get_length(stack) != 0) {
-        
         stack_top = ntsymstack_top(stack);
-
         if(token->id == TOKENID_NEWLINE) {
             if(EOL_FLAG == true) {
                 token_dtor(token);
@@ -767,105 +832,9 @@ void parse() {
             }
         }
         else {
-            switch(stack_top->id) {
-                case NONTERMINAL_PROGRAM:
-                    error = nonterminal_program_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_PACKAGES:
-                    error = nonterminal_packages_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_PACKAGE:
-                    error = nonterminal_package_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_FUNCTIONS:
-                    error = nonterminal_functions_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_FUNCTION:
-                    error = nonterminal_function_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_PARAMETERS:
-                    error = nonterminal_parameters_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_PARAMETER:
-                    error = nonterminal_parameter_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_PARAMETER_NEXT:
-                    error = nonterminal_parameter_next_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_RETURN_TYPES:
-                    error = nonterminal_return_types_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_TYPES:
-                    error = nonterminal_types_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_TYPE:
-                    error = nonterminal_type_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_TYPE_NEXT:
-                    error = nonterminal_type_next_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_RETURN:
-                    error = nonterminal_return_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_DEFINITION:
-                    error = nonterminal_definition_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_FOR_DEFINITION:
-                    error = nonterminal_for_definition_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_ASSIGNMENT:
-                    error = nonterminal_assignment_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_FOR_ASSIGNMENT:
-                    error = nonterminal_for_assignment_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_ASSIGNMENT_RIGHT:
-                    error = nonterminal_assignment_right_derivation(stack, token->id, token_next->id);
-                    break;
-                case NONTERMINAL_FOR_ASSIGNMENT_RIGHT:
-                    error = nonterminal_for_assignment_right_derivation(stack, token->id, token_next->id);
-                    break;
-                case NONTERMINAL_ID_NEXT:
-                    error = nonterminal_id_next_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_COMMANDS:
-                    error = nonterminal_commands_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_COMMAND:
-                    error = nonterminal_command_derivation(stack, token->id, token_next->id);
-                    break;
-                case NONTERMINAL_IF:
-                    error = nonterminal_if_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_ELSE_IF:
-                    error = nonterminal_else_if_derivation(stack, token->id, token_next->id);
-                    break;
-                case NONTERMINAL_FOR:
-                    error = nonterminal_for_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_CALL:
-                    error = nonterminal_call_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_IDS:
-                    error = nonterminal_ids_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_EXPRESSIONS:
-                    error = nonterminal_expressions_derivation(stack, token->id);
-                    break;
-                case NONTERMINAL_EXPRESSION:
-                    ntsymbol_dtor(ntsymstack_pop(stack));
-                    error = precedence_parser(&token, &token_next);
-                    break;
-                case NONTERMINAL_EXPRESSION_NEXT:
-                    error = nonterminal_expression_next_derivation(stack, token->id);
-                    break;
-                default:
-                    error = true;
-                    break;
-            }
+            error = find_derivation(stack_top->id, stack, &token, &token_next);
         }
     }
-
     ntsymstack_dtor(stack);
 
     if(error) {
@@ -873,6 +842,6 @@ void parse() {
         token_dtor(token_next);
         exit(ERRCODE_SYNTAX_ERROR);
     }
-
+    
     return;
 }
