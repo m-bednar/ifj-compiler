@@ -486,7 +486,7 @@ token_t* get_next_token() {
             // prev = c;
             return token_ctor(TOKENID_END_OF_FILE, value);
          case STATE_COMMENT:
-            if (c == '\n') {
+            if (c == '\n' || c == EOF) {
                prev = c;
                state = STATE_START;
             }
