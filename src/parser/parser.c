@@ -630,6 +630,9 @@ bool reduce(ntposymstack_t *stack) {
         }
 
     }
+    else {
+        return true;
+    }
     return false;
 }
 
