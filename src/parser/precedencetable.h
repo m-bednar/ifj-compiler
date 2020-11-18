@@ -8,6 +8,8 @@
 
 #include "../scanner/token.h"
 
+#define TABLE_SIZE 21
+
 typedef enum ptablesymbol_e {
     PT_G,  // >
     PT_L,  // <
@@ -39,7 +41,7 @@ typedef enum terminalid_e {
    TERMINAL_END_OF_FILE                 // EOF
 } terminalid_e;
 
-extern const int **precedence_table;
+extern const int precedence_table[TABLE_SIZE][TABLE_SIZE];
 
 /**
  * Returns terminal ID of given token ID.
