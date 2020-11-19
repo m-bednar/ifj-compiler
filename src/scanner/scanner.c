@@ -17,6 +17,7 @@ typedef enum state_e {
    STATE_START,
    STATE_IDENTIFIER_KEYWORD,
    STATE_NUM,
+   STATE_NUM_UNDERSCORE,
    STATE_NUM_ZERO,
    STATE_DECIMAL,
    STATE_BASE,
@@ -252,8 +253,25 @@ token_t* get_next_token() {
             } else if ((c == 'e') || (c == 'E')) {
                buffer = append((char)c, buffer);
                state = STATE_EXP_START;
+            } else if (c == '_') {
+               state = STATE_NUM_UNDERSCORE;
             } else { // end of num
                prev = c;
+               char* pEnd;
+               value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
+               free(buffer);
+               return token_ctor(TOKENID_NUM, value);
+            }
+            break;
+         case STATE_NUM_UNDERSCORE:
+            if(isdigit(c)) {
+               prev = c;
+               state = STATE_NUM;
+            } else if (c == '_') {
+               exit(ERRCODE_LEXICAL_ERROR);
+            } else { // _ is start of new token
+               ungetc(c, stdin);
+               prev = '_';
                char* pEnd;
                value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
                free(buffer);
