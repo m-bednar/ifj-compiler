@@ -20,6 +20,7 @@ typedef enum state_e {
    STATE_NUM_ZERO,
    STATE_DECIMAL,
    STATE_BASE,
+   STATE_BASE_UNDERSCORE,
    STATE_EXP_START,
    STATE_EXP,
    STATE_OPERATOR_ADD,
@@ -190,6 +191,20 @@ bool str_to_bool(char* str) {
    return strcmp(str, "true") == 0 ? true : false;
 }
 
+/**
+ * Returns true if char c belongs to given base, otherwise returns false
+ */
+bool char_belongs_to_base(char c, int base) {
+   if (base == BASE_BIN && c >= '0' && c <= '1') {
+      return true;
+   } else if (base == BASE_OCT && c >= '0' && c <= '7') {
+      return true;
+   } else if (base == BASE_HEX && (isdigit(c) || (toupper(c) >= 'A' && toupper(c) <= 'F'))) {
+      return true;
+   }
+   return false;
+}
+
 token_t* get_next_token() {
    state_e state = STATE_START;
    int c = '\0';
@@ -284,13 +299,30 @@ token_t* get_next_token() {
             }
             break;
          case STATE_BASE:
-            if (isdigit(c) || c == '_' ||
-               (base == BASE_HEX && toupper(c) >= 'A' && toupper(c) <= 'F')) {
-               if (c != '_') {
+            if (char_belongs_to_base(c, base)) {
                   buffer = append((char) c, buffer);
+            } else if (c == '_') {
+                  if (buffer == NULL) { // underscore at the start of num (after 0x)
+                     exit(ERRCODE_LEXICAL_ERROR);
                }
+               state = STATE_BASE_UNDERSCORE;
             } else {
                prev = c;
+               char* pEnd;
+               value.int_value = (int64_t) strtoll(buffer, & pEnd, base);
+               free(buffer);
+               return token_ctor(TOKENID_NUM, value);
+            }
+            break;
+         case STATE_BASE_UNDERSCORE:
+            if (char_belongs_to_base(c, base)) {
+               prev = c;
+               state = STATE_BASE;
+            } else if (c == '_') {
+               exit(ERRCODE_LEXICAL_ERROR);
+            } else {
+               ungetc(c, stdin); // return char after _ to stream
+               prev = '_';
                char* pEnd;
                value.int_value = (int64_t) strtoll(buffer, & pEnd, base);
                free(buffer);
