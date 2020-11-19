@@ -340,11 +340,11 @@ token_t* get_next_token() {
             break;
          case STATE_BASE:
             if (char_belongs_to_base(c, base)) {
-                  buffer = append((char) c, buffer);
+               buffer = append((char) c, buffer);
             } else if (c == '_') {
                   if (buffer == NULL) { // underscore at the start of num (after 0x)
                      exit(ERRCODE_LEXICAL_ERROR);
-               }
+                  }
                state = STATE_BASE_UNDERSCORE;
             } else {
                prev = c;
@@ -399,7 +399,7 @@ token_t* get_next_token() {
             }
             break;
          case STATE_EXP_UNDERSCORE:
-            if(isdigit(c)) {
+            if (isdigit(c)) {
                prev = c;
                state = STATE_EXP;
             } else if (c == '_') {
@@ -468,7 +468,7 @@ token_t* get_next_token() {
             }
             break;
          case STATE_OPERATOR_ASSIGN:
-            if(c == '=') {
+            if (c == '=') {
                return token_ctor(TOKENID_OPERATOR_EQUALS, value);
             } else {
                prev = c;
