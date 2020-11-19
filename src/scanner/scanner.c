@@ -25,6 +25,7 @@ typedef enum state_e {
    STATE_BASE_UNDERSCORE,
    STATE_EXP_START,
    STATE_EXP,
+   STATE_EXP_UNDERSCORE,
    STATE_OPERATOR_ADD,
    STATE_OPERATOR_SUB,
    STATE_OPERATOR_MUL,
@@ -383,10 +384,30 @@ token_t* get_next_token() {
          case STATE_EXP:
             if (isdigit(c)) {
                buffer = append((char) c, buffer);
+            } else if (c == '_') {
+               if (!isdigit(buffer[strlen(buffer)-1])) {
+                  exit(ERRCODE_LEXICAL_ERROR);
+               }
+               state = STATE_EXP_UNDERSCORE;
             } else {
                if (strlen(buffer) == 0 || (strlen(buffer) == 1 && buffer[0] == '-')) { // No digits were read as an exponent
                   exit(ERRCODE_LEXICAL_ERROR);
                }
+               value.decimal_value = strtod(buffer, &pEnd);
+               free(buffer);
+               return token_ctor(TOKENID_NUM_DECIMAL, value);
+            }
+            break;
+         case STATE_EXP_UNDERSCORE:
+            if(isdigit(c)) {
+               prev = c;
+               state = STATE_EXP;
+            } else if (c == '_') {
+               exit(ERRCODE_LEXICAL_ERROR);
+            } else {
+               ungetc(c, stdin); // return char after _ to stream
+               prev = '_';
+               char* pEnd;
                value.decimal_value = strtod(buffer, &pEnd);
                free(buffer);
                return token_ctor(TOKENID_NUM_DECIMAL, value);
