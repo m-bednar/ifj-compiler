@@ -290,7 +290,7 @@ token_t* get_next_token() {
                buffer = append((char)'0', buffer);
                buffer = append((char)c, buffer);
                state = STATE_EXP_START;
-            } else if (isdigit(c) || c == '_') { // other digits or underscore after 0 not allowed
+            } else if (isdigit(c)) { // other digits after 0 not allowed
                exit(ERRCODE_LEXICAL_ERROR);
             } else { // just 0
                prev = c;
