@@ -42,12 +42,7 @@ typedef enum nonterminalid_e {
     NONTERMINAL_IDS,
     NONTERMINAL_EXPRESSION,
     NONTERMINAL_EXPRESSIONS,
-    NONTERMINAL_EXPRESSION_NEXT,
-    // precedence operators
-    PRECEDENCE_OPERATOR_EQUALS,
-    PRECEDENCE_OPERATOR_GREATER,
-    PRECEDENCE_OPERATOR_LESS,
-    PRECEDENCE_OPERATOR_EOE     // end of expression
+    NONTERMINAL_EXPRESSION_NEXT
 } nonterminalid_e;
 
 typedef struct ntsymbol_t {
