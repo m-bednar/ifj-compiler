@@ -20,6 +20,7 @@ typedef enum state_e {
    STATE_NUM_UNDERSCORE,
    STATE_NUM_ZERO,
    STATE_DECIMAL,
+   STATE_DECIMAL_UNDERSCORE,
    STATE_BASE,
    STATE_BASE_UNDERSCORE,
    STATE_EXP_START,
@@ -305,11 +306,31 @@ token_t* get_next_token() {
                }
                buffer = append((char)c, buffer);
                state = STATE_EXP_START;
+            } else if (c == '_') {
+               if (!isdigit(buffer[strlen(buffer)-1])) {
+                  exit(ERRCODE_LEXICAL_ERROR);
+               }
+               state = STATE_DECIMAL_UNDERSCORE;
             } else {
                if (!are_decimal_numbers_present(buffer)) {
                   exit(ERRCODE_LEXICAL_ERROR);
                }
                prev = c;
+               char* pEnd;
+               value.decimal_value = (double) strtod(buffer, &pEnd);
+               free(buffer);
+               return token_ctor(TOKENID_NUM_DECIMAL, value);
+            }
+            break;
+         case STATE_DECIMAL_UNDERSCORE:
+            if (isdigit(c)) {
+               prev = c;
+               state = STATE_DECIMAL;
+            } else if (c == '_') {
+               exit(ERRCODE_LEXICAL_ERROR);
+            } else {
+               ungetc(c, stdin);
+               prev = '_';
                char* pEnd;
                value.decimal_value = (double) strtod(buffer, &pEnd);
                free(buffer);
