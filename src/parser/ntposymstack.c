@@ -1,3 +1,4 @@
+
 /**
  * IFJ20 Compiler
  * @file ntposymstack.c
@@ -10,85 +11,90 @@ static const float DEALLOC_MIN_UNUSED_PERCENTAGE = 0.5;
 static const int ALLOC_MIN_ELEMENTS_COUNT = 4;
 
 ntposymstack_t* ntposymstack_ctor() {
-    ntposymstack_t* stack = safe_alloc(sizeof(ntposymstack_t));
+   ntposymstack_t* stack = safe_alloc(sizeof(ntposymstack_t));
 
-    stack->length = 0;
-    stack->capacity = 0;
-    stack->memory = NULL;
-    return stack;
+   stack->length = 0;
+   stack->capacity = 0;
+   stack->memory = NULL;
+   return stack;
 }
 
 void ntposymstack_dtor(ntposymstack_t* stack) {
-    guard(stack != NULL);
+   guard(stack != NULL);
 
-    if (stack->memory != NULL) {
-        for (int i = 0; i < stack->length; i++) {
-            ntposymbol_dtor(stack->memory[i]);
-        }
-        free(stack->memory);
-        stack->length = 0;
-        stack->capacity = 0;
-        stack->memory = NULL;
-        free(stack);
-    }
-    return;
+   if (stack->memory != NULL) {
+      for (int i = 0; i < stack->length; i++) {
+         ntposymbol_dtor(stack->memory[i]);
+      }
+      free(stack->memory);
+      stack->length = 0;
+      stack->capacity = 0;
+      stack->memory = NULL;
+      free(stack);
+   }
+   return;
 }
 
 void ntposymstack_push(ntposymstack_t* stack, ntposymbol_t* ntposymbol) {
-    guard(stack != NULL);
-    guard(ntposymbol != NULL);
-    
-    // Allocates additional memory, when capacity is reached
-    if (stack->capacity == stack->length) {
-        stack->memory = safe_realloc(stack->memory, sizeof(ntposymbol_t*) * (stack->length + ALLOC_MIN_ELEMENTS_COUNT));
-        stack->capacity += ALLOC_MIN_ELEMENTS_COUNT;
-    }
+   guard(stack != NULL);
+   guard(ntposymbol != NULL);
 
-    stack->memory[stack->length] = ntposymbol;
-    stack->length++;
-    return;
+   // Allocates additional memory, when capacity is reached
+   if (stack->capacity == stack->length) {
+      stack->memory = safe_realloc(
+            stack->memory,
+            sizeof(ntposymbol_t*) * (stack->length + ALLOC_MIN_ELEMENTS_COUNT));
+      stack->capacity += ALLOC_MIN_ELEMENTS_COUNT;
+   }
+
+   stack->memory[stack->length] = ntposymbol;
+   stack->length++;
+   return;
 }
 
 ntposymbol_t* ntposymstack_pop(ntposymstack_t* stack) {
-    guard(stack != NULL);
-    guard(stack->length != 0);
+   guard(stack != NULL);
+   guard(stack->length != 0);
 
-    ntposymbol_t* top = stack->memory[stack->length - 1];
-    stack->length--;
+   ntposymbol_t* top = stack->memory[stack->length - 1];
+   stack->length--;
 
-    // Deallocates excessive memory, when less than DEALLOC_MIN_UNUSED_PERCENTAGE percent is used
-    if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE && stack->capacity > ALLOC_MIN_ELEMENTS_COUNT) {
-        stack->memory = safe_realloc(stack->memory, sizeof(ntposymbol_t*) * (stack->length));
-        stack->capacity = stack->length;
-    }
+   // Deallocates excessive memory, when less than DEALLOC_MIN_UNUSED_PERCENTAGE
+   // percent is used
+   if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE &&
+         stack->capacity > ALLOC_MIN_ELEMENTS_COUNT) {
+      stack->memory =
+            safe_realloc(stack->memory, sizeof(ntposymbol_t*) * (stack->length));
+      stack->capacity = stack->length;
+   }
 
-    return top; 
+   return top;
 }
 
 ntposymbol_t* ntposymstack_top(ntposymstack_t* stack) {
-    guard(stack != NULL);
-    guard(stack->length != 0);
+   guard(stack != NULL);
+   guard(stack->length != 0);
 
-    ntposymbol_t* top = stack->memory[stack->length - 1];
-    return top; 
+   ntposymbol_t* top = stack->memory[stack->length - 1];
+   return top;
 }
 
 ntposymbol_t* ntposymstack_top_terminal(ntposymstack_t* stack) {
-    guard(stack != NULL);
-    guard(stack->length != 0);
+   guard(stack != NULL);
+   guard(stack->length != 0);
 
-    ntposymbol_t* top_terminal = NULL;
+   ntposymbol_t* top_terminal = NULL;
 
-    for(int i = stack->length - 1; i >= 0; i--) {
-        if(stack->memory[i]->type == TERMINAL) {
-            top_terminal = stack->memory[i];
-            break;
-        }
-    }
+   for (int i = stack->length - 1; i >= 0; i--) {
+      if (stack->memory[i]->type == TERMINAL) {
+         top_terminal = stack->memory[i];
+         break;
+      }
+   }
 
-    return top_terminal; 
+   return top_terminal;
 }
 
 int ntposymstack_get_length(ntposymstack_t* stack) {
-    return stack->length;
+   return stack->length;
 }

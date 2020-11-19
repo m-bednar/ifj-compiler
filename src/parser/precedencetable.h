@@ -11,14 +11,14 @@
 #define TABLE_SIZE 21
 
 typedef enum ptablesymbol_e {
-    PT_G,  // >
-    PT_L,  // <
-    PT_E,  // =
-    PT_N   // none
+   PT_G,  // >
+   PT_L,  // <
+   PT_E,  // =
+   PT_N   // none
 } ptablesymbol_e;
 
 typedef enum terminalid_e {
-   TERMINAL_OPERATOR_OR,            // ||
+   TERMINAL_OPERATOR_OR,                // ||
    TERMINAL_OPERATOR_AND,               // &&
    TERMINAL_OPERATOR_EQUALS,            // ==
    TERMINAL_OPERATOR_NOT_EQUAL,         // !=

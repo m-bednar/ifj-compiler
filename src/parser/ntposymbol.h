@@ -15,14 +15,14 @@
 #define OPERATOR 0
 
 typedef enum symtype_e {
-    NONTERMINAL,
-    TERMINAL,
-    PRECEDENCE_OPERATOR
+   NONTERMINAL,
+   TERMINAL,
+   PRECEDENCE_OPERATOR
 } symtype_e;
 
 typedef struct ntposymbol_t {
-    symtype_e type;
-    int id;
+   symtype_e type;
+   int id;
 } ntposymbol_t;
 
 
