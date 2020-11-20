@@ -20,6 +20,7 @@ symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype_e* arg_types
    fn->arg_types = arg_types;
    fn->ret_count = ret_count;
    fn->ret_types = ret_types;
+   fn->defined = defined;
    symbolval.fn = fn;
    
    return symbolval;
