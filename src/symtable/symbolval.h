@@ -5,9 +5,9 @@
  */
 
 #pragma once
+#include <stdbool.h>
 
 typedef enum vartype_e {
-   VT_VOID,
    VT_BOOL,
    VT_INT,
    VT_FLOAT,
@@ -15,14 +15,15 @@ typedef enum vartype_e {
 } vartype_e;
 
 typedef struct symbolvalfn_t {
-   int arg_count;
-   int ret_count;
-   vartype_e* arg_types;
-   vartype_e* ret_types;
+   int arg_count;          // Count of arguments
+   int ret_count;          // Count of return values
+   vartype_e* arg_types;   // Types of arguments (NULL if no arguments)
+   vartype_e* ret_types;   // Types of return values (NULL if void)
+   bool defined;           // Whatever function was already defined
 } symbolvalfn_t;
 
 typedef struct symbolvalvar_t {
-   vartype_e type;
+   vartype_e type;         // Type of the variable
 } symbolvalvar_t;
 
 typedef union symbolval_u {
@@ -34,7 +35,7 @@ typedef union symbolval_u {
 /**
  * Allocates and creates new symbol value for function.
  */
-symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype_e* arg_types, vartype_e* ret_types);
+symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype_e* arg_types, vartype_e* ret_types, bool defined);
 
 /**
  * Allocates and creates new symbol value for variable.
