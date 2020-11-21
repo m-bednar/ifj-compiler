@@ -17,32 +17,32 @@ typedef enum astnodetype_e{
 } astnode_type_e;
 
 typedef struct astnode_globalval_t {
-   astnode_codeblock_t* functions;
-} astnode_ifval_t;
+    struct astnode_codeblock_t* functions;
+} astnode_globalval_t;
 
 typedef struct astnode_expval_t {
    token_t** postfix;
-} astnode_ifval_t;
+} astnode_expval_t;
 
 typedef struct astnode_retval_t {
    astnode_expval_t* expresion;
-} astnode_ifval_t;
+} astnode_retval_t;
 
 typedef struct astnode_funcval_t {
    astnode_retval_t* return_val;
-   astnode_codeblock_t* body;
-} astnode_ifval_t;
+   struct astnode_codeblock_t* body;
+} astnode_funcval_t;
 
 typedef struct astnode_ifval_t {
    astnode_expval_t* condition;
-   astnode_codeblock_t* true_body;
-   astnode_codeblock_t* else_body;
+   struct astnode_codeblock_t* true_body;
+   struct astnode_codeblock_t* else_body;
 } astnode_ifval_t;
 
 typedef struct astnode_forval_t {
    astnode_expval_t* condition;
-   astnode_codeblock_t* body;
-} astnode_ifval_t;
+   struct astnode_codeblock_t* body;
+} astnode_forval_t;
 
 
 typedef union astnode_value_u {
@@ -64,3 +64,8 @@ typedef struct astnode_codeblock_t {
    astnode_t** children;
    int children_count;
 } astnode_codeblock_t;
+
+/**
+ * Allocate new AST
+ */
+astnode_t* ast_ctor();
