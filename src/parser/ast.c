@@ -9,7 +9,7 @@
 
 astnode_t* ast_ctor(){
    astnode_t* ast = safe_alloc(sizeof(astnode_t));
-   ast->type = TYPE_GLOBAL;
+   ast->type = ANT_GLOBAL;
    ast->value.globalval.functions = NULL;
    return ast;
 }

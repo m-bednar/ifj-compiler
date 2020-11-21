@@ -10,12 +10,12 @@
 #include "../scanner/scanner.h"
 
 typedef enum astnodetype_e{
-   TYPE_IF_VAL,
-   TYPE_FOR_VAL,
-   TYPE_EXP_VAL,
-   TYPE_RETURN_VAL,
-   TYPE_FUNC_VAL,
-   TYPE_GLOBAL
+   ANT_IF,
+   ANT_FOR,
+   ANT_EXP,
+   ANT_RETURN,
+   ANT_FUNC,
+   ANT_GLOBAL
 } astnode_type_e;
 
 typedef struct astnode_globalval_t {
