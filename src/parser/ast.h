@@ -4,6 +4,8 @@
  * @authors Michal Trlica (xtrlic02)
  */
 
+#pragma once
+
 #include <stdbool.h>
 #include "../scanner/scanner.h"
 
