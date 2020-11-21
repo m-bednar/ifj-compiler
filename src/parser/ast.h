@@ -31,6 +31,7 @@ typedef struct astnode_retval_t {
 } astnode_retval_t;
 
 typedef struct astnode_funcval_t {
+   char* name;
    astnode_retval_t* return_val;
    struct astnode_codeblock_t* body;
 } astnode_funcval_t;
