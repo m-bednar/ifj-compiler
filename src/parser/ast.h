@@ -51,6 +51,7 @@ typedef union astnode_value_u {
    astnode_expval_t expval;
    astnode_funcval_t funcval;
    astnode_retval_t returnval;
+   astnode_globalval_t globalval;
 } astnode_value_u;
 
 typedef struct astnode_t{
