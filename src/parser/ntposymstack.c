@@ -83,16 +83,13 @@ ntposymbol_t* ntposymstack_top_terminal(ntposymstack_t* stack) {
    guard(stack != NULL);
    guard(stack->length != 0);
 
-   ntposymbol_t* top_terminal = NULL;
-
    for (int i = stack->length - 1; i >= 0; i--) {
       if (stack->memory[i]->type == TERMINAL) {
-         top_terminal = stack->memory[i];
-         break;
+         return stack->memory[i];
       }
    }
 
-   return top_terminal;
+   return NULL;
 }
 
 int ntposymstack_get_length(ntposymstack_t* stack) {
