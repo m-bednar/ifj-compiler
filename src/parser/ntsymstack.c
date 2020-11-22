@@ -40,9 +40,7 @@ void ntsymstack_push(ntsymstack_t* stack, ntsymbol_t* ntsymbol) {
 
    // Allocates additional memory, when capacity is reached
    if (stack->capacity == stack->length) {
-      stack->memory = safe_realloc(
-            stack->memory,
-            sizeof(ntsymbol_t*) * (stack->length + ALLOC_MIN_ELEMENTS_COUNT));
+      stack->memory = safe_realloc(stack->memory, sizeof(ntsymbol_t*) * (stack->length + ALLOC_MIN_ELEMENTS_COUNT));
       stack->capacity += ALLOC_MIN_ELEMENTS_COUNT;
    }
 
@@ -62,8 +60,7 @@ ntsymbol_t* ntsymstack_pop(ntsymstack_t* stack) {
    // percent is used
    if (stack->length < stack->capacity * DEALLOC_MIN_UNUSED_PERCENTAGE &&
          stack->capacity > ALLOC_MIN_ELEMENTS_COUNT) {
-      stack->memory =
-            safe_realloc(stack->memory, sizeof(ntsymbol_t*) * (stack->length));
+      stack->memory = safe_realloc(stack->memory, sizeof(ntsymbol_t*) * (stack->length));
       stack->capacity = stack->length;
    }
 
