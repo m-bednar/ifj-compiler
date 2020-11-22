@@ -17,6 +17,7 @@ typedef enum astnodetype_e{
    ANT_FUNCDEC,
    ANT_FUNCCALL,
    ANT_ASSIGN,
+   ANT_DEFVAR,
    ANT_GLOBAL
 } astnode_type_e;
 
@@ -33,6 +34,11 @@ typedef struct astnode_assignval_t {
    astnode_expval_t* right_expresions;
    int expresions_count;
 } astnode_assignval_t;
+
+typedef struct astnode_defvarval_t {
+   astnode_expval_t expresion;
+   token_t* variable;
+} astnode_defvarval_t;
 
 typedef struct astnode_retval_t {
    astnode_expval_t* expresion;
@@ -71,6 +77,7 @@ typedef union astnode_value_u {
    astnode_globalval_t globalval;
    astnode_funccallval_t funccallval;
    astnode_assignval_t assignval;
+   astnode_defvarval_t defvarval;
 } astnode_value_u;
 
 typedef struct astnode_t{
