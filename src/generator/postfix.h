@@ -8,4 +8,8 @@
 
 #include "../scanner/token.h"
 
+/**
+ * Converts token array in infix notation to postfix notation. 
+ * Return new lenght of the array without resizing it and destructs all additional tokens.
+ */
 int infix_to_postfix(token_t** infix, int length);
