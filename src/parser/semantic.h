@@ -7,6 +7,9 @@
 #pragma once
 
 #include "../scanner/scanner.h"
+#include "ast.h"
+
+static astnode_t* ast;
 
 typedef enum semantic_error_e {
    SERROR_DECLARE_3,
