@@ -15,6 +15,7 @@ typedef enum astnodetype_e{
    ANT_EXP,
    ANT_RET,
    ANT_FUNCDEC,
+   ANT_FUNCCALL,
    ANT_GLOBAL
 } astnode_type_e;
 
@@ -36,6 +37,12 @@ typedef struct astnode_funcdecval_t {
    struct astnode_codeblock_t* body;
 } astnode_funcdecval_t;
 
+typedef struct astnode_funccallval_t {
+   char* name;
+   astnode_expval_t* params;
+} astnode_funccallval_t;
+
+
 typedef struct astnode_ifval_t {
    astnode_expval_t* condition;
    struct astnode_codeblock_t* true_body;
@@ -55,6 +62,7 @@ typedef union astnode_value_u {
    astnode_funcdecval_t funcdecval;
    astnode_retval_t returnval;
    astnode_globalval_t globalval;
+   astnode_funccallval_t funccallval;
 } astnode_value_u;
 
 typedef struct astnode_t{
