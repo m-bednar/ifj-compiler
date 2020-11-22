@@ -5,7 +5,6 @@
  */
 
 #include "semantic.h"
-#include "../scanner/scanner.h"
 
 
 semantic_error_e semantic(token_t* token){
