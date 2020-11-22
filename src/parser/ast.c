@@ -50,11 +50,11 @@ astnode_t* astnode_ret_ctor(){
    return ast_node;
 }
 
-astnode_t* astnode_func_ctor(){
+astnode_t* astnode_funcdec_ctor(){
    astnode_t* ast_node = safe_alloc(sizeof(astnode_t));
    ast_node->parent = NULL;
-   ast_node->type = ANT_FUNC;
-   ast_node->value.funcval.body = NULL;
-   ast_node->value.funcval.return_val = NULL;
+   ast_node->type = ANT_FUNCDEC;
+   ast_node->value.funcdecval.body = NULL;
+   ast_node->value.funcdecval.return_val = NULL;
    return ast_node;
 }
