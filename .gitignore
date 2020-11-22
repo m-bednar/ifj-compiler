@@ -4,6 +4,8 @@
 
 # Binaries
 bin
+main
+main.exe
 
 # Test dir
 test
