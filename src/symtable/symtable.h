@@ -32,7 +32,7 @@ bool bintree_add(bintree_t* tree, symbol_t* value);
 /**
  * Returns symbol, specified by identifier, if found, NULL if not found.
  */
-symbol_t* bintree_get(bintree_t* tree, const char* identifier);
+symbol_t* bintree_find(bintree_t* tree, const char* identifier);
 
 /**
  * Print whole bintree to stderr.
