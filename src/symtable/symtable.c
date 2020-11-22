@@ -59,3 +59,7 @@ symbol_t* bintree_get(bintree_t* tree, const char* identifier) {
 
    return NULL;
 }
+
+void bintree_print(bintree_t* tree) {
+   binitem_print(tree->root);
+}
