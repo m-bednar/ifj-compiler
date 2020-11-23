@@ -21,3 +21,5 @@ void tokenstack_dtor(tokenstack_t* stack);
 void tokenstack_push(tokenstack_t* stack, token_t* token);
 
 token_t* tokenstack_pop(tokenstack_t* stack);
+
+int tokenstack_get_lenght(tokenstack_t* stack);
