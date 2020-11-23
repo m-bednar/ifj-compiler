@@ -30,6 +30,12 @@ typedef struct astnode_expval_t {
    int tokens_count;
 } astnode_expval_t;
 
+typedef struct astnode_funccallval_t {
+   char* name;
+   astnode_expval_t** params;
+   int params_count;
+} astnode_funccallval_t;
+
 typedef struct astnode_assignval_t {
    token_t** left_ids;
    astnode_expval_t** right_expresions; // NULL if function is there insted
@@ -51,13 +57,6 @@ typedef struct astnode_funcdeclval_t {
    char* name;
    struct astnode_codeblock_t* body;
 } astnode_funcdeclval_t;
-
-typedef struct astnode_funccallval_t {
-   char* name;
-   astnode_expval_t** params;
-   int params_count;
-} astnode_funccallval_t;
-
 
 typedef struct astnode_ifval_t {
    astnode_expval_t* condition;
