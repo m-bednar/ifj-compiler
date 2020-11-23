@@ -21,13 +21,8 @@ typedef enum astnode_type_e {
    ANT_GLOBAL
 } astnode_type_e;
 
-typedef struct astnode_generic_t {
-   astnode_type_e type;
-   union astnode_value_u value;
-} astnode_generic_t;
-
 typedef struct astnode_codeblock_t {
-   astnode_generic_t** children;
+   struct astnode_generic_t** children;
    int children_count;
 } astnode_codeblock_t;
 
@@ -93,6 +88,11 @@ typedef union astnode_value_u {
    astnode_assign_t assignval;
    astnode_defvar_t defvarval;
 } astnode_value_u;
+
+typedef struct astnode_generic_t {
+   astnode_type_e type;
+   astnode_value_u value;
+} astnode_generic_t;
 
 /**
  * Allocate new AST
