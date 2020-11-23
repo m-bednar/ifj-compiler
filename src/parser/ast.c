@@ -38,7 +38,7 @@ astnode_t* astnode_exp_ctor(){
    astnode_t* ast_node = safe_alloc(sizeof(astnode_t));
    ast_node->parent = NULL;
    ast_node->type = ANT_EXP;
-   ast_node->value.expval.postfix = NULL;
+   ast_node->value.expval.tokens = NULL;
    return ast_node;
 }
 
@@ -53,8 +53,7 @@ astnode_t* astnode_ret_ctor(){
 astnode_t* astnode_funcdec_ctor(){
    astnode_t* ast_node = safe_alloc(sizeof(astnode_t));
    ast_node->parent = NULL;
-   ast_node->type = ANT_FUNCDEC;
-   ast_node->value.funcdecval.body = NULL;
-   ast_node->value.funcdecval.return_val = NULL;
+   ast_node->type = ANT_FUNCDECL;
+   ast_node->value.funcdeclval.body = NULL;
    return ast_node;
 }
