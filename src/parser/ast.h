@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include "../scanner/scanner.h"
 
-typedef enum astnode_type_e{
+typedef enum astnode_type_e {
    ANT_IF,
    ANT_FOR,
    ANT_EXP,
@@ -21,79 +21,80 @@ typedef enum astnode_type_e{
    ANT_GLOBAL
 } astnode_type_e;
 
-typedef struct astnode_globalval_t {
-    struct astnode_codeblock_t* functions;
-} astnode_globalval_t;
-
-typedef struct astnode_expval_t {
-   token_t** tokens;
-   int tokens_count;
-} astnode_expval_t;
-
-typedef struct astnode_funccallval_t {
-   char* name;
-   astnode_expval_t** params;
-   int params_count;
-} astnode_funccallval_t;
-
-typedef struct astnode_assignval_t {
-   token_t** left_ids;
-   astnode_expval_t** right_expresions; // NULL if function is there insted
-   astnode_funccallval_t* right_function;
-   int expresions_count;
-   int ids_count;
-} astnode_assignval_t;
-
-typedef struct astnode_defvarval_t {
-   astnode_expval_t expresion;
-   token_t* variable;
-} astnode_defvarval_t;
-
-typedef struct astnode_retval_t {
-   astnode_expval_t* expresion;
-} astnode_retval_t;
-
-typedef struct astnode_funcdeclval_t {
-   char* name;
-   struct astnode_codeblock_t* body;
-} astnode_funcdeclval_t;
-
-typedef struct astnode_ifval_t {
-   astnode_expval_t* condition;
-   struct astnode_codeblock_t* true_body;
-   struct astnode_codeblock_t* else_body;
-} astnode_ifval_t;
-
-typedef struct astnode_forval_t {
-   astnode_expval_t* condition;
-   struct astnode_codeblock_t* body;
-} astnode_forval_t;
-
-
-typedef union astnode_value_u {
-   astnode_ifval_t ifval;
-   astnode_forval_t forval;
-   astnode_expval_t expval;
-   astnode_funcdeclval_t funcdeclval;
-   astnode_retval_t returnval;
-   astnode_globalval_t globalval;
-   astnode_funccallval_t funccallval;
-   astnode_assignval_t assignval;
-   astnode_defvarval_t defvarval;
-} astnode_value_u;
-
-typedef struct astnode_t{
+typedef struct astnode_generic_t {
    astnode_type_e type;
-   astnode_value_u value;
-   struct astnode_t* parent;
-} astnode_t;
+   union astnode_value_u value;
+} astnode_generic_t;
 
 typedef struct astnode_codeblock_t {
-   astnode_t** children;
+   astnode_generic_t** children;
    int children_count;
 } astnode_codeblock_t;
+
+typedef struct astnode_global_t {
+   astnode_codeblock_t* functions;
+} astnode_global_t;
+
+typedef struct astnode_exp_t {
+   token_t** tokens;
+   int tokens_count;
+} astnode_exp_t;
+
+typedef struct astnode_funccall_t {
+   char* name;
+   astnode_exp_t** params;
+   int params_count;
+} astnode_funccall_t;
+
+typedef struct astnode_assign_t {
+   token_t** left_ids;
+   astnode_exp_t** right_expresions; // NULL if function is there insted
+   astnode_funccall_t* right_function;
+   int expresions_count;
+   int ids_count;
+} astnode_assign_t;
+
+typedef struct astnode_defvar_t {
+   astnode_exp_t* expression;
+   token_t* variable;
+} astnode_defvar_t;
+
+typedef struct astnode_ret_t {
+   astnode_exp_t** expressions;
+} astnode_ret_t;
+
+typedef struct astnode_funcdecl_t {
+   char* name;
+   astnode_codeblock_t* body;
+} astnode_funcdecl_t;
+
+typedef struct astnode_if_t {
+   astnode_exp_t* condition;
+   astnode_codeblock_t* true_body;
+   astnode_codeblock_t* else_body;
+} astnode_if_t;
+
+typedef struct astnode_forval_t {
+   astnode_exp_t* condition;
+   astnode_defvar_t* defvar;  // NULL if assign is used or first statement is empty
+   astnode_assign_t* assign;  // NULL if defvar is used or first statement is empty
+   astnode_exp_t* varchange;  // evaluated after each loop
+   astnode_codeblock_t* body;
+} astnode_forval_t;
+
+typedef union astnode_value_u {
+   astnode_if_t ifval;
+   astnode_forval_t forval;
+   astnode_exp_t expval;
+   astnode_funcdecl_t funcdeclval;
+   astnode_ret_t returnval;
+   astnode_global_t globalval;
+   astnode_funccall_t funccallval;
+   astnode_assign_t assignval;
+   astnode_defvar_t defvarval;
+} astnode_value_u;
 
 /**
  * Allocate new AST
  */
-astnode_t* ast_ctor();
+astnode_generic_t* ast_ctor();
