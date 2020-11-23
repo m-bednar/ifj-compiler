@@ -42,13 +42,19 @@
 
 ### Makefile příkazy
 
-##### make
+##### make run
 - Zkompiluje projekt
-- Spustí */bin/main* bez vstupu
+- Spustí */main* bez vstupu
 
 ##### make try FILE=*vstupni_soubor*
 - Zkompiluje projekt
-- Spustí */bin/main* se standartním vstupem ze souboru *vstupni_soubor*
+- Spustí */main* se standartním vstupem ze souboru *vstupni_soubor*
+- Po skončení vypíše návratový kód kompilátoru
+
+##### make gen IN=*vstupni_soubor* OUT=*vystupni_soubor*
+- Zkompiluje projekt
+- Spustí */main* se standartním vstupem ze souboru *vstupni_soubor*
+- Výstup souboru je přesměrován do souboru *vystupni_soubor*
 - Po skončení vypíše návratový kód kompilátoru
 
 ### Registrovaná rozšíření
