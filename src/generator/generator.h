@@ -9,4 +9,4 @@
 #include "../symtable/symtable.h"
 #include "../parser/ast.h"
 
-void generate(astnode_global_t* global, bintree_t* symtable);
+void generate(astnode_global_t* global, bintree_t* fnsymtable);
