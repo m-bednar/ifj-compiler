@@ -26,13 +26,16 @@ typedef struct astnode_globalval_t {
 } astnode_globalval_t;
 
 typedef struct astnode_expval_t {
-   token_t** postfix;
+   token_t** tokens;
+   int tokens_count;
 } astnode_expval_t;
 
 typedef struct astnode_assignval_t {
-   struct astnode_codeblock_t* left_ids;
-   astnode_expval_t* right_expresions;
+   token_t** left_ids;
+   astnode_expval_t** right_expresions; // NULL if function is there insted
+   astnode_funccallval_t* right_function;
    int expresions_count;
+   int ids_count;
 } astnode_assignval_t;
 
 typedef struct astnode_defvarval_t {
@@ -46,13 +49,13 @@ typedef struct astnode_retval_t {
 
 typedef struct astnode_funcdeclval_t {
    char* name;
-   astnode_retval_t* return_val;
    struct astnode_codeblock_t* body;
 } astnode_funcdeclval_t;
 
 typedef struct astnode_funccallval_t {
    char* name;
-   astnode_expval_t* params;
+   astnode_expval_t** params;
+   int params_count;
 } astnode_funccallval_t;
 
 
