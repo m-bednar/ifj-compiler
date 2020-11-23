@@ -34,12 +34,22 @@ void bintreestack_push(bintreestack_t* stack, bintree_t* tree);
 bintree_t* bintreestack_pop(bintreestack_t* stack);
 
 /**
- * Returns element on specified index without removing it.
- * Throws error, when no element is found.
+ * Returns top element without removing it.
  */
-bintree_t* bintreestack_get(bintreestack_t* stack, int index);
+bintree_t* bintreestack_peek(bintreestack_t* stack);
+
+/**
+ * Returns first found symbol in stack with given identifier or NULL when not found.
+ */
+symbol_t* bintreestack_find(bintreestack_t* stack, char* identifier, int* level);
+
 
 /**
  * Returns length (number of elements) of the stack.
  */
 int bintreestack_get_length(bintreestack_t* stack);
+
+/**
+ * Prints whole stack and it's content to stderr.
+ */
+void bintreestack_print(bintreestack_t* stack);

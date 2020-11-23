@@ -41,6 +41,6 @@ void symbol_print(symbol_t* symbol) {
       fprintf(stderr, "id: %s, type: VARIABLE, value type: %d\n", symbol->identifier, val->type);
    } else {
       symbolvalfn_t* val = symbol->value.fn;
-      fprintf(stderr, "id: %s, type: FUNCTION, args: %d, rets: %d\n", symbol->identifier, val->arg_count, val->ret_count);
+      fprintf(stderr, "id: %s, type: FUNCTION, args: %d, rets: %d, def: %d\n", symbol->identifier, val->arg_count, val->ret_count, val->defined);
    }
 }
