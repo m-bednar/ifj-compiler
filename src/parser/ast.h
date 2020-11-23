@@ -35,7 +35,7 @@ typedef struct astnode_exp_t {
 
 typedef struct astnode_funccall_t {
    char* name;
-   astnode_exp_t** params;
+   token_t** params;
    int params_count;
 } astnode_funccall_t;
 
