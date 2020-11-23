@@ -69,6 +69,7 @@ bintree_t* bintreestack_peek(bintreestack_t* stack) {
    return stack->memory[stack->length - 1];
 }
 
+
 symbol_t* bintreestack_find(bintreestack_t* stack, char* identifier, int* level) {
    guard(stack != NULL);
    guard(identifier != NULL);

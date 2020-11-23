@@ -43,6 +43,7 @@ bintree_t* bintreestack_peek(bintreestack_t* stack);
  */
 symbol_t* bintreestack_find(bintreestack_t* stack, char* identifier, int* level);
 
+
 /**
  * Returns length (number of elements) of the stack.
  */
