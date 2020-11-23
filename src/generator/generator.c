@@ -12,6 +12,30 @@
 #define printcm(s, ...) printf("   "); printf(s,##__VA_ARGS__); printf("\n")   // Print command function
 #define printlb(s, ...) printf("\n"); printf(s,##__VA_ARGS__); printf("\n")  // Print label function
 
+void generate_assign(astnode_assign_t node) {
+
+}
+
+void generate_defvar(astnode_defvar_t node) {
+
+}
+
+void generate_for(astnode_forval_t node) {
+
+}
+
+void generate_if(astnode_if_t node) {
+
+}
+
+void generate_funccall(astnode_funccall_t node) {
+
+}
+
+void generate_ret(astnode_ret_t node) {
+
+}
+
 void generate_generic(astnode_generic_t* node) {
    switch (node->type) {
       case ANT_ASSIGN:
