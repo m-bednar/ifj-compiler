@@ -592,7 +592,7 @@ void add_operator_and_shift(token_t** token, token_t** token_next, ntposymstack_
    while (stack_top_terminal_id != ntposymstack_top(stack)->id) {
       ntposymstack_push(help_stack, ntposymstack_pop(stack));
    }
-   ntposymstack_push(stack, ntposymbol_ctor(OPERATOR, PRECEDENCE_OPERATOR));
+   ntposymstack_push(stack, ntposymbol_ctor(PRECEDENCE_OPERATOR, PRECEDENCE_OPERATOR));
    while (ntposymstack_top(help_stack)->id != TERMINAL_END_OF_FILE) {
       ntposymstack_push(stack, ntposymstack_pop(help_stack));
    }
