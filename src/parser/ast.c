@@ -57,3 +57,12 @@ astnode_t* astnode_funcdec_ctor(){
    ast_node->value.funcdeclval.body = NULL;
    return ast_node;
 }
+
+void astnode_codeblock_insert(astnode_codeblock_t* codeblock, astnode_t* node){
+   if(codeblock == NULL || node == NULL){
+      return;
+   }
+   codeblock->children = safe_alloc(sizeof(astnode_t) * (codeblock->children_count + 1));
+   codeblock->children_count++;
+   codeblock->children[codeblock->children_count-1] = node;
+}
