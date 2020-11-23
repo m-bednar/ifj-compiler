@@ -7,3 +7,5 @@
 #include "generator.h"
 
 
+void generate(astnode_global_t* global, bintree_t* symtable) {
+}
