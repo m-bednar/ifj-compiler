@@ -41,7 +41,7 @@ bintree_t* bintreestack_peek(bintreestack_t* stack);
 /**
  * Returns first found symbol in stack with given identifier or NULL when not found.
  */
-symbol_t* bintreestack_find(bintreestack_t* stack, char* identifier);
+symbol_t* bintreestack_find(bintreestack_t* stack, char* identifier, int* level);
 
 /**
  * Returns length (number of elements) of the stack.
