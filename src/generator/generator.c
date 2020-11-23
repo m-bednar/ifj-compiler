@@ -18,7 +18,12 @@ void generate_assign(astnode_assign_t* node) {
 void generate_defvar(astnode_defvar_t* node, bintreestack_t* varstack) {
    char* var = str_var(node->variable->value.string_value, FT_TF, varstack);
    printcm("DEFVAR %s", var);
-   // TODO:
+   if (evaluate_expression(node->expression, varstack) == ET_STACK) {
+      printcm("POPS %s", var);
+   } else {
+      // TODO:
+   }
+   // TODO: add to symtable
    free(var);
 }
 
@@ -77,6 +82,7 @@ void generate_funcdecl(astnode_funcdecl_t* func, bintree_t* fntable, bintreestac
 void generate(astnode_global_t* global, bintree_t* fntable) {
    bintreestack_t* varstack = bintreestack_ctor();
    printlb(".IFJcode20");
+   printcm("CREATEFRAME");
    printcm("CALL main");
    printcm("EXIT int@0");
 

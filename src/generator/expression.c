@@ -85,7 +85,7 @@ void print_pushs_int(int value) {
 }
 
 void print_pushs_float(double value) {
-   printcm("PUSHS float@%f", value); // FIXME: f should be a, but it is not working
+   printcm("PUSHS float@%a", value);
 }
 
 void evaluate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
@@ -93,9 +93,6 @@ void evaluate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
       switch (exp->tokens[i]->id) {
          case TOKENID_IDENTIFIER:
             print_pushs_identifier(exp->tokens[i]->value.string_value, FT_TF, varstack);
-            break;
-         case TOKENID_STRING_LITERAL:
-            print_pushs_string(exp->tokens[i]->value.string_value);
             break;
          case TOKENID_BOOL_LITERAL:
             print_pushs_bool(exp->tokens[i]->value.bool_value);
@@ -106,13 +103,50 @@ void evaluate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
          case TOKENID_NUM:
             print_pushs_int(exp->tokens[i]->value.int_value);
             break;
+         case TOKENID_OPERATOR_ADD:
+            printcm("ADDS");
+            break;
+         case TOKENID_OPERATOR_SUB:
+            printcm("SUBS");
+            break;
+         case TOKENID_OPERATOR_MUL:
+            printcm("MULS");
+            break;
+         case TOKENID_OPERATOR_DIV:
+            printcm("DIV");   // FIXME: IDIV version required
+            break;
+         case TOKENID_OPERATOR_AND:
+            printcm("ANDS");
+            break;
+         case TOKENID_OPERATOR_OR:
+            printcm("ORS");
+            break;
+         case TOKENID_OPERATOR_NOT:
+            printcm("NOTS");
+            break;
+         case TOKENID_OPERATOR_EQUALS:
+            printcm("EQS");
+            break;
+         case TOKENID_OPERATOR_NOT_EQUAL:
+            printcm("EQS");
+            printcm("NOTS");
+            break;
+         case TOKENID_OPERATOR_LESS:
+            printcm("LTS");
+            break;
+         case TOKENID_OPERATOR_GREATER:
+            printcm("GTS");
+            break;
+         case TOKENID_OPERATOR_LESS_OR_EQUAL:
+            printcm("GTS");
+            printcm("NOTS");
+            break;
+         case TOKENID_OPERATOR_GREATER_OR_EQUAL:
+            printcm("LTS");
+            printcm("NOTS");
+            break;
          default:
             exit(ERRCODE_INTERNAL_ERROR);
-      }
-      if (exp->tokens[i]->id == TOKENID_IDENTIFIER) {
-         char* var = str_var(exp->tokens[i]->value.string_value, FT_TF, varstack);
-         printcm("PUSHS %s", var);
-         free(var);
       }
    }
 }
@@ -123,7 +157,8 @@ void evaluate_local_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
 }
 
 exptype_e evaluate_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
-   if (exp->tokens_count == 3) {
+   // TODO: check for string concat
+   if (exp->tokens_count <= 3) {
       evaluate_local_expression(exp, varstack);
       return ET_LOCAL;
    } else {
