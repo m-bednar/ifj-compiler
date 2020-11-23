@@ -5,8 +5,12 @@
  */
 
 #include "semantic.h"
+#include "../error.h"
 
-
-semantic_error_e semantic(token_t* token){
-   return 0;
+int semantic(token_t* token){
+   static astnode_t* ast;
+   if(ast == NULL){
+      ast = ast_ctor();
+   }
+   return -1;
 }

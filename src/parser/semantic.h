@@ -9,15 +9,7 @@
 #include "../scanner/scanner.h"
 #include "ast.h"
 
-static astnode_t* ast;
-
-typedef enum semantic_error_e {
-   SERROR_DECLARE_3,
-   SERROR_UNKNOWN_TYPE_4,
-   SERROR_ASSIGN_TYPE_5,
-   SERROR_FUNC_CALL_6,
-   SERROR_OTHER_7,
-   SERROR_DEVIDE_BY_ZERO_9
-}semantic_error_e;
-
-semantic_error_e semantic(token_t* token);
+/*
+ * returns ERROR code or -1 if no error occured 
+ */
+int semantic(token_t* token);
