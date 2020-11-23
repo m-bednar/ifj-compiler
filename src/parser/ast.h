@@ -9,12 +9,12 @@
 #include <stdbool.h>
 #include "../scanner/scanner.h"
 
-typedef enum astnodetype_e{
+typedef enum astnode_type_e{
    ANT_IF,
    ANT_FOR,
    ANT_EXP,
    ANT_RET,
-   ANT_FUNCDEC,
+   ANT_FUNCDECL,
    ANT_FUNCCALL,
    ANT_ASSIGN,
    ANT_DEFVAR,
@@ -44,11 +44,11 @@ typedef struct astnode_retval_t {
    astnode_expval_t* expresion;
 } astnode_retval_t;
 
-typedef struct astnode_funcdecval_t {
+typedef struct astnode_funcdeclval_t {
    char* name;
    astnode_retval_t* return_val;
    struct astnode_codeblock_t* body;
-} astnode_funcdecval_t;
+} astnode_funcdeclval_t;
 
 typedef struct astnode_funccallval_t {
    char* name;
@@ -72,7 +72,7 @@ typedef union astnode_value_u {
    astnode_ifval_t ifval;
    astnode_forval_t forval;
    astnode_expval_t expval;
-   astnode_funcdecval_t funcdecval;
+   astnode_funcdeclval_t funcdeclval;
    astnode_retval_t returnval;
    astnode_globalval_t globalval;
    astnode_funccallval_t funccallval;
