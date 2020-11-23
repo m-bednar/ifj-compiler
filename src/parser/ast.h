@@ -77,15 +77,15 @@ typedef struct astnode_for_t {
 } astnode_for_t;
 
 typedef union astnode_value_u {
-   astnode_if_t ifval;
-   astnode_for_t forval;
-   astnode_exp_t expval;
-   astnode_funcdecl_t funcdeclval;
-   astnode_ret_t returnval;
-   astnode_global_t globalval;
-   astnode_funccall_t funccallval;
-   astnode_assign_t assignval;
-   astnode_defvar_t defvarval;
+   astnode_if_t* ifval;
+   astnode_for_t* forval;
+   astnode_exp_t* expval;
+   astnode_funcdecl_t* funcdeclval;
+   astnode_ret_t* returnval;
+   astnode_global_t* globalval;
+   astnode_funccall_t* funccallval;
+   astnode_assign_t* assignval;
+   astnode_defvar_t* defvarval;
 } astnode_value_u;
 
 typedef struct astnode_generic_t {
