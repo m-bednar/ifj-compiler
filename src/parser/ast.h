@@ -12,13 +12,10 @@
 typedef enum astnode_type_e {
    ANT_IF,
    ANT_FOR,
-   ANT_EXP,
    ANT_RET,
-   ANT_FUNCDECL,
    ANT_FUNCCALL,
    ANT_ASSIGN,
-   ANT_DEFVAR,
-   ANT_GLOBAL
+   ANT_DEFVAR
 } astnode_type_e;
 
 typedef struct astnode_codeblock_t {

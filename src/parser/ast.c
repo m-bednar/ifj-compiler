@@ -9,7 +9,7 @@
 
 astnode_generic_t* ast_ctor() {
    astnode_generic_t* ast = safe_alloc(sizeof(astnode_generic_t));
-   ast->type = ANT_GLOBAL;
+   // ast->type = ANT_GLOBAL;
    ast->value.globalval.functions = NULL;
    return ast;
 }
@@ -33,7 +33,7 @@ astnode_generic_t* astnode_for_ctor() {
 
 astnode_generic_t* astnode_exp_ctor() {
    astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
-   ast_node->type = ANT_EXP;
+   // ast_node->type = ANT_EXP;
    ast_node->value.expval.tokens = NULL;
    return ast_node;
 }
@@ -47,7 +47,7 @@ astnode_generic_t* astnode_ret_ctor() {
 
 astnode_generic_t* astnode_funcdecl_ctor() {
    astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
-   ast_node->type = ANT_FUNCDECL;
+   // ast_node->type = ANT_FUNCDECL;
    ast_node->value.funcdeclval.body = NULL;
    return ast_node;
 }
