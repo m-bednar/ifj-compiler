@@ -63,15 +63,34 @@ bintree_t* bintreestack_pop(bintreestack_t* stack) {
    return last;
 }
 
-bintree_t* bintreestack_get(bintreestack_t* stack, int index) {
+bintree_t* bintreestack_peek(bintreestack_t* stack) {
    guard(stack != NULL);
    guard(stack->length != 0);
-   guard(index < stack->length);
-   guard(index > 0);
+   return stack->memory[stack->length - 1];
+}
 
-   return stack->memory[index];
+symbol_t* bintreestack_find(bintreestack_t* stack, char* identifier) {
+   guard(stack != NULL);
+   guard(identifier != NULL);
+
+   for (int i = stack->length - 1; i >= 0; i--) {
+      symbol_t* found = bintree_find(stack->memory[i], identifier);
+      if (found != NULL) {
+         return found;
+      }
+   }
+
+   return NULL;
 }
 
 int bintreestack_get_length(bintreestack_t* stack) {
    return stack->length;
+}
+
+void bintreestack_print(bintreestack_t* stack) {
+   for (int i = stack->length - 1; i >= 0; i--) {
+      fprintf(stderr, "----- stack %d -----\n", i);
+      bintree_print(stack->memory[i]);
+      fprintf(stderr, "-------------------\n");
+   }
 }
