@@ -28,6 +28,7 @@ typedef struct astnode_codeblock_t {
 
 typedef struct astnode_global_t {
    astnode_codeblock_t* functions;
+   int functions_count;
 } astnode_global_t;
 
 typedef struct astnode_exp_t {
@@ -43,9 +44,9 @@ typedef struct astnode_funccall_t {
 
 typedef struct astnode_assign_t {
    token_t** left_ids;
-   astnode_exp_t** right_expresions; // NULL if function is there insted
+   astnode_exp_t** right_expressions; // NULL if function is there instead
    astnode_funccall_t* right_function;
-   int expresions_count;
+   int expressions_count;
    int ids_count;
 } astnode_assign_t;
 
@@ -56,6 +57,7 @@ typedef struct astnode_defvar_t {
 
 typedef struct astnode_ret_t {
    astnode_exp_t** expressions;
+   int expressions_count;
 } astnode_ret_t;
 
 typedef struct astnode_funcdecl_t {
