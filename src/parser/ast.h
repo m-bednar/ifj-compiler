@@ -68,17 +68,17 @@ typedef struct astnode_if_t {
    astnode_codeblock_t* else_body;
 } astnode_if_t;
 
-typedef struct astnode_forval_t {
+typedef struct astnode_for_t {
    astnode_exp_t* condition;
    astnode_defvar_t* defvar;  // NULL if assign is used or first statement is empty
    astnode_assign_t* assign;  // NULL if defvar is used or first statement is empty
    astnode_exp_t* varchange;  // evaluated after each loop
    astnode_codeblock_t* body;
-} astnode_forval_t;
+} astnode_for_t;
 
 typedef union astnode_value_u {
    astnode_if_t ifval;
-   astnode_forval_t forval;
+   astnode_for_t forval;
    astnode_exp_t expval;
    astnode_funcdecl_t funcdeclval;
    astnode_ret_t returnval;
