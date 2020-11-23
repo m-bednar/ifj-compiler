@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include "../scanner/token.h"
+#include "../parser/ast.h"
 
 /**
- * Converts token array in infix notation to postfix notation. 
- * Return new lenght of the array without resizing it and destructs all additional tokens.
+ * Converts expression in infix notation to postfix notation.
  */
-int infix_to_postfix(token_t** infix, int length);
+void infix_to_postfix(astnode_exp_t* exp);

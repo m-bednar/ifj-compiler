@@ -83,34 +83,33 @@ int op_precedence(token_t* token) {
    }
 } 
 
-int infix_to_postfix(token_t** infix, int length) {
-   tstack_t* stack = tstack_ctor(length);
+void infix_to_postfix(astnode_exp_t* exp) {
+   tstack_t* stack = tstack_ctor(exp->tokens_count);
    int j = 0;  // postfix length
 
-   for (int i = 0; i < length; i++) {
-      if (is_operand(infix[i])) {
-         infix[j++] = infix[i];
-      } else if (infix[i]->id == TOKENID_LEFT_PARENTHESES) {
-         tstack_push(stack, infix[i]); 
-      } else if (infix[i]->id == TOKENID_RIGHT_PARENTHESES) { 
+   for (int i = 0; i < exp->tokens_count; i++) {
+      if (is_operand(exp->tokens[i])) {
+         exp->tokens[j++] = exp->tokens[i];
+      } else if (exp->tokens[i]->id == TOKENID_LEFT_PARENTHESES) {
+         tstack_push(stack, exp->tokens[i]); 
+      } else if (exp->tokens[i]->id == TOKENID_RIGHT_PARENTHESES) { 
          while (!tstack_isempty(stack) && tstack_peek(stack)->id != TOKENID_LEFT_PARENTHESES) {
-            infix[j++] = tstack_pop(stack);
+            exp->tokens[j++] = tstack_pop(stack);
          }
          token_dtor(tstack_pop(stack)); 
       } else { 
          // operator is encountered
-         while (!tstack_isempty(stack) && op_precedence(infix[i]) <= op_precedence(tstack_peek(stack))) {
-            infix[j++] = tstack_pop(stack);
+         while (!tstack_isempty(stack) && op_precedence(exp->tokens[i]) <= op_precedence(tstack_peek(stack))) {
+            exp->tokens[j++] = tstack_pop(stack);
          }
-         tstack_push(stack, infix[i]); 
+         tstack_push(stack, exp->tokens[i]); 
       } 
    }
 
    // pop rest of the operators on stack
    while (!tstack_isempty(stack)) {
-      infix[j++] = tstack_pop(stack); 
+      exp->tokens[j++] = tstack_pop(stack); 
    }
 
    tstack_dtor(stack);
-   return j;
 }
