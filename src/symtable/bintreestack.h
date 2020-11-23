@@ -4,6 +4,8 @@
  * @authors Martin Bednář (xbedna77)
  */
 
+#pragma once 
+
 #include "symtable.h"
 
 typedef struct bintreestack_t {

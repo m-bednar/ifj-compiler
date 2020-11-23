@@ -24,7 +24,7 @@ typedef struct astnode_codeblock_t {
 } astnode_codeblock_t;
 
 typedef struct astnode_global_t {
-   astnode_funcdecl_t** functions;
+   struct astnode_funcdecl_t** functions;
    int functions_count;
 } astnode_global_t;
 
