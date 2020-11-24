@@ -17,8 +17,6 @@ bool nonterminal_expression_next_derivation(ntsymstack_t* stack, int token_id) {
       ntsymbol_dtor(ntsymstack_pop(stack));
       return false;
    } else if (token_id == TOKENID_COMMA) {
-      ntsymbol_dtor(ntsymstack_pop(stack));
-      ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
       ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION, false));
       ntsymstack_push(stack, ntsymbol_ctor(TOKENID_COMMA, true));
       return false;
@@ -358,7 +356,6 @@ bool nonterminal_definition_derivation(ntsymstack_t* stack, int token_id) {
 bool nonterminal_return_derivation(ntsymstack_t* stack, int token_id) {
    if (token_id == TOKENID_KEYWORD_RETURN) {
       ntsymbol_dtor(ntsymstack_pop(stack));
-      ntsymstack_push(stack, ntsymbol_ctor(TOKENID_NEWLINE, true));
       ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSIONS, false));
       ntsymstack_push(stack, ntsymbol_ctor(TOKENID_KEYWORD_RETURN, true));
       return false;
