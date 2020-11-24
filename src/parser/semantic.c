@@ -8,7 +8,9 @@
 #include "tokenstack.h"
 #include "../error.h"
 #include "../symtable/bintreestack.h"
+#include "ntsymbol.h"
 #include <stdbool.h>
+#include <string.h>
 
 /*
  * returns true if type1 and type2 are same or if type1 is NULL
@@ -116,39 +118,77 @@ int semantic_assign(tokenstack_t* stack, bintreestack_t* symtable_stack){
    token_t* token;
    int err;
    vartype_e type;
-
+   symbol_t* symbol;
+   //checking expressions
    do{
-      token = tokenstack_pop(stack);
-      if(token->id != TOKENID_COMMA){
-         tokenstack_push(expression_stack, token);
+
+      do{
+         token = tokenstack_pop(stack);
+         if(token->id != TOKENID_COMMA && token->id != TOKENID_OPERATOR_ASSIGN){
+            tokenstack_push(expression_stack, token);
+         }
+      }while(token->id != TOKENID_COMMA && token->id != TOKENID_OPERATOR_ASSIGN);
+      
+      // dtor token with comma
+      if(token->id == TOKENID_COMMA){
+         token_dtor(token);
       }
-   }while(token->id != TOKENID_COMMA);
 
-   err = semantic_expression(expression_stack, &type, symtable_stack);
-   tokenstack_dtor(expression_stack);
+      err = semantic_expression(expression_stack, &type, symtable_stack);
+      tokenstack_dtor(expression_stack);
 
-   if(err != -1){
-      return err; //error occured in expression
-   }
-   
-   if(expression_types == NULL){
-      expression_types = safe_alloc(sizeof(vartype_e));
-   }
-   else{
-      expression_types = safe_realloc(expression_types, sizeof(vartype_e) * (expression_types_size+1));
-   }
-   expression_types_size++;
+      if(err != -1){
+         return err; //error occured in expression
+      }
+      
+      //realloc expression_types array
+      if(expression_types == NULL){
+         expression_types = safe_alloc(sizeof(vartype_e));
+      }
+      else{
+         expression_types = safe_realloc(expression_types, sizeof(vartype_e) * (expression_types_size+1));
+      }
+      expression_types_size++;
 
-   expression_types[expression_types_size-1] = type;
+      expression_types[expression_types_size-1] = type;
+
+   }while(token->id != TOKENID_OPERATOR_ASSIGN);
+
+   token_dtor(token);
+
+   int i = 0;
+   while(tokenstack_get_lenght(stack) != 0){
+      token = tokenstack_pop(stack);
+
+      if(!strcmp(token->value.string_value, "_")){
+         i++;
+      }
+      else if(token->id != TOKENID_COMMA){
+         symbol = bintreestack_find(symtable_stack, token->value.string_value, NULL);
+         if(symbol == NULL){
+            // TODO: dtor
+            return ERRCODE_VAR_UNDEFINED_ERROR; // 
+         }
+         else if(symbol->value.var->type != expression_types[i]){
+            // TODO: dtor
+            return ERRCODE_GENERAL_SEMANTIC_ERROR;
+         }
+         i++;
+      }
+
+      token_dtor(token);
+   }
+
+
 
    return -1;
 }
 
-int semantic(token_t* token, bool eol_flag){
-   static astnode_generic_t* ast;
-   static bintreestack_t* symtable_stack;
-   static bintree_t* symtable_global;
-   static tokenstack_t* token_stack;
+int semantic(token_t* token, nonterminalid_e flag, int eol_flag){
+   static astnode_generic_t* ast = NULL;
+   static bintreestack_t* symtable_stack = NULL;
+   static bintree_t* symtable_global = NULL;
+   static tokenstack_t* token_stack = NULL;
 
    if(ast == NULL){
       ast = ast_ctor();
@@ -166,7 +206,7 @@ int semantic(token_t* token, bool eol_flag){
    while(!eol_flag){
       tokenstack_push(token_stack, token);
    }
-   
+   // TODO: ignor new line
    if(!eol_flag){
       return -1; //whole line wasnt read yet
    }
