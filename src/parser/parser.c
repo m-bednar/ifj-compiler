@@ -7,6 +7,364 @@
 #include "parser.h"
 
 
+void print_nonterminal(int nonterminal_id) {
+    switch(nonterminal_id) {
+        case NONTERMINAL_PROGRAM:
+            printf("<program>");
+            break;
+        case NONTERMINAL_PACKAGES:
+            printf("<packages>");
+            break;
+        case NONTERMINAL_PACKAGE:
+            printf("<package>");
+            break;
+        case NONTERMINAL_FUNCTIONS:
+            printf("<functions>");
+            break;
+        case NONTERMINAL_FUNCTION:
+            printf("<function>");
+            break;
+        case NONTERMINAL_PARAMETERS:
+            printf("<parameters>");
+            break;
+        case NONTERMINAL_PARAMETER:
+            printf("<parameter>");
+            break;
+        case NONTERMINAL_PARAMETER_NEXT:
+            printf("<parameter_next>");
+            break;
+        case NONTERMINAL_RETURN_TYPES:
+            printf("<return_types>");
+            break;
+        case NONTERMINAL_TYPES:
+            printf("<types>");
+            break;
+        case NONTERMINAL_TYPE:
+            printf("<type>");
+            break;
+        case NONTERMINAL_TYPE_NEXT:
+            printf("<type_next>");
+            break;
+        case NONTERMINAL_RETURN:
+            printf("<return>");
+            break;
+        case NONTERMINAL_DEFINITION:
+            printf("<definition>");
+            break;
+        case NONTERMINAL_FOR_DEFINITION:
+            printf("<for_definition>");
+            break;
+        case NONTERMINAL_ASSIGNMENT:
+            printf("<assignment>");
+            break;
+        case NONTERMINAL_FOR_ASSIGNMENT:
+            printf("<for_assignment>");
+            break;
+        case NONTERMINAL_ASSIGNMENT_RIGHT:
+            printf("<assignment_right>");
+            break;
+        case NONTERMINAL_FOR_ASSIGNMENT_RIGHT:
+            printf("<for_assignment_right>");
+            break;
+        case NONTERMINAL_ID_NEXT:
+            printf("<id_next>");
+            break;
+        case NONTERMINAL_COMMANDS:
+            printf("<commands>");
+            break;
+        case NONTERMINAL_COMMAND:
+            printf("<command>");
+            break;
+        case NONTERMINAL_IF:
+            printf("<if>");
+            break;
+        case NONTERMINAL_ELSE:
+            printf("<else>");
+            break;
+        case NONTERMINAL_FOR:
+            printf("<for>");
+            break;
+        case NONTERMINAL_CALL:
+            printf("<call>");
+            break;
+        case NONTERMINAL_TERMS:
+            printf("<terms>");
+            break;
+         case NONTERMINAL_TERM:
+            printf("<term>");
+            break;
+         case NONTERMINAL_TERM_NEXT:
+            printf("<term_next>");
+            break;
+        case NONTERMINAL_EXPRESSIONS:
+            printf("<expressions>");
+            break;
+        case NONTERMINAL_EXPRESSION:
+            printf("<expression>");
+            break;
+        case NONTERMINAL_EXPRESSION_NEXT:
+            printf("<expression_next>");
+            break;
+        default:
+            printf("not nonterminal");
+            break;
+    }
+    return;
+}
+
+void print_terminal(int terminal_id) {
+    switch(terminal_id) {
+        case TOKENID_IDENTIFIER:
+            printf("id");
+            break;
+        case TOKENID_KEYWORD_IF:
+            printf("if");
+            break;
+        case TOKENID_KEYWORD_FOR:
+            printf("for");
+            break;
+        
+        case TOKENID_KEYWORD_ELSE:
+            printf("else");
+            break;
+        case TOKENID_KEYWORD_RETURN:
+            printf("return");
+            break;
+        case TOKENID_KEYWORD_PACKAGE:
+            printf("package");
+            break;
+        case TOKENID_KEYWORD_FUNC:
+            printf("func");
+            break;
+        case TOKENID_KEYWORD_FLOAT64:
+            printf("float64");
+            break;
+        case TOKENID_KEYWORD_INT:
+            printf("int");
+            break;
+        case TOKENID_KEYWORD_STRING:
+            printf("string");
+            break;
+        case TOKENID_KEYWORD_BOOL:
+            printf("bool");
+            break;
+        case TOKENID_STRING_LITERAL:
+            printf("string_literal");
+            break;
+        case TOKENID_BOOL_LITERAL:
+            printf("bool_literal");
+            break;
+        case TOKENID_NUM:
+            printf("num");
+            break;
+        case TOKENID_NUM_DECIMAL:
+            printf("num_decimal");
+            break;
+        case TOKENID_OPERATOR_ADD:
+            printf("+");
+            break;
+        case TOKENID_OPERATOR_ADD_AND_ASSIGN:
+            printf("+=");
+            break;
+        case TOKENID_OPERATOR_SUB:
+            printf("-");
+            break;
+        case TOKENID_OPERATOR_SUB_AND_ASSIGN:
+            printf("-=");
+            break;
+        case TOKENID_OPERATOR_MUL:
+            printf("*");
+            break;
+        case TOKENID_OPERATOR_MUL_AND_ASSIGN:
+            printf("*=");
+            break;
+        case TOKENID_OPERATOR_DIV:
+            printf("/");
+            break;
+        case TOKENID_OPERATOR_DIV_AND_ASSIGN:
+            printf("/=");
+            break;
+        case TOKENID_OPERATOR_LESS:
+            printf("<");
+            break;
+        case TOKENID_OPERATOR_LESS_OR_EQUAL:
+            printf("<=");
+            break;
+        case TOKENID_OPERATOR_GREATER:
+            printf(">");
+            break;
+        case TOKENID_OPERATOR_GREATER_OR_EQUAL:
+            printf(">=");
+            break;
+        case TOKENID_OPERATOR_DECLARE:
+            printf(":=");
+            break;
+        case TOKENID_OPERATOR_ASSIGN:
+            printf("=");
+            break;
+        case TOKENID_OPERATOR_EQUALS:
+            printf("==");
+            break;
+        case TOKENID_OPERATOR_NOT:
+            printf("!");
+            break;
+        case TOKENID_OPERATOR_NOT_EQUAL:
+            printf("!=");
+            break;
+        case TOKENID_OPERATOR_AND:
+            printf("&&");
+            break;
+        case TOKENID_OPERATOR_OR:
+            printf("||");
+            break;
+        case TOKENID_LEFT_PARENTHESES:
+            printf("(");
+            break;
+        case TOKENID_RIGHT_PARENTHESES:
+            printf(")");
+            break;
+        case TOKENID_LEFT_BRACKET:
+            printf("{");
+            break;
+        case TOKENID_RIGHT_BRACKET:
+            printf("}");
+            break;
+        case TOKENID_SEMICOLON:
+            printf(";");
+            break;
+        case TOKENID_COMMA:
+            printf(",");
+            break;
+        case TOKENID_NEWLINE:
+            printf("\\n");
+            break;
+        case TOKENID_END_OF_FILE:
+            printf("$");
+            break;
+        default:
+            printf("not terminal");
+            break;
+    }
+    return;
+}
+
+void print_ntpo_terminal(int terminal_id) {
+    switch(terminal_id) {
+        case TERMINAL_IDENTIFIER:
+            printf("id");
+            break;
+        case TERMINAL_STRING_LITERAL:
+            printf("string_literal");
+            break;
+        case TERMINAL_BOOL_LITERAL:
+            printf("bool_literal");
+            break;
+        case TERMINAL_NUM:
+            printf("num");
+            break;
+        case TERMINAL_NUM_DECIMAL:
+            printf("num_decimal");
+            break;
+        case TERMINAL_OPERATOR_ADD:
+            printf("+");
+            break;
+        case TERMINAL_OPERATOR_SUB:
+            printf("-");
+            break;
+        case TERMINAL_OPERATOR_MUL:
+            printf("*");
+            break;
+        case TERMINAL_OPERATOR_DIV:
+            printf("/");
+            break;
+        case TERMINAL_OPERATOR_LESS:
+            printf("<");
+            break;
+        case TERMINAL_OPERATOR_LESS_OR_EQUAL:
+            printf("<=");
+            break;
+        case TERMINAL_OPERATOR_GREATER:
+            printf(">");
+            break;
+        case TERMINAL_OPERATOR_GREATER_OR_EQUAL:
+            printf(">=");
+            break;
+        case TERMINAL_OPERATOR_EQUALS:
+            printf("==");
+            break;
+        case TERMINAL_OPERATOR_NOT:
+            printf("!");
+            break;
+        case TERMINAL_OPERATOR_NOT_EQUAL:
+            printf("!=");
+            break;
+        case TERMINAL_OPERATOR_AND:
+            printf("&&");
+            break;
+        case TERMINAL_OPERATOR_OR:
+            printf("||");
+            break;
+        case TERMINAL_LEFT_PARENTHESES:
+            printf("(");
+            break;
+        case TERMINAL_RIGHT_PARENTHESES:
+            printf(")");
+            break;
+        case TERMINAL_END_OF_FILE:
+            printf("$");
+            break;
+        default:
+            printf("not terminal");
+            break;
+    }
+    return;
+}
+
+void print_stack(ntsymstack_t *stack) {
+    printf("----  Stack  ----\n");
+    for(int i = stack->length - 1; i >= 0; i--) {
+        printf(" ");
+        if(stack->memory[i]->is_terminal) {
+            print_terminal(stack->memory[i]->id);
+            printf("\n");
+        }
+        else {
+            print_nonterminal(stack->memory[i]->id);
+            printf("\n");
+        }
+    }
+    if(stack->length == 0) {
+        printf(" empty\n");
+    }
+    printf("-----------------\n");
+    return;
+}
+
+void print_ntpo_stack(ntposymstack_t *stack) {
+    printf("----  Stack  ----\n");
+    for(int i = stack->length - 1; i >= 0; i--) {
+        printf(" ");
+        if(stack->memory[i]->type == TERMINAL) {
+            print_ntpo_terminal(stack->memory[i]->id);
+            printf("\n");
+        }
+        else if(stack->memory[i]->type == PRECEDENCE_OPERATOR) {
+            printf("<");
+            printf("\n");
+        }
+        else {
+            print_nonterminal(stack->memory[i]->id);
+            printf("\n");
+        }
+    }
+    if(stack->length == 0) {
+        printf(" empty\n");
+    }
+    printf("-----------------\n");
+    return;
+}
+
+
 /**
  * Nonterminal derivations for predictive parsing.
  * Derivates nonterminals based on LL grammar rules.
@@ -43,11 +401,51 @@ bool nonterminal_expressions_derivation(ntsymstack_t* stack, int token_id) {
    }
 }
 
-bool nonterminal_ids_derivation(ntsymstack_t* stack, int token_id) {
+bool nonterminal_term_next_derivation(ntsymstack_t* stack, int token_id) {
+   if (token_id == TOKENID_COMMA) {
+      ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_TERM, false));
+      ntsymstack_push(stack, ntsymbol_ctor(TOKENID_COMMA, true));
+      return false;
+   } else if (token_id == TOKENID_RIGHT_PARENTHESES) {
+      ntsymbol_dtor(ntsymstack_pop(stack));
+      return false;
+   } else {
+      return true;
+   }
+}
+
+bool nonterminal_term_derivation(ntsymstack_t* stack, int token_id) {
    if (token_id == TOKENID_IDENTIFIER) {
       ntsymbol_dtor(ntsymstack_pop(stack));
-      ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_ID_NEXT, false));
       ntsymstack_push(stack, ntsymbol_ctor(TOKENID_IDENTIFIER, true));
+      return false;
+   } else if (token_id == TOKENID_NUM) {
+      ntsymbol_dtor(ntsymstack_pop(stack));
+      ntsymstack_push(stack, ntsymbol_ctor(TOKENID_NUM, true));
+      return false;
+   } else if (token_id == TOKENID_NUM_DECIMAL) {
+      ntsymbol_dtor(ntsymstack_pop(stack));
+      ntsymstack_push(stack, ntsymbol_ctor(TOKENID_NUM_DECIMAL, true));
+      return false;
+   } else if (token_id == TOKENID_STRING_LITERAL) {
+      ntsymbol_dtor(ntsymstack_pop(stack));
+      ntsymstack_push(stack, ntsymbol_ctor(TOKENID_STRING_LITERAL, true));
+      return false;
+   } else if (token_id == TOKENID_BOOL_LITERAL) {
+      ntsymbol_dtor(ntsymstack_pop(stack));
+      ntsymstack_push(stack, ntsymbol_ctor(TOKENID_BOOL_LITERAL, true));
+      return false;
+   } else {
+      return true;
+   }
+}
+
+bool nonterminal_terms_derivation(ntsymstack_t* stack, int token_id) {
+   if (token_id == TOKENID_IDENTIFIER || token_id == TOKENID_NUM || token_id == TOKENID_NUM_DECIMAL || 
+         token_id == TOKENID_STRING_LITERAL || token_id == TOKENID_BOOL_LITERAL) {
+      ntsymbol_dtor(ntsymstack_pop(stack));
+      ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_TERM_NEXT, false));
+      ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_TERM, false));
       return false;
    } else if (token_id == TOKENID_RIGHT_PARENTHESES) {
       ntsymbol_dtor(ntsymstack_pop(stack));
@@ -61,7 +459,7 @@ bool nonterminal_call_derivation(ntsymstack_t* stack, int token_id) {
    if (token_id == TOKENID_IDENTIFIER) {
       ntsymbol_dtor(ntsymstack_pop(stack));
       ntsymstack_push(stack, ntsymbol_ctor(TOKENID_RIGHT_PARENTHESES, true));
-      ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_IDS, false));
+      ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_TERMS, false));
       ntsymstack_push(stack, ntsymbol_ctor(TOKENID_LEFT_PARENTHESES, true));
       ntsymstack_push(stack, ntsymbol_ctor(TOKENID_IDENTIFIER, true));
       return false;
@@ -736,8 +1134,12 @@ bool find_derivation(int stack_top_id, ntsymstack_t* stack, token_t** token, tok
          return nonterminal_for_derivation(stack, (*token)->id);
       case NONTERMINAL_CALL:
          return nonterminal_call_derivation(stack, (*token)->id);
-      case NONTERMINAL_IDS:
-         return nonterminal_ids_derivation(stack, (*token)->id);
+      case NONTERMINAL_TERMS:
+         return nonterminal_terms_derivation(stack, (*token)->id);
+      case NONTERMINAL_TERM:
+         return nonterminal_term_derivation(stack, (*token)->id);
+      case NONTERMINAL_TERM_NEXT:
+         return nonterminal_term_next_derivation(stack, (*token)->id);
       case NONTERMINAL_EXPRESSIONS:
          return nonterminal_expressions_derivation(stack, (*token)->id);
       case NONTERMINAL_EXPRESSION:
@@ -806,6 +1208,9 @@ void parse() {
    ntsymstack_dtor(stack);
 
    if (error) {
+        printf("Unexpected token ");
+        print_terminal(token->id);
+        printf("\n");
       token_dtor(token);
       token_dtor(token_next);
       exit(ERRCODE_SYNTAX_ERROR);
