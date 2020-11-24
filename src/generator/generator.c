@@ -34,13 +34,38 @@ void generate_returns_pops(astnode_assign_t* node, bintreestack_t* varstack) {
    }
 }
 
-void generate_funccall(astnode_funccall_t* node, bintree_t* fntable, bool clears) {
-   node = node;
+void generate_funccall(astnode_funccall_t* node, bintreestack_t* varstack, bintree_t* fntable, bool clears) {
+   symbol_t* fn_declaration = bintree_find(fntable, node->name);
+   
+   printcm("PUSHFRAME");
+   printcm("CREATEFRAME");
+
+   for (int i = 0; i < node->params_count; i++) {
+      char* param = generate_var_str(fn_declaration->value.fn->arg_names[i], FT_TF, 0);
+      printcm("DEFVAR %s", param);
+
+      if (is_const_tokenid(node->params[i]->id)) {
+         printcm("MOVE %s %s", param, generate_const_str(node->params[i]));
+      } else {
+         int depth = get_var_depth(node->params[i]->value.string_value, varstack);
+         char* var = generate_var_str(node->params[i]->value.string_value, FT_TF, depth);
+         printcm("MOVE %s %s", param, var);
+         free(var);
+      }
+      free(param);
+   }
+
+   printcm("CALL %s", node->name);
+   printcm("POPFRAME");
+
+   if (clears && fn_declaration->value.fn->ret_count > 0) {
+      printcm("CLEARS");
+   }
 }
 
 void generate_assign(astnode_assign_t* node, bintreestack_t* varstack, bintree_t* fntable) {
    if (node->right_function != NULL) {
-      generate_funccall(node->right_function, fntable, false);
+      generate_funccall(node->right_function, varstack, fntable, false);
       symbol_t* fn_declaration = bintree_find(fntable, node->right_function->name);
       if (node->ids_count == 0 && fn_declaration->value.fn->ret_count > 0) {
          printcm("CLEARS");
@@ -91,7 +116,7 @@ void generate_generic(astnode_generic_t* node, bintreestack_t* varstack, bintree
          generate_if(node->value.ifval);
          break;
       case ANT_FUNCCALL:
-         generate_funccall(node->value.funccallval, fntable, true);
+         generate_funccall(node->value.funccallval, varstack, fntable, true);
          break;
       case ANT_RET:
          generate_ret(node->value.returnval);
