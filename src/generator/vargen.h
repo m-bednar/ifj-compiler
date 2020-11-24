@@ -26,6 +26,11 @@ int new_var_depth(bintreestack_t* varstack);
 int get_var_depth(char* identifier, bintreestack_t* varstack);
 
 /**
+ * Returns true, if id belongs to token with constant value.
+ */
+bool is_const_tokenid(tokenid_e id);
+
+/**
  * Creates new string with correct variable signature.
  */
 char* generate_var_str(char* identifier, frametype_e frame, int depth);
