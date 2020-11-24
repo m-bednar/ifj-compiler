@@ -30,23 +30,24 @@ int main() {
    global->functions[0]->body->children[0]->value.defvarval->expression = safe_alloc(sizeof(astnode_exp_t));
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens_count = 5;
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens = safe_alloc(sizeof(token_t*) * 5);
+   // 3 + 4 * 2   =>   3 4 2 * +   ==   11
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens[0] = safe_alloc(sizeof(token_t));
-   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[0]->id = TOKENID_NUM_DECIMAL;
-   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[0]->value.decimal_value = 5.0;
+   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[0]->id = TOKENID_NUM;
+   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[0]->value.int_value = 6;
 
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens[1] = safe_alloc(sizeof(token_t));
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens[1]->id = TOKENID_OPERATOR_ADD;
 
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens[2] = safe_alloc(sizeof(token_t));
-   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[2]->id = TOKENID_NUM_DECIMAL;
-   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[2]->value.decimal_value = 2.2;
+   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[2]->id = TOKENID_NUM;
+   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[2]->value.int_value = 4;
 
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens[3] = safe_alloc(sizeof(token_t));
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens[3]->id = TOKENID_OPERATOR_MUL;
 
    global->functions[0]->body->children[0]->value.defvarval->expression->tokens[4] = safe_alloc(sizeof(token_t));
-   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[4]->id = TOKENID_NUM_DECIMAL;
-   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[4]->value.decimal_value = 9.1;
+   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[4]->id = TOKENID_NUM;
+   global->functions[0]->body->children[0]->value.defvarval->expression->tokens[4]->value.int_value = 2;
 
    global->functions[1] = safe_alloc(sizeof(astnode_funcdecl_t));
    global->functions[1]->name = safe_alloc(sizeof(char) * 7);
