@@ -34,6 +34,7 @@ int semantic_expresion(tokenstack_t* stack, vartype_e* type, bintreestack_t* sym
    while(tokenstack_get_lenght(stack) != 0){
       if(token_current != NULL){
          token_last = token_current;
+         token_last = token_last; // TODO: remove, only for compiler compliance
       }
       token_current = tokenstack_pop(stack);
       
@@ -66,6 +67,37 @@ int semantic_expresion(tokenstack_t* stack, vartype_e* type, bintreestack_t* sym
          break;
       }
    }
+   return -1;
+}
+
+int semantic_declare(tokenstack_t* stack, bintreestack_t* symtable_stack){
+   tokenstack_t* expresion_stack = tokenstack_ctor();
+   token_t* token;
+   vartype_e type;
+   symbol_t* new_symbol;
+   int err;
+
+   do{
+      token = tokenstack_pop(stack);
+      if(token->id != TOKENID_OPERATOR_DECLARE){
+         tokenstack_push(expresion_stack, token);
+      }
+   }while(token->id != TOKENID_OPERATOR_DECLARE);
+
+   err = semantic_expresion(expresion_stack, &type, symtable_stack);
+   tokenstack_dtor(expresion_stack);
+
+
+   token = tokenstack_pop(stack); // pop identifier
+   //TODO: dtor stack
+   if(err != -1){
+      return err; //error occured in expression
+   }
+
+   new_symbol = symbol_ctor(token->value.string_value, ST_VARIABLE, symbolval_var_ctor(type));
+
+   bintree_add(bintreestack_peek(symtable_stack), new_symbol);
+
    return -1;
 }
 
