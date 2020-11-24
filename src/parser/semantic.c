@@ -25,7 +25,7 @@ bool check_same_type(vartype_e* type1, vartype_e type2){
    return false;
 }
 
-int semantic_expresion(tokenstack_t* stack, vartype_e* type, bintreestack_t* symtable_stack){
+int semantic_expression(tokenstack_t* stack, vartype_e* type, bintreestack_t* symtable_stack){
    token_t* token_current = NULL;
    token_t* token_last;
    symbol_t* symbol;
@@ -84,7 +84,7 @@ int semantic_declare(tokenstack_t* stack, bintreestack_t* symtable_stack){
       }
    }while(token->id != TOKENID_OPERATOR_DECLARE);
 
-   err = semantic_expresion(expresion_stack, &type, symtable_stack);
+   err = semantic_expression(expresion_stack, &type, symtable_stack);
    tokenstack_dtor(expresion_stack);
 
 
