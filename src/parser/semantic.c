@@ -75,7 +75,9 @@ int semantic_declare(tokenstack_t* stack, bintreestack_t* symtable_stack){
    token_t* token;
    vartype_e type;
    symbol_t* new_symbol;
+   symbol_t* symbol;
    int err;
+   int level;
 
    do{
       token = tokenstack_pop(stack);
@@ -94,8 +96,12 @@ int semantic_declare(tokenstack_t* stack, bintreestack_t* symtable_stack){
       return err; //error occured in expression
    }
 
-   new_symbol = symbol_ctor(token->value.string_value, ST_VARIABLE, symbolval_var_ctor(type));
+   symbol = bintreestack_find(symtable_stack, token->value.string_value, &level);
+   if(level == (bintreestack_get_length(symtable_stack) - 1) && symbol != NULL){
+      return ERRCODE_VAR_UNDEFINED_ERROR; //variable was already declared in this scope 
+   }
 
+   new_symbol = symbol_ctor(token->value.string_value, ST_VARIABLE, symbolval_var_ctor(type));
    bintree_add(bintreestack_peek(symtable_stack), new_symbol);
 
    return -1;
