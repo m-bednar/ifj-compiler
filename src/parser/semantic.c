@@ -66,6 +66,7 @@ int semantic_expression(tokenstack_t* stack, vartype_e* type, bintreestack_t* sy
          default:
          break;
       }
+      //TODO: free token
    }
    return -1;
 }
@@ -98,11 +99,47 @@ int semantic_declare(tokenstack_t* stack, bintreestack_t* symtable_stack){
 
    symbol = bintreestack_find(symtable_stack, token->value.string_value, &level);
    if(level == (bintreestack_get_length(symtable_stack) - 1) && symbol != NULL){
+      token_dtor(token);
       return ERRCODE_VAR_UNDEFINED_ERROR; //variable was already declared in this scope 
    }
 
    new_symbol = symbol_ctor(token->value.string_value, ST_VARIABLE, symbolval_var_ctor(type));
    bintree_add(bintreestack_peek(symtable_stack), new_symbol);
+   token_dtor(token);
+   return -1;
+}
+
+int semantic_assign(tokenstack_t* stack, bintreestack_t* symtable_stack){
+   tokenstack_t* expression_stack = tokenstack_ctor();
+   vartype_e* expression_types = NULL; //vartype array
+   int expression_types_size = 0;
+   token_t* token;
+   int err;
+   vartype_e type;
+
+   do{
+      token = tokenstack_pop(stack);
+      if(token->id != TOKENID_COMMA){
+         tokenstack_push(expression_stack, token);
+      }
+   }while(token->id != TOKENID_COMMA);
+
+   err = semantic_expression(expression_stack, &type, symtable_stack);
+   tokenstack_dtor(expression_stack);
+
+   if(err != -1){
+      return err; //error occured in expression
+   }
+   
+   if(expression_types == NULL){
+      expression_types = safe_alloc(sizeof(vartype_e));
+   }
+   else{
+      expression_types = safe_realloc(expression_types, sizeof(vartype_e) * (expression_types_size+1));
+   }
+   expression_types_size++;
+
+   expression_types[expression_types_size-1] = type;
 
    return -1;
 }
