@@ -43,24 +43,6 @@ void print_pushs_identifier(char* identifier, bintreestack_t* varstack) {
    free(var);
 }
 
-void print_pushs_string(char* value) {
-   char* str = convert_string(value);
-   printcm("PUSHS string@%s", str);
-   free(str);
-}
-
-void print_pushs_bool(bool value) {
-   printcm("PUSHS bool@%s", value ? "true" : "false");
-}
-
-void print_pushs_int(int value) {
-   printcm("PUSHS int@%d", value);
-}
-
-void print_pushs_float(double value) {
-   printcm("PUSHS float@%a", value);
-}
-
 void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
    for (int i = 0; i < exp->tokens_count; i++) {
       switch (exp->tokens[i]->id) {
@@ -68,13 +50,13 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
             print_pushs_identifier(exp->tokens[i]->value.string_value, varstack);
             break;
          case TOKENID_BOOL_LITERAL:
-            print_pushs_bool(exp->tokens[i]->value.bool_value);
+            printcm("PUSHS bool@%s", exp->tokens[i]->value.bool_value ? "true" : "false");
             break;
          case TOKENID_NUM_DECIMAL:
-            print_pushs_float(exp->tokens[i]->value.decimal_value);
+            printcm("PUSHS float@%a", exp->tokens[i]->value.decimal_value);
             break;
          case TOKENID_NUM:
-            print_pushs_int(exp->tokens[i]->value.int_value);
+            printcm("PUSHS int@%d", exp->tokens[i]->value.int_value);
             break;
          case TOKENID_OPERATOR_ADD:
             printcm("ADDS");
@@ -86,7 +68,7 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
             printcm("MULS");
             break;
          case TOKENID_OPERATOR_DIV:
-            printcm("DIV");   // FIXME: IDIV version required
+            printcm(exp->tokens[0]->id == TOKENID_NUM_DECIMAL ? "IDIVS" : "DIVS");
             break;
          case TOKENID_OPERATOR_AND:
             printcm("ANDS");
