@@ -9,6 +9,7 @@
 #include "../scanner/token.h"
 
 typedef enum vartype_e {
+   VT_UNDEFINED,
    VT_BOOL,
    VT_INT,
    VT_FLOAT,
