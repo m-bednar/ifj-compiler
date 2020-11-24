@@ -12,4 +12,4 @@
 /*
  * returns ERROR code or -1 if no error occured 
  */
-int semantic(token_t* token);
+int semantic(token_t* token, bool eol_flag);
