@@ -32,7 +32,7 @@ int get_var_depth(char* identifier, bintreestack_t* varstack) {
 }
 
 bool is_const_tokenid(tokenid_e id) {
-   return id == TOKENID_NUM_DECIMAL || id == TOKENID_NUM || id == TOKENID_STRING_LITERAL || TOKENID_BOOL_LITERAL;
+   return id == TOKENID_NUM_DECIMAL || id == TOKENID_NUM || id == TOKENID_STRING_LITERAL || id == TOKENID_BOOL_LITERAL;
 }
 
 char* generate_const_str(token_t* token) {
