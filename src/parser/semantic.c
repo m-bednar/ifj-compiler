@@ -101,10 +101,12 @@ int semantic_declare(tokenstack_t* stack, bintreestack_t* symtable_stack){
    return -1;
 }
 
-int semantic(token_t* token){
+int semantic(token_t* token, bool eol_flag){
    static astnode_generic_t* ast;
    static bintreestack_t* symtable_stack;
    static bintree_t* symtable_global;
+   static tokenstack_t* token_stack;
+
    if(ast == NULL){
       ast = ast_ctor();
    }
@@ -114,7 +116,24 @@ int semantic(token_t* token){
    if(symtable_global == NULL){
       symtable_global = bintree_ctor();
    }
+   if(token_stack == NULL){
+      token_stack = tokenstack_ctor();
+   }
 
-   token = token; // TODO: remove, only for compiler compliance
+   while(!eol_flag){
+      tokenstack_push(token_stack, token);
+   }
+   
+   if(!eol_flag){
+      return -1; //whole line wasnt read yet
+   }
+
+   // TODO: ast insert
+
+
+   // TODO: call semantic functions
+
+   tokenstack_dtor(token_stack);
+
    return -1;
 }
