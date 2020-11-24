@@ -6,36 +6,8 @@
 
 #include "expression.h"
 #include "postfix.h"
+#include "vargen.h"
 #include "utils.h"
-
-int digits(int n) {
-   int count = 0;
-   do {
-      count++;
-      n /= 10;
-   } while(n != 0);
-   return count; 
-} 
-
-char* str_var(char* identifier, frametype_e frame, bintreestack_t* varstack) {
-   const int suflen = 3; // length of frame suffix
-   int depth;
-   bintreestack_find(varstack, identifier, &depth);
-   depth = depth == -1 ? bintreestack_get_length(varstack) - 1 : depth;
-   char* var = safe_alloc(sizeof(char) * (digits(depth) + strlen(identifier) + suflen + 2));
-   switch (frame) {
-      case FT_GF:
-         sprintf(var, "GF@%s&%d", identifier, depth);
-         break;
-      case FT_LF:
-         sprintf(var, "LF@%s&%d", identifier, depth);
-         break;
-      case FT_TF:
-         sprintf(var, "TF@%s&%d", identifier, depth);
-         break;
-   }
-   return var;
-}
 
 char* convert_string(char* str) {
    const int csize = 4; // Size of special ascii code
@@ -64,8 +36,9 @@ char* convert_string(char* str) {
    return out;
 }
 
-void print_pushs_identifier(char* identifier, frametype_e frame, bintreestack_t* varstack) {
-   char* var = str_var(identifier, frame, varstack);
+void print_pushs_identifier(char* identifier, bintreestack_t* varstack) {
+   int depth = get_var_depth(identifier, varstack);
+   char* var = generate_var_str(identifier, FT_TF, depth);
    printcm("PUSHS %s", var);
    free(var);
 }
@@ -88,11 +61,11 @@ void print_pushs_float(double value) {
    printcm("PUSHS float@%a", value);
 }
 
-void evaluate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
+void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
    for (int i = 0; i < exp->tokens_count; i++) {
       switch (exp->tokens[i]->id) {
          case TOKENID_IDENTIFIER:
-            print_pushs_identifier(exp->tokens[i]->value.string_value, FT_TF, varstack);
+            print_pushs_identifier(exp->tokens[i]->value.string_value, varstack);
             break;
          case TOKENID_BOOL_LITERAL:
             print_pushs_bool(exp->tokens[i]->value.bool_value);
@@ -151,19 +124,31 @@ void evaluate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
    }
 }
 
-void evaluate_local_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
+void generate_local_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
    exp = exp;
    varstack = varstack;
 }
 
-exptype_e evaluate_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
+void generate_const_expression(char* varstr, astnode_exp_t* exp) {
+   char* val = generate_const_str(exp->tokens[0]);
+   printcm("MOVE %s %s", varstr, val);
+   free(val);
+}
+
+void generate_assign_expression(char* identifier, char* varstr, astnode_exp_t* exp, bintreestack_t* varstack) {
    // TODO: check for string concat
-   if (exp->tokens_count <= 3) {
-      evaluate_local_expression(exp, varstack);
-      return ET_LOCAL;
+   identifier = identifier;
+   if (exp->tokens_count == 1) {
+      generate_const_expression(varstr, exp);
+   } else if (exp->tokens_count <= 3) {
+      generate_local_expression(exp, varstack);
    } else {
       infix_to_postfix(exp);
-      evaluate_stack_expression(exp, varstack);
-      return ET_STACK;
+      // optimize postfix
+      if (exp->tokens_count == 1) {
+         generate_const_expression(varstr, exp);
+      } else {
+         generate_stack_expression(exp, varstack);
+      }
    }
 }
