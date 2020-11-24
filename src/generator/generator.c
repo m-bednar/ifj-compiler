@@ -6,6 +6,7 @@
 
 #include "generator.h"
 #include "expression.h"
+#include "vargen.h"
 #include "utils.h"
 #include "../symtable/bintreestack.h"
 #include <stdbool.h>
@@ -16,14 +17,15 @@ void generate_assign(astnode_assign_t* node) {
 }
 
 void generate_defvar(astnode_defvar_t* node, bintreestack_t* varstack) {
-   char* var = str_var(node->variable->value.string_value, FT_TF, varstack);
+   int depth = new_var_depth(varstack);
+   char* var = generate_var_str(node->variable->value.string_value, FT_TF, depth);
+   
+   symbol_t* symbol = symbol_ctor(node->variable->value.string_value, ST_VARIABLE, symbolval_var_ctor(VT_UNDEFINED));
+   bintree_add(bintreestack_peek(varstack), symbol);
+   
    printcm("DEFVAR %s", var);
-   if (evaluate_expression(node->expression, varstack) == ET_STACK) {
-      printcm("POPS %s", var);
-   } else {
-      // TODO:
-   }
-   // TODO: add to symtable
+   generate_assign_expression(node->variable->value.string_value, var, node->expression, varstack);
+
    free(var);
 }
 
