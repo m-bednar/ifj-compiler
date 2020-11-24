@@ -673,7 +673,7 @@ bool precedence_parser(token_t** token, token_t** token_next) {
    ntposymstack_t* help_stack = ntposymstack_ctor();
    int input_terminal_id;
    int stack_top_terminal_id;
-
+   bool empty = true;
    bool error = false;
 
    ntposymstack_push(stack, ntposymbol_ctor(TERMINAL_END_OF_FILE, TERMINAL));
@@ -682,13 +682,14 @@ bool precedence_parser(token_t** token, token_t** token_next) {
    while (!error) {
       if ((*token)->id == TOKENID_NEWLINE || (*token)->id == TOKENID_COMMA || (*token)->id == TOKENID_LEFT_BRACKET ||
             (*token)->id == TOKENID_SEMICOLON) {
-         if (ntposymstack_top_terminal(stack)->id == TERMINAL_END_OF_FILE) {
+         if (ntposymstack_top_terminal(stack)->id == TERMINAL_END_OF_FILE && !empty) {
             break;
          } else {
             input_terminal_id = TERMINAL_END_OF_FILE;
          }
       } else {
          input_terminal_id = get_precedence_terminal_id((*token)->id);
+         empty = false;
       }
 
       stack_top_terminal_id = ntposymstack_top_terminal(stack)->id;
