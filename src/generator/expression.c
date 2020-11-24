@@ -109,6 +109,7 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
 void generate_local_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
    exp = exp;
    varstack = varstack;
+   printcm("(local expression)");
 }
 
 void generate_const_expression(char* varstr, astnode_exp_t* exp) {
@@ -126,11 +127,13 @@ void generate_assign_expression(char* identifier, char* varstr, astnode_exp_t* e
       generate_local_expression(exp, varstack);
    } else {
       infix_to_postfix(exp);
-      // optimize postfix
       if (exp->tokens_count == 1) {
          generate_const_expression(varstr, exp);
+      } else if (exp->tokens_count <= 3) {
+         generate_local_expression(exp, varstack);
       } else {
          generate_stack_expression(exp, varstack);
+         printcm("POPS %s", varstr);
       }
    }
 }
