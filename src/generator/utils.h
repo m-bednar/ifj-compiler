@@ -9,5 +9,6 @@
 #include <stdlib.h>
 
 #define dprint(s, ...) fprintf(stderr,"%s:%d: ", __FILE__, __LINE__); fprintf(stderr, s,##__VA_ARGS__); fprintf(stderr, "\n")
+#define pcomment(s, ...) printf("   # "); printf(s,##__VA_ARGS__); printf("\n")  // Print comment function
 #define printcm(s, ...) printf("   "); printf(s,##__VA_ARGS__); printf("\n")  // Print command function
 #define printlb(s, ...) printf(s,##__VA_ARGS__); printf("\n")   // Print label function
