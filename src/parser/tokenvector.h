@@ -14,12 +14,12 @@ typedef struct tokenvector_t {
    token_t** memory;
 } tokenvector_t;
 
-tokenvector_t* tokenvector_t_ctor();
+tokenvector_t* tokenvector_ctor();
 
 void tokenvector_dtor(tokenvector_t* vector);
 
-tokenvector_t* tokenvector_get(int index);
+token_t* tokenvector_get(tokenvector_t* vector, int index);
 
-void tokenvector_push(token_t* token);
+void tokenvector_push(tokenvector_t* vector, token_t* token);
 
 int tokenstack_get_lenght(tokenvector_t* vector);
