@@ -26,7 +26,7 @@ void generate_returns_pops(astnode_assign_t* node, bintreestack_t* varstack) {
          int depth = get_var_depth(node->left_ids[i]->value.string_value, varstack);
          printcm("POPS %s", generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth));
       } else {
-         printcm("POPS GF@$void");
+         printcm("POPS GF@$tmp");
       }
    }
    if (clears_from != node->ids_count) {
@@ -66,12 +66,7 @@ void generate_funccall(astnode_funccall_t* node, bintreestack_t* varstack, bintr
 void generate_assign(astnode_assign_t* node, bintreestack_t* varstack, bintree_t* fntable) {
    if (node->right_function != NULL) {
       generate_funccall(node->right_function, varstack, fntable, false);
-      symbol_t* fn_declaration = bintree_find(fntable, node->right_function->name);
-      if (node->ids_count == 0 && fn_declaration->value.fn->ret_count > 0) {
-         printcm("CLEARS");
-      } else {
-         generate_returns_pops(node, varstack);
-      }
+      generate_returns_pops(node, varstack);
    }
 }
 
@@ -83,7 +78,7 @@ void generate_defvar(astnode_defvar_t* node, bintreestack_t* varstack) {
    bintree_add(bintreestack_peek(varstack), symbol);
    
    printcm("DEFVAR %s", var);
-   generate_assign_expression(node->variable->value.string_value, var, node->expression, varstack);
+   generate_assign_expression(node->variable->value.string_value, var, node->expression, varstack, true);
 
    free(var);
 }
@@ -132,6 +127,7 @@ void generate_funcdecl(astnode_funcdecl_t* func, bintreestack_t* varstack, bintr
    for (int i = 0; i < func->body->children_count; i++) {
       generate_generic(func->body->children[i], varstack, fntable);
    }
+   bintreestack_print(varstack);
    bintree_dtor(bintreestack_pop(varstack));
    printcm("RETURN");
 }
@@ -139,6 +135,7 @@ void generate_funcdecl(astnode_funcdecl_t* func, bintreestack_t* varstack, bintr
 void generate(astnode_global_t* global, bintree_t* fntable) {
    bintreestack_t* varstack = bintreestack_ctor();
    printlb(".IFJcode20");
+   printcm("DEFVAR GF@$tmp");
    printcm("CREATEFRAME");
    printcm("CALL main");
    printcm("EXIT int@0");
