@@ -54,6 +54,6 @@ void tokenvector_push(tokenvector_t* vector, token_t* token){
    vector->length++;
 }
 
-int tokenstack_get_lenght(tokenvector_t* vector){
+int tokenvector_get_lenght(tokenvector_t* vector){
    return vector->length;
 }
