@@ -97,3 +97,7 @@ typedef struct astnode_generic_t {
  * Allocate new AST
  */
 astnode_generic_t* ast_ctor();
+
+void ast_global_add_func(astnode_generic_t* global, astnode_funcdecl_t* funcdecl);
+
+astnode_funcdecl_t* ast_funcdecl_ctor(char* name);

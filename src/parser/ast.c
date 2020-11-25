@@ -14,6 +14,17 @@ astnode_generic_t* ast_ctor() {
    return ast;
 }
 
+void ast_global_add_func(astnode_generic_t* global, astnode_funcdecl_t* funcdecl){
+   if(global->value.globalval->functions == NULL){
+      global->value.globalval->functions = safe_alloc(sizeof(astnode_funcdecl_t*));
+   }
+   else{
+      global->value.globalval->functions = safe_realloc(global->value.globalval->functions, sizeof(astnode_funcdecl_t*) * (global->value.globalval->functions_count + 1));
+   }
+   global->value.globalval->functions[global->value.globalval->functions_count] = funcdecl;
+   global->value.globalval->functions_count++;
+}
+
 astnode_generic_t* astnode_if_ctor() {
    astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
    ast_node->type = ANT_IF;
@@ -45,10 +56,9 @@ astnode_generic_t* astnode_ret_ctor() {
    return ast_node;
 }
 
-astnode_generic_t* astnode_funcdecl_ctor() {
-   astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
-   // ast_node->type = ANT_FUNCDECL;
-   ast_node->value.funcdeclval->body = NULL;
+astnode_funcdecl_t* astnode_funcdecl_ctor(char* name) {
+   astnode_funcdecl_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
+   ast_node->name = name;
    return ast_node;
 }
 
