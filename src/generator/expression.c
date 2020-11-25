@@ -36,22 +36,16 @@ char* convert_string(char* str) {
    return out;
 }
 
-void add_const_to_varstack(char* identifier, token_t* token, bintreestack_t* varstack, vartype_e type) {
-   identifier = identifier; token = token; varstack = varstack; type = type;
-   // TODO:
-}
-
 bool is_bool_operator(tokenid_e id) {
    return id == TOKENID_OPERATOR_NOT || id == TOKENID_OPERATOR_NOT_EQUAL || id == TOKENID_OPERATOR_EQUALS
       || id == TOKENID_OPERATOR_LESS || id == TOKENID_OPERATOR_LESS_OR_EQUAL || id == TOKENID_OPERATOR_GREATER
       || id == TOKENID_OPERATOR_GREATER_OR_EQUAL;
 }
 
-vartype_e determine_token_type(token_t* token) {
+vartype_e determine_token_type(token_t* token, bintreestack_t* varstack) {
    switch (token->id) {
       case TOKENID_IDENTIFIER:
-         // TODO:
-         return VT_UNDEFINED;
+         return bintreestack_find(varstack, token->value.string_value, NULL)->value.var->type;
       case TOKENID_STRING_LITERAL:
          return VT_STRING;
       case TOKENID_BOOL_LITERAL:
@@ -61,7 +55,7 @@ vartype_e determine_token_type(token_t* token) {
       case TOKENID_NUM:
          return VT_INT;
       default:
-         error("Cannot determine type from given token.");
+         return VT_UNDEFINED;
    }
 }
 
@@ -70,13 +64,16 @@ vartype_e determine_expression_type(astnode_exp_t* exp, bintreestack_t* varstack
    token_t* first = exp->tokens[0];
    varstack = varstack;
    if (exp->tokens_count == 1) {
-      return determine_token_type(first);
+      return determine_token_type(first, varstack);
    } 
    if (is_bool_operator(last->id)) {
       return VT_BOOL;
    }
-   if (is_const_tokenid(first->id)) {
-      return determine_token_type(first);
+   for (int i = 0; i < exp->tokens_count; i++) {
+      vartype_e type = determine_token_type(exp->tokens[i], varstack);
+      if (type != VT_UNDEFINED) {
+         return type;
+      }
    }
    error("Given expression cannot be determined.");
 }
@@ -155,7 +152,17 @@ void generate_local_expression(char* var, astnode_exp_t* exp, bintreestack_t* va
    exp = exp;
    varstack = varstack;
    var = var;
-   /*printcm("(local expression)");*/
+   /*
+   if (exp->tokens_count == 2) {
+      guard(exp->tokens[0] == TOKENID_IDENTIFIER && exp->tokens[1] == TOKENID_OPERATOR_NOT);
+      int depth = get_var_depth(exp->tokens[0]->value.string_value, varstack);
+      char* var = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, depth);
+      printcm("NOT %s %s", var, var);
+   } else {
+      int depth = get_var_depth(exp->tokens[0]->value.string_value, varstack);
+      char* var = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, depth);
+   }
+   */
 }
 
 void generate_const_expression(char* varstr, astnode_exp_t* exp) {
