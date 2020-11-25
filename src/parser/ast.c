@@ -42,10 +42,10 @@ astnode_generic_t* astnode_for_ctor() {
    return ast_node;
 }
 
-astnode_generic_t* astnode_exp_ctor() {
-   astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
-   // ast_node->type = ANT_EXP;
-   ast_node->value.expval->tokens = NULL;
+astnode_exp_t* astnode_exp_ctor(token_t** tokens, int token_count) {
+   astnode_exp_t* ast_node = safe_alloc(sizeof(astnode_exp_t));
+   ast_node->tokens = tokens;
+   ast_node->tokens_count = token_count;
    return ast_node;
 }
 
@@ -69,4 +69,12 @@ void astnode_codeblock_insert(astnode_codeblock_t* codeblock, astnode_generic_t*
    codeblock->children = safe_alloc(sizeof(astnode_generic_t) * (codeblock->children_count + 1));
    codeblock->children_count++;
    codeblock->children[codeblock->children_count-1] = node;
+}
+
+astnode_generic_t* astnode_defvar_ctor(token_t* variable, astnode_exp_t* expression){
+   astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
+   ast_node->type = ANT_DEFVAR;
+   ast_node->value.defvarval->expression = expression;
+   ast_node->value.defvarval->variable = variable;
+   return ast_node;
 }

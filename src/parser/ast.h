@@ -100,4 +100,8 @@ astnode_generic_t* ast_ctor();
 
 void ast_global_add_func(astnode_generic_t* global, astnode_funcdecl_t* funcdecl);
 
-astnode_funcdecl_t* ast_funcdecl_ctor(char* name);
+astnode_funcdecl_t* astnode_funcdecl_ctor(char* name);
+
+astnode_exp_t* astnode_exp_ctor(token_t** tokens, int token_count);
+
+astnode_generic_t* astnode_defvar_ctor(token_t* variable, astnode_exp_t* expression);
