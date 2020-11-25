@@ -40,7 +40,7 @@ typedef union symbolval_u {
 /**
  * Allocates and creates new symbol value for function.
  */
-symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype_e* arg_types, vartype_e* ret_types, bool defined);
+symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, char** arg_names, vartype_e* arg_types, vartype_e* ret_types, bool defined);
 
 /**
  * Allocates and creates new symbol value for variable.
