@@ -197,6 +197,38 @@ void replace_three_tokens(astnode_exp_t* exp, token_t* token, int index) {
    exp->tokens_count -= 2;
 }
 
+void optimize_by_decomposition(astnode_exp_t* exp, bintreestack_t* varstack) {
+   for (int i = 0; i < exp->tokens_count; i++) {
+      if (exp->tokens[i]->id == TOKENID_IDENTIFIER) {
+         symbol_t* symbol = bintreestack_find(varstack, exp->tokens[i]->value.string_value, NULL);
+         if (symbol->value.var->is_const && symbol->value.var->type != VT_UNDEFINED) {
+            free(exp->tokens[i]->value.string_value);
+            switch (symbol->value.var->type) {
+               case VT_STRING:
+                  exp->tokens[i]->id = TOKENID_STRING_LITERAL;
+                  exp->tokens[i]->value.string_value = safe_alloc(sizeof(char) * (strlen(symbol->value.var->const_val.string_value) + 1));
+                  strcpy(exp->tokens[i]->value.string_value, symbol->value.var->const_val.string_value);
+                  break;
+               case VT_BOOL:
+                  exp->tokens[i]->id = TOKENID_BOOL_LITERAL;
+                  exp->tokens[i]->value.bool_value = symbol->value.var->const_val.bool_value;
+                  break;
+               case VT_FLOAT:
+                  exp->tokens[i]->id = TOKENID_NUM_DECIMAL;
+                  exp->tokens[i]->value.decimal_value = symbol->value.var->const_val.decimal_value;
+                  break;
+               case VT_INT:
+                  exp->tokens[i]->id = TOKENID_NUM;
+                  exp->tokens[i]->value.int_value = symbol->value.var->const_val.int_value;
+                  break;
+               default: 
+                  break;
+            }
+         }
+      }
+   }
+}
+
 void optimize_by_evaluation(astnode_exp_t* exp) {
    bool optimized;
    do {
@@ -213,13 +245,13 @@ void optimize_by_evaluation(astnode_exp_t* exp) {
    } while (optimized);
 }
 
-void optimize_postfix(astnode_exp_t* exp) {
-   // optimize_by_decomposition(exp);
+void optimize_postfix(astnode_exp_t* exp, bintreestack_t* varstack) {
+   optimize_by_decomposition(exp, varstack);
    // optimize_by_arithmetics(exp);
    optimize_by_evaluation(exp);
 }
 
-void infix_to_postfix(astnode_exp_t* exp) {
+void infix_to_postfix(astnode_exp_t* exp, bintreestack_t* varstack) {
    tstack_t* stack = tstack_ctor(exp->tokens_count);
    int j = 0;  // postfix length
 
@@ -251,5 +283,5 @@ void infix_to_postfix(astnode_exp_t* exp) {
    exp->tokens = safe_realloc(exp->tokens, j * sizeof(token_t*));
 
    tstack_dtor(stack);
-   optimize_postfix(exp);
+   optimize_postfix(exp, varstack);
 }

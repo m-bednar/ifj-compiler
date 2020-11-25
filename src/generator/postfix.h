@@ -7,8 +7,9 @@
 #pragma once
 
 #include "../parser/ast.h"
+#include "../symtable/bintreestack.h"
 
 /**
  * Converts expression in infix notation to postfix notation.
  */
-void infix_to_postfix(astnode_exp_t* exp);
+void infix_to_postfix(astnode_exp_t* exp, bintreestack_t* varstack);

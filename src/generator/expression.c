@@ -36,6 +36,67 @@ char* convert_string(char* str) {
    return out;
 }
 
+void add_const_to_varstack(char* identifier, token_t* token, bintreestack_t* varstack, vartype_e type) {
+   symbol_t* symbol = bintreestack_find(varstack, identifier, NULL);
+   symbol->value.var->is_const = true;
+   switch (type) {
+      case VT_STRING:
+         symbol->value.var->const_val.string_value = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
+         strcpy(symbol->value.var->const_val.string_value, token->value.string_value);
+         break;
+      case VT_BOOL:
+         symbol->value.var->const_val.bool_value = token->value.bool_value;
+         break;
+      case VT_FLOAT:
+         symbol->value.var->const_val.decimal_value = token->value.decimal_value;
+         break;
+      case VT_INT:
+         symbol->value.var->const_val.int_value = token->value.int_value;
+         break;
+      default:
+         error("Given type cannot be const.");
+   }
+}
+
+bool is_bool_operator(tokenid_e id) {
+   return id == TOKENID_OPERATOR_NOT || id == TOKENID_OPERATOR_NOT_EQUAL || id == TOKENID_OPERATOR_EQUALS
+      || id == TOKENID_OPERATOR_LESS || id == TOKENID_OPERATOR_LESS_OR_EQUAL || id == TOKENID_OPERATOR_GREATER
+      || id == TOKENID_OPERATOR_GREATER_OR_EQUAL;
+}
+
+vartype_e determine_token_type(token_t* token) {
+   switch (token->id) {
+      case TOKENID_IDENTIFIER:
+         // TODO:
+         return VT_UNDEFINED;
+      case TOKENID_STRING_LITERAL:
+         return VT_STRING;
+      case TOKENID_BOOL_LITERAL:
+         return VT_BOOL;
+      case TOKENID_NUM_DECIMAL:
+         return VT_FLOAT;
+      case TOKENID_NUM:
+         return VT_INT;
+      default:
+         error("Cannot determine type from given token.");
+   }
+}
+
+vartype_e determine_expression_type(astnode_exp_t* exp) {
+   token_t* last = exp->tokens[exp->tokens_count - 1];
+   token_t* first = exp->tokens[0];
+   if (exp->tokens_count == 1) {
+      return determine_token_type(first);
+   } 
+   if (is_bool_operator(last->id)) {
+      return VT_BOOL;
+   }
+   if (is_const_tokenid(first->id)) {
+      return determine_token_type(first);
+   }
+   error("Given expression cannot be determined.");
+}
+
 void print_pushs_identifier(char* identifier, bintreestack_t* varstack) {
    int depth = get_var_depth(identifier, varstack);
    char* var = generate_var_str(identifier, FT_TF, depth);
@@ -59,7 +120,7 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
             printcm("PUSHS int@%d", exp->tokens[i]->value.int_value);
             break;
          case TOKENID_OPERATOR_ADD:
-            printcm("ADDS");
+            printcm(determine_expression_type(exp) == VT_STRING ? "CONCAT" : "ADDS");
             break;
          case TOKENID_OPERATOR_SUB:
             printcm("SUBS");
@@ -68,7 +129,7 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
             printcm("MULS");
             break;
          case TOKENID_OPERATOR_DIV:
-            printcm(exp->tokens[0]->id == TOKENID_NUM_DECIMAL ? "IDIVS" : "DIVS");
+            printcm(determine_expression_type(exp) == VT_FLOAT ? "IDIVS" : "DIVS");
             break;
          case TOKENID_OPERATOR_AND:
             printcm("ANDS");
@@ -118,22 +179,20 @@ void generate_const_expression(char* varstr, astnode_exp_t* exp) {
    free(val);
 }
 
-void generate_assign_expression(char* identifier, char* varstr, astnode_exp_t* exp, bintreestack_t* varstack) {
-   // TODO: check for string concat
-   identifier = identifier;
+void generate_assign_expression(char* identifier, char* varstr, astnode_exp_t* exp, bintreestack_t* stack, bool can_const) {
+   infix_to_postfix(exp, stack);
    if (exp->tokens_count == 1) {
-      generate_const_expression(varstr, exp);
-   } else if (exp->tokens_count <= 3) {
-      generate_local_expression(exp, varstack);
-   } else {
-      infix_to_postfix(exp);
-      if (exp->tokens_count == 1) {
-         generate_const_expression(varstr, exp);
-      } else if (exp->tokens_count <= 3) {
-         generate_local_expression(exp, varstack);
+      vartype_e exptype = determine_expression_type(exp);
+      dprint("%d ", exptype);
+      if (exptype != VT_UNDEFINED && can_const) {
+         add_const_to_varstack(identifier, exp->tokens[0], stack, exptype);
       } else {
-         generate_stack_expression(exp, varstack);
-         printcm("POPS %s", varstr);
+         generate_const_expression(varstr, exp);
       }
+   } else if (exp->tokens_count <= 3) {
+      generate_local_expression(exp, stack);
+   } else {
+      generate_stack_expression(exp, stack);
+      printcm("POPS %s", varstr);
    }
 }
