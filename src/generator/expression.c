@@ -13,16 +13,13 @@ char* convert_string(char* str) {
    const int csize = 4; // Size of special ascii code
    char* out;
    int len = strlen(str);
-   
    for (int i = 0; i < (int)strlen(str); i++) {
       if ((str[i] >= 0 && str[i] <= 32) || str[i] == 35 || str[i] == 92) {
          len += csize;
       }
    }
-   
    out = safe_alloc(sizeof(char) * len + 1);
    len = 0;
-
    for (int i = 0; i < (int)strlen(str); i++) {
       if ((str[i] >= 0 && str[i] <= 32) || str[i] == 35 || str[i] == 92) {
          sprintf(out + len * sizeof(char), "\\%03d", (int)str[i]);
@@ -32,7 +29,6 @@ char* convert_string(char* str) {
          len++;
       }
    }
-
    return out;
 }
 
