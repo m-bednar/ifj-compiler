@@ -190,10 +190,18 @@ token_t* eval_operation(token_t* operand1, token_t* operand2, token_t* operator)
 }
 
 void replace_three_tokens(astnode_exp_t* exp, token_t* token, int index) {
+   token_t* new = token_ctor(token->id, token->value);
+   if (token->id == TOKENID_IDENTIFIER || token->id == TOKENID_STRING_LITERAL) {
+      new->value.string_value = safe_alloc(strlen(token->value.string_value) + 1);
+      strcpy(new->value.string_value, token->value.string_value);
+   }
+
+   token_dtor(exp->tokens[index]);
    token_dtor(exp->tokens[index + 1]);
    token_dtor(exp->tokens[index + 2]);
-   
-   exp->tokens[index] = token;
+
+   exp->tokens[index] = new;
+
    for (int i = index + 3; i < exp->tokens_count; i++) {
       exp->tokens[i - 2] = exp->tokens[i];
    }
@@ -217,8 +225,68 @@ void optimize_by_evaluation(astnode_exp_t* exp) {
    } while (optimized);
 }
 
+bool is_zero_value(token_t* t) {
+   return (t->id == TOKENID_NUM && t->value.int_value == 0) ||
+      (t->id == TOKENID_NUM_DECIMAL && t->value.decimal_value == 0.0);
+}
+
+bool is_unary_value(token_t* t) {
+   return (t->id == TOKENID_NUM && t->value.int_value == 1) ||
+      (t->id == TOKENID_NUM_DECIMAL && t->value.decimal_value == 1.0);
+}
+
+void optimize_by_arithmetics(astnode_exp_t* exp) {
+   bool optimized;
+   do {
+      optimized = false;
+      for (int i = 0; i < exp->tokens_count - 2 && !optimized; i++) {
+         token_t* t1 = exp->tokens[i];
+         token_t* t2 = exp->tokens[i + 1];
+         token_t* t3 = exp->tokens[i + 2];
+         if (is_operand(t1) && is_operand(t2) && !is_operand(t3)) {
+            switch (t3->id) {
+               case TOKENID_OPERATOR_MUL:
+                  if (is_zero_value(t1)) {
+                     replace_three_tokens(exp, t1, i);
+                  } else if (is_zero_value(t2)) {
+                     replace_three_tokens(exp, t2, i);
+                  } else if (is_unary_value(t1)) {
+                     replace_three_tokens(exp, t2, i);
+                  } else if (is_unary_value(t2)) {
+                     replace_three_tokens(exp, t1, i);
+                  }
+                  break;
+               case TOKENID_OPERATOR_DIV:
+                  if (is_zero_value(t1)) {
+                     replace_three_tokens(exp, t1, i);
+                  } else if (is_zero_value(t2)) {
+                     // TODO: error, zero division
+                  } else if (is_unary_value(t2)) {
+                     replace_three_tokens(exp, t1, i);
+                  }
+                  break;
+               case TOKENID_OPERATOR_ADD:
+                  if (is_zero_value(t1)) {
+                     replace_three_tokens(exp, t2, i);
+                  } else if (is_zero_value(t2)) {
+                     replace_three_tokens(exp, t1, i);
+                  }
+                  break;
+               case TOKENID_OPERATOR_SUB:
+                  if (is_zero_value(t2)) {
+                     replace_three_tokens(exp, t1, i);
+                  }
+                  break;
+               default:
+                  break;
+            }
+         }
+      }
+   } while (optimized);
+}
+
 void optimize_postfix(astnode_exp_t* exp) {
-   // optimize_by_arithmetics(exp);
+   optimize_by_arithmetics(exp);
    optimize_by_evaluation(exp);
 }
 

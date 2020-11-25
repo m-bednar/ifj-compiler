@@ -213,7 +213,12 @@ void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t*
 
 void generate_const_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
    char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
-   char* val = generate_const_str(exp->tokens[0]);
+   char* val;
+   if (is_const_tokenid(exp->tokens[0]->id)) {
+      val = generate_const_str(exp->tokens[0]);
+   } else {
+      val = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, vartable_depth(vartable, exp->tokens[0]->value.string_value));
+   }
    printcm("MOVE %s %s", var, val);
    free(var);
    free(val);
