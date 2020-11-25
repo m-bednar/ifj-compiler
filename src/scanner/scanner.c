@@ -414,26 +414,14 @@ token_t* get_next_token() {
             }
             break;
          case STATE_OPERATOR_ADD:
-            if (c == '=') {
-               return token_ctor(TOKENID_OPERATOR_ADD_AND_ASSIGN, value);
-            } else {
                prev = c;
                return token_ctor(TOKENID_OPERATOR_ADD, value);
-            }
          case STATE_OPERATOR_SUB:
-            if (c == '=') {
-               return token_ctor(TOKENID_OPERATOR_SUB_AND_ASSIGN, value);
-            } else {
                prev = c;
                return token_ctor(TOKENID_OPERATOR_SUB, value);
-            }
          case STATE_OPERATOR_MUL:
-            if (c == '=') {
-               return token_ctor(TOKENID_OPERATOR_MUL_AND_ASSIGN, value);
-            } else {
                prev = c;
                return token_ctor(TOKENID_OPERATOR_MUL, value);
-            }
          case STATE_OPERATOR_LESS:
             if (c == '=') {
                return token_ctor(TOKENID_OPERATOR_LESS_OR_EQUAL, value);
@@ -453,8 +441,6 @@ token_t* get_next_token() {
                state = STATE_COMMENT;
             } else if (c == '*') {
                state = STATE_BLOCK_COMMENT;
-            } else if (c == '=') {
-               return token_ctor(TOKENID_OPERATOR_DIV_AND_ASSIGN, value);
             } else {
                prev = c;
                return token_ctor(TOKENID_OPERATOR_DIV, value);
