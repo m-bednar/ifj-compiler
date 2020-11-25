@@ -8,7 +8,6 @@
 #include "tokenstack.h"
 #include "../error.h"
 #include "../symtable/bintreestack.h"
-#include "ntsymbol.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -203,9 +202,6 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag){
       token_stack = tokenstack_ctor();
    }
 
-   while(!eol_flag){
-      tokenstack_push(token_stack, token);
-   }
    // TODO: ignor new line
    if(!eol_flag){
       return -1; //whole line wasnt read yet

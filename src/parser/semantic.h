@@ -8,6 +8,8 @@
 
 #include "../scanner/scanner.h"
 #include "ast.h"
+#include "ntsymbol.h"
+
 
 /*
  * returns ERROR code or -1 if no error occured 
