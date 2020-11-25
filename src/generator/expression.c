@@ -38,10 +38,10 @@ bool is_bool_operator(tokenid_e id) {
       || id == TOKENID_OPERATOR_GREATER_OR_EQUAL;
 }
 
-vartype_e determine_token_type(token_t* token, bintreestack_t* varstack) {
+vartype_e determine_token_type(token_t* token, vartable_t* vartable) {
    switch (token->id) {
       case TOKENID_IDENTIFIER:
-         return bintreestack_find(varstack, token->value.string_value, NULL)->value.var->type;
+         return vartable_find(vartable, token->value.string_value)->type;
       case TOKENID_STRING_LITERAL:
          return VT_STRING;
       case TOKENID_BOOL_LITERAL:
@@ -55,18 +55,14 @@ vartype_e determine_token_type(token_t* token, bintreestack_t* varstack) {
    }
 }
 
-vartype_e determine_expression_type(astnode_exp_t* exp, bintreestack_t* varstack) {
-   token_t* last = exp->tokens[exp->tokens_count - 1];
-   token_t* first = exp->tokens[0];
-   varstack = varstack;
-   if (exp->tokens_count == 1) {
-      return determine_token_type(first, varstack);
-   } 
-   if (is_bool_operator(last->id)) {
-      return VT_BOOL;
+vartype_e determine_expression_type(astnode_exp_t* exp, vartable_t* vartable) {
+   for (int i = 0; i < exp->tokens_count; i++) {
+      if (is_bool_operator(exp->tokens[i]->id)) {
+         return VT_BOOL;
+      }
    }
    for (int i = 0; i < exp->tokens_count; i++) {
-      vartype_e type = determine_token_type(exp->tokens[i], varstack);
+      vartype_e type = determine_token_type(exp->tokens[i], vartable);
       if (type != VT_UNDEFINED) {
          return type;
       }
@@ -74,18 +70,17 @@ vartype_e determine_expression_type(astnode_exp_t* exp, bintreestack_t* varstack
    error("Given expression cannot be determined.");
 }
 
-void print_pushs_identifier(char* identifier, bintreestack_t* varstack) {
-   int depth = get_var_depth(identifier, varstack);
-   char* var = generate_var_str(identifier, FT_TF, depth);
+void print_pushs_identifier(char* identifier, vartable_t* vartable) {
+   char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
    printcm("PUSHS %s", var);
    free(var);
 }
 
-void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
+void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
    for (int i = 0; i < exp->tokens_count; i++) {
       switch (exp->tokens[i]->id) {
          case TOKENID_IDENTIFIER:
-            print_pushs_identifier(exp->tokens[i]->value.string_value, varstack);
+            print_pushs_identifier(exp->tokens[i]->value.string_value, vartable);
             break;
          case TOKENID_BOOL_LITERAL:
             printcm("PUSHS bool@%s", exp->tokens[i]->value.bool_value ? "true" : "false");
@@ -106,7 +101,7 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
             printcm("MULS");
             break;
          case TOKENID_OPERATOR_DIV:
-            printcm(determine_expression_type(exp, varstack) == VT_FLOAT ? "IDIVS" : "DIVS");
+            printcm(determine_expression_type(exp, vartable) == VT_FLOAT ? "IDIVS" : "DIVS");
             break;
          case TOKENID_OPERATOR_AND:
             printcm("ANDS");
@@ -144,39 +139,97 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
    }
 }
 
-void generate_local_expression(char* var, astnode_exp_t* exp, bintreestack_t* varstack) {
-   exp = exp;
-   varstack = varstack;
-   var = var;
-   /*
+void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
+   char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
    if (exp->tokens_count == 2) {
-      guard(exp->tokens[0] == TOKENID_IDENTIFIER && exp->tokens[1] == TOKENID_OPERATOR_NOT);
-      int depth = get_var_depth(exp->tokens[0]->value.string_value, varstack);
-      char* var = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, depth);
-      printcm("NOT %s %s", var, var);
+      guard(exp->tokens[0]->id == TOKENID_IDENTIFIER && exp->tokens[1]->id == TOKENID_OPERATOR_NOT);
+      char* op1 = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, vartable_depth(vartable, identifier));
+      printcm("NOT %s %s", var, op1);
+      free(op1);
    } else {
-      int depth = get_var_depth(exp->tokens[0]->value.string_value, varstack);
-      char* var = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, depth);
+      char* op1; 
+      char* op2;
+      if (is_const_tokenid(exp->tokens[0]->id)) {
+         op1 = generate_const_str(exp->tokens[0]);
+      } else {
+         op1 = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, vartable_depth(vartable, identifier)); 
+      }
+      if (is_const_tokenid(exp->tokens[1]->id)) {
+         op2 = generate_const_str(exp->tokens[1]);
+      } else {
+         op2 = generate_var_str(exp->tokens[1]->value.string_value, FT_TF, vartable_depth(vartable, identifier)); 
+      }
+      switch (exp->tokens[2]->id) {
+         case TOKENID_OPERATOR_ADD:
+            printcm("ADD %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_SUB:
+            printcm("SUB %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_MUL:
+            printcm("MUL %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_DIV:
+            printcm(determine_expression_type(exp, vartable) == VT_FLOAT ? "IDIV" : "DIV");
+            break;
+         case TOKENID_OPERATOR_AND:
+            printcm("AND %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_OR:
+            printcm("OR %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_NOT:
+            printcm("NOT %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_EQUALS:
+            printcm("EQ %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_NOT_EQUAL:
+            printcm("EQ %s %s %s", var, op1, op2);
+            printcm("NOT %s %s", var, var);
+            break;
+         case TOKENID_OPERATOR_LESS:
+            printcm("LT %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_GREATER:
+            printcm("GT %s %s %s", var, op1, op2);
+            break;
+         case TOKENID_OPERATOR_LESS_OR_EQUAL:
+            printcm("GT %s %s %s", var, op1, op2);
+            printcm("NOT %s %s", var, var);
+            break;
+         case TOKENID_OPERATOR_GREATER_OR_EQUAL:
+            printcm("LT %s %s %s", var, op1, op2);
+            printcm("NOT %s %s", var, var);
+            break;
+         default:
+            exit(ERRCODE_INTERNAL_ERROR);
+      }
+      free(op1);
+      free(op2);
    }
-   */
+   free(var);
 }
 
-void generate_const_expression(char* varstr, astnode_exp_t* exp) {
+void generate_const_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
+   char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
    char* val = generate_const_str(exp->tokens[0]);
-   printcm("MOVE %s %s", varstr, val);
+   printcm("MOVE %s %s", var, val);
+   free(var);
    free(val);
 }
 
-vartype_e generate_assign_expression(char* varstr, astnode_exp_t* exp, bintreestack_t* varstack) {
+void generate_assign_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
    infix_to_postfix(exp);
-   printcm("DEFVAR %s", varstr);
+   
    if (exp->tokens_count == 1) {
-      generate_const_expression(varstr, exp);
+      generate_const_expression(identifier, exp, vartable);
    } else if (exp->tokens_count == 2 || exp->tokens_count == 3) {
-      generate_local_expression(varstr, exp, varstack);
+      generate_local_expression(identifier, exp, vartable);
    } else {
-      generate_stack_expression(exp, varstack);
-      printcm("POPS %s", varstr);
+      generate_stack_expression(exp, vartable);
+      char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+      printcm("POPS %s", var);
+      free(var);
    }
-   return determine_expression_type(exp, varstack);
 }

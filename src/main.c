@@ -31,62 +31,82 @@ astnode_funcdecl_t* new_funcdecl(char* name) {
    return func;
 }
 
+astnode_defvar_t* new_defvar(char* identifier, astnode_exp_t* exp) {
+   astnode_defvar_t* def = safe_alloc(sizeof(astnode_defvar_t));
+   token_value_u value;
+   def->variable = token_ctor(TOKENID_IDENTIFIER, value);
+   def->variable->value.string_value = safe_alloc(strlen(identifier) + 1);
+   strcpy(def->variable->value.string_value, identifier);
+   def->expression = exp;
+   return def;
+}
+
 int main() {
    astnode_global_t* global = new_global();
 
    astnode_funcdecl_t* fn1 = new_funcdecl("main");
-   astnode_funcdecl_t* fn2 = new_funcdecl("myfunction");
 
    global_function_push(global, fn1);
-   global_function_push(global, fn2);
+
+   token_value_u value;
 
    fn1->body->children_count = 2;
-   fn1->body->children = safe_alloc(sizeof(astnode_generic_t*) * 2);
+   fn1->body->children = safe_alloc(sizeof(astnode_generic_t*) * 3);
+   
+   astnode_exp_t* exp1 = safe_alloc(sizeof(astnode_exp_t));
+
+   exp1->tokens_count = 3;
+   exp1->tokens = safe_alloc(sizeof(token_t*) * exp1->tokens_count);
+
+   exp1->tokens[0] = token_ctor(TOKENID_NUM, value);
+   exp1->tokens[0]->value.int_value = 2;
+   exp1->tokens[1] = token_ctor(TOKENID_OPERATOR_ADD, value);
+   exp1->tokens[2] = token_ctor(TOKENID_NUM, value);
+   exp1->tokens[2]->value.int_value = 3;
+
    fn1->body->children[0] = safe_alloc(sizeof(astnode_generic_t));
    fn1->body->children[0]->type = ANT_DEFVAR;
-   fn1->body->children[0]->value.defvarval = safe_alloc(sizeof(astnode_defvar_t));
-   token_value_u value;
-   value.string_value = safe_alloc(6);
-   strcpy(value.string_value, "abc");
-   fn1->body->children[0]->value.defvarval->variable = token_ctor(TOKENID_IDENTIFIER, value);
-   fn1->body->children[0]->value.defvarval->expression = safe_alloc(sizeof(astnode_exp_t));
-   fn1->body->children[0]->value.defvarval->expression->tokens_count = 5;
-   fn1->body->children[0]->value.defvarval->expression->tokens = safe_alloc(sizeof(token_t*) * 5);
-   // 3 + 4 * 2   =>   3 4 2 * +   ==   11
-   value.decimal_value = 5;
-   fn1->body->children[0]->value.defvarval->expression->tokens[0] = token_ctor(TOKENID_NUM, value);
-   fn1->body->children[0]->value.defvarval->expression->tokens[0]->value.int_value = 2;
+   fn1->body->children[0]->value.defvarval = new_defvar("var1", exp1);
 
-   fn1->body->children[0]->value.defvarval->expression->tokens[1] = token_ctor(TOKENID_OPERATOR_ADD, value);
+   astnode_exp_t* exp2 = safe_alloc(sizeof(astnode_exp_t));
 
-   
-   fn1->body->children[0]->value.defvarval->expression->tokens[2] = token_ctor(TOKENID_NUM, value);
-   fn1->body->children[0]->value.defvarval->expression->tokens[2]->value.int_value = 3;
+   exp2->tokens_count = 3;
+   exp2->tokens = safe_alloc(sizeof(token_t*) * exp1->tokens_count);
 
-   fn1->body->children[0]->value.defvarval->expression->tokens[3] = token_ctor(TOKENID_OPERATOR_DIV, value);
+   exp2->tokens[0] = token_ctor(TOKENID_NUM, value);
+   exp2->tokens[0]->value.int_value = 1;
+   exp2->tokens[1] = token_ctor(TOKENID_OPERATOR_MUL, value);
+   exp2->tokens[2] = token_ctor(TOKENID_IDENTIFIER, value);
+   exp2->tokens[2]->value.string_value = safe_alloc(5 * sizeof(char));
+   strcpy(exp2->tokens[2]->value.string_value, "var1");
 
-   fn1->body->children[0]->value.defvarval->expression->tokens[4] = token_ctor(TOKENID_NUM, value);
-   fn1->body->children[0]->value.defvarval->expression->tokens[4]->value.int_value = 4;
-
+   fn1->body->children[1] = safe_alloc(sizeof(astnode_generic_t));
+   fn1->body->children[1]->type = ANT_DEFVAR;
+   fn1->body->children[1]->value.defvarval = new_defvar("var2", exp2);
+  
+   /*
    char* names[] = { "x", "y" };
    vartype_e types[] = { VT_INT, VT_INT };
    
-   fn1->body->children[1] = safe_alloc(sizeof(astnode_funccall_t));
-   fn1->body->children[1]->type = ANT_FUNCCALL;
-   fn1->body->children[1]->value.funccallval = safe_alloc(sizeof(astnode_funccall_t));
-   fn1->body->children[1]->value.funccallval->name = safe_alloc(strlen("myfunction") + 1);
+   fn1->body->children[2] = safe_alloc(sizeof(astnode_funccall_t));
+   fn1->body->children[2]->type = ANT_FUNCCALL;
+   fn1->body->children[2]->value.funccallval = safe_alloc(sizeof(astnode_funccall_t));
+   fn1->body->children[2]->value.funccallval->name = safe_alloc(strlen("myfunction") + 1);
    strcpy(fn1->body->children[1]->value.funccallval->name, "myfunction");
-   fn1->body->children[1]->value.funccallval->params = safe_alloc(2 * sizeof(token_t*));
+   fn1->body->children[2]->value.funccallval->params = safe_alloc(2 * sizeof(token_t*));
    value.int_value = 5;
-   fn1->body->children[1]->value.funccallval->params[0] = token_ctor(TOKENID_NUM, value);
+   fn1->body->children[2]->value.funccallval->params[0] = token_ctor(TOKENID_NUM, value);
    value.bool_value = false;
-   fn1->body->children[1]->value.funccallval->params[1] = token_ctor(TOKENID_BOOL_LITERAL, value);
-   fn1->body->children[1]->value.funccallval->params_count = 2;
+   fn1->body->children[2]->value.funccallval->params[1] = token_ctor(TOKENID_BOOL_LITERAL, value);
+   fn1->body->children[2]->value.funccallval->params_count = 2;
 
-   bintree_t* fntable = bintree_ctor();
+   
    bintree_add(fntable, symbol_ctor("myfunction", ST_FUNCTION, symbolval_fn_ctor(2, 0, names, types, NULL, true)));
 
    fn2->body->children_count = 0;
+   */
+
+   bintree_t* fntable = bintree_ctor();
    
    generate(global, fntable);
    // bintree_dtor(fntable); TODO: Uncomment 

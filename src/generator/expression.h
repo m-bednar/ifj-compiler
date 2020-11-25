@@ -6,12 +6,16 @@
 
 #pragma once
 
-#include "../symtable/bintreestack.h"
+#include "vartable.h"
 #include "../parser/ast.h"
 
+/**
+ * Determines resulting type of an expression.
+ */
+vartype_e determine_expression_type(astnode_exp_t* exp, vartable_t* vartable);
 
 /**
  * Evaluates and generates defvar expression to stdout.
  * Returns vartype of expression.
  */
-vartype_e generate_assign_expression(char* varstr, astnode_exp_t* exp, bintreestack_t* varstack);
+void generate_assign_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable);

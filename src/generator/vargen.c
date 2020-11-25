@@ -5,6 +5,10 @@
  */
 
 #include "vargen.h"
+#include "../error.h"
+#include "../memory.h"
+#include <string.h>
+#include <stdio.h>
 
 static const int BOOL_CONST_PREFIX = 6;
 static const int STR_CONST_PREFIX = 8;
@@ -18,17 +22,6 @@ int digits_count(int n) {
       n /= 10;
    } while(n != 0);
    return count; 
-}
-
-int new_var_depth(bintreestack_t* varstack) {
-   return bintreestack_get_length(varstack) - 1;
-}
-
-int get_var_depth(char* identifier, bintreestack_t* varstack) {
-   int depth;
-   bintreestack_find(varstack, identifier, &depth);
-   guard(depth != -1);
-   return depth;
 }
 
 bool is_const_tokenid(tokenid_e id) {
