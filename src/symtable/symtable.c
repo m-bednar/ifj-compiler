@@ -61,5 +61,10 @@ symbol_t* bintree_find(bintree_t* tree, const char* identifier) {
 }
 
 void bintree_print(bintree_t* tree) {
-   binitem_print(tree->root);
+   guard(tree != NULL);
+   if (tree->root != NULL) {
+      binitem_print(tree->root);
+   } else {
+      fprintf(stderr, "(empty bintree)\n");
+   }
 }
