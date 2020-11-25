@@ -14,4 +14,4 @@
 /*
  * returns ERROR code or -1 if no error occured 
  */
-int semantic(token_t* token, nonterminalid_e flag, int eol_flag)
+int semantic(token_t* token, nonterminalid_e flag, int eol_flag);
