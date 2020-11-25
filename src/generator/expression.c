@@ -37,25 +37,8 @@ char* convert_string(char* str) {
 }
 
 void add_const_to_varstack(char* identifier, token_t* token, bintreestack_t* varstack, vartype_e type) {
-   symbol_t* symbol = bintreestack_find(varstack, identifier, NULL);
-   symbol->value.var->is_const = true;
-   switch (type) {
-      case VT_STRING:
-         symbol->value.var->const_val.string_value = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
-         strcpy(symbol->value.var->const_val.string_value, token->value.string_value);
-         break;
-      case VT_BOOL:
-         symbol->value.var->const_val.bool_value = token->value.bool_value;
-         break;
-      case VT_FLOAT:
-         symbol->value.var->const_val.decimal_value = token->value.decimal_value;
-         break;
-      case VT_INT:
-         symbol->value.var->const_val.int_value = token->value.int_value;
-         break;
-      default:
-         error("Given type cannot be const.");
-   }
+   identifier = identifier; token = token; varstack = varstack; type = type;
+   // TODO:
 }
 
 bool is_bool_operator(tokenid_e id) {
@@ -82,9 +65,10 @@ vartype_e determine_token_type(token_t* token) {
    }
 }
 
-vartype_e determine_expression_type(astnode_exp_t* exp) {
+vartype_e determine_expression_type(astnode_exp_t* exp, bintreestack_t* varstack) {
    token_t* last = exp->tokens[exp->tokens_count - 1];
    token_t* first = exp->tokens[0];
+   varstack = varstack;
    if (exp->tokens_count == 1) {
       return determine_token_type(first);
    } 
@@ -120,7 +104,7 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
             printcm("PUSHS int@%d", exp->tokens[i]->value.int_value);
             break;
          case TOKENID_OPERATOR_ADD:
-            printcm(determine_expression_type(exp) == VT_STRING ? "CONCAT" : "ADDS");
+            printcm("ADDS");
             break;
          case TOKENID_OPERATOR_SUB:
             printcm("SUBS");
@@ -129,7 +113,7 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
             printcm("MULS");
             break;
          case TOKENID_OPERATOR_DIV:
-            printcm(determine_expression_type(exp) == VT_FLOAT ? "IDIVS" : "DIVS");
+            printcm(determine_expression_type(exp, varstack) == VT_FLOAT ? "IDIVS" : "DIVS");
             break;
          case TOKENID_OPERATOR_AND:
             printcm("ANDS");
@@ -167,10 +151,11 @@ void generate_stack_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
    }
 }
 
-void generate_local_expression(astnode_exp_t* exp, bintreestack_t* varstack) {
+void generate_local_expression(char* var, astnode_exp_t* exp, bintreestack_t* varstack) {
    exp = exp;
    varstack = varstack;
-   printcm("(local expression)");
+   var = var;
+   /*printcm("(local expression)");*/
 }
 
 void generate_const_expression(char* varstr, astnode_exp_t* exp) {
@@ -179,20 +164,16 @@ void generate_const_expression(char* varstr, astnode_exp_t* exp) {
    free(val);
 }
 
-void generate_assign_expression(char* identifier, char* varstr, astnode_exp_t* exp, bintreestack_t* stack, bool can_const) {
-   infix_to_postfix(exp, stack);
+vartype_e generate_assign_expression(char* varstr, astnode_exp_t* exp, bintreestack_t* varstack) {
+   infix_to_postfix(exp);
+   printcm("DEFVAR %s", varstr);
    if (exp->tokens_count == 1) {
-      vartype_e exptype = determine_expression_type(exp);
-      dprint("%d ", exptype);
-      if (exptype != VT_UNDEFINED && can_const) {
-         add_const_to_varstack(identifier, exp->tokens[0], stack, exptype);
-      } else {
-         generate_const_expression(varstr, exp);
-      }
-   } else if (exp->tokens_count <= 3) {
-      generate_local_expression(exp, stack);
+      generate_const_expression(varstr, exp);
+   } else if (exp->tokens_count == 2 || exp->tokens_count == 3) {
+      generate_local_expression(varstr, exp, varstack);
    } else {
-      generate_stack_expression(exp, stack);
+      generate_stack_expression(exp, varstack);
       printcm("POPS %s", varstr);
    }
+   return determine_expression_type(exp, varstack);
 }

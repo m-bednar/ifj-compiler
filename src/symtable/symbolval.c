@@ -33,7 +33,6 @@ symbolval_u symbolval_var_ctor(vartype_e type) {
    
    var->type = type;
    symbolval.var = var;
-   symbolval.var->is_const = false;
    
    return symbolval;
 }
@@ -60,9 +59,6 @@ void symbolval_fn_dtor(symbolval_u symbolval) {
 
 void symbolval_var_dtor(symbolval_u symbolval) {
    guard(symbolval.var != NULL);
-   if (symbolval.var->type == VT_STRING && symbolval.var->is_const) {
-      free(symbolval.var->const_val.string_value);
-   }
    free(symbolval.var);
    symbolval.var = NULL;
 }

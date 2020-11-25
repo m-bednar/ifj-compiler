@@ -36,7 +36,7 @@ void generate_returns_pops(astnode_assign_t* node, bintreestack_t* varstack) {
 
 void generate_funccall(astnode_funccall_t* node, bintreestack_t* varstack, bintree_t* fntable, bool clears) {
    symbol_t* fn_declaration = bintree_find(fntable, node->name);
-   
+
    printcm("PUSHFRAME");
    printcm("CREATEFRAME");
 
@@ -74,11 +74,9 @@ void generate_defvar(astnode_defvar_t* node, bintreestack_t* varstack) {
    int depth = new_var_depth(varstack);
    char* var = generate_var_str(node->variable->value.string_value, FT_TF, depth);
    
-   symbol_t* symbol = symbol_ctor(node->variable->value.string_value, ST_VARIABLE, symbolval_var_ctor(VT_UNDEFINED));
+   vartype_e exptype = generate_assign_expression(var, node->expression, varstack);
+   symbol_t* symbol = symbol_ctor(node->variable->value.string_value, ST_VARIABLE, symbolval_var_ctor(exptype));
    bintree_add(bintreestack_peek(varstack), symbol);
-   
-   printcm("DEFVAR %s", var);
-   generate_assign_expression(node->variable->value.string_value, var, node->expression, varstack, true);
 
    free(var);
 }
@@ -99,22 +97,34 @@ void generate_generic(astnode_generic_t* node, bintreestack_t* varstack, bintree
    fntable = fntable; // TODO: Remove when fntable is used
    switch (node->type) {
       case ANT_ASSIGN:
+         pcomment("Assigment start");
          generate_assign(node->value.assignval, varstack, fntable);
+         pcomment("Assigment end");
          break;
       case ANT_DEFVAR:
+         pcomment("Defvar start");
          generate_defvar(node->value.defvarval, varstack);
+         pcomment("Defvar end");
          break;
       case ANT_FOR:
+         pcomment("For start");
          generate_for(node->value.forval);
+         pcomment("For end");
          break;
       case ANT_IF:
+         pcomment("If start");
          generate_if(node->value.ifval);
+         pcomment("If end");
          break;
       case ANT_FUNCCALL:
+         pcomment("Funccall start");
          generate_funccall(node->value.funccallval, varstack, fntable, true);
+         pcomment("Funccall end");
          break;
       case ANT_RET:
+         pcomment("Return start");
          generate_ret(node->value.returnval);
+         pcomment("Return end");
          break;
       default: 
          exit(ERRCODE_INTERNAL_ERROR);
@@ -127,7 +137,6 @@ void generate_funcdecl(astnode_funcdecl_t* func, bintreestack_t* varstack, bintr
    for (int i = 0; i < func->body->children_count; i++) {
       generate_generic(func->body->children[i], varstack, fntable);
    }
-   bintreestack_print(varstack);
    bintree_dtor(bintreestack_pop(varstack));
    printcm("RETURN");
 }
@@ -146,5 +155,4 @@ void generate(astnode_global_t* global, bintree_t* fntable) {
    }
 
    bintreestack_dtor(varstack);
-   bintree_dtor(fntable);
 }

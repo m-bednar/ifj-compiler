@@ -40,8 +40,8 @@ int main() {
    global_function_push(global, fn1);
    global_function_push(global, fn2);
 
-   fn1->body->children_count = 1;
-   fn1->body->children = safe_alloc(sizeof(astnode_generic_t*));
+   fn1->body->children_count = 2;
+   fn1->body->children = safe_alloc(sizeof(astnode_generic_t*) * 2);
    fn1->body->children[0] = safe_alloc(sizeof(astnode_generic_t));
    fn1->body->children[0]->type = ANT_DEFVAR;
    fn1->body->children[0]->value.defvarval = safe_alloc(sizeof(astnode_defvar_t));
@@ -55,19 +55,41 @@ int main() {
    // 3 + 4 * 2   =>   3 4 2 * +   ==   11
    value.decimal_value = 5;
    fn1->body->children[0]->value.defvarval->expression->tokens[0] = token_ctor(TOKENID_NUM, value);
+   fn1->body->children[0]->value.defvarval->expression->tokens[0]->value.int_value = 2;
 
    fn1->body->children[0]->value.defvarval->expression->tokens[1] = token_ctor(TOKENID_OPERATOR_ADD, value);
 
-   value.decimal_value = 3;
+   
    fn1->body->children[0]->value.defvarval->expression->tokens[2] = token_ctor(TOKENID_NUM, value);
+   fn1->body->children[0]->value.defvarval->expression->tokens[2]->value.int_value = 3;
 
    fn1->body->children[0]->value.defvarval->expression->tokens[3] = token_ctor(TOKENID_OPERATOR_DIV, value);
 
-   value.decimal_value = 4;
    fn1->body->children[0]->value.defvarval->expression->tokens[4] = token_ctor(TOKENID_NUM, value);
+   fn1->body->children[0]->value.defvarval->expression->tokens[4]->value.int_value = 4;
+
+   char* names[] = { "x", "y" };
+   vartype_e types[] = { VT_INT, VT_INT };
+   
+   fn1->body->children[1] = safe_alloc(sizeof(astnode_funccall_t));
+   fn1->body->children[1]->type = ANT_FUNCCALL;
+   fn1->body->children[1]->value.funccallval = safe_alloc(sizeof(astnode_funccall_t));
+   fn1->body->children[1]->value.funccallval->name = safe_alloc(strlen("myfunction") + 1);
+   strcpy(fn1->body->children[1]->value.funccallval->name, "myfunction");
+   fn1->body->children[1]->value.funccallval->params = safe_alloc(2 * sizeof(token_t*));
+   value.int_value = 5;
+   fn1->body->children[1]->value.funccallval->params[0] = token_ctor(TOKENID_NUM, value);
+   value.bool_value = false;
+   fn1->body->children[1]->value.funccallval->params[1] = token_ctor(TOKENID_BOOL_LITERAL, value);
+   fn1->body->children[1]->value.funccallval->params_count = 2;
+
+   bintree_t* fntable = bintree_ctor();
+   bintree_add(fntable, symbol_ctor("myfunction", ST_FUNCTION, symbolval_fn_ctor(2, 0, names, types, NULL, true)));
 
    fn2->body->children_count = 0;
    
-   generate(global, bintree_ctor());
+   generate(global, fntable);
+   // bintree_dtor(fntable); TODO: Uncomment 
+
    return EXIT_SUCCESS;
 }

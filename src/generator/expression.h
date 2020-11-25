@@ -12,5 +12,6 @@
 
 /**
  * Evaluates and generates defvar expression to stdout.
+ * Returns vartype of expression.
  */
-void generate_assign_expression(char* identifier, char* varstr, astnode_exp_t* exp, bintreestack_t* stack, bool can_const);
+vartype_e generate_assign_expression(char* varstr, astnode_exp_t* exp, bintreestack_t* varstack);
