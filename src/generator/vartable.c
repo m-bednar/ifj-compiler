@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include "../error.h"
+#include "utils.h"
 #include "vartable.h"
 
 vartable_t* vartable_ctor() {

@@ -155,9 +155,9 @@ token_t* eval_operation(token_t* operand1, token_t* operand2, token_t* operator)
       case TOKENID_OPERATOR_ADD:
          if (operand1->id == TOKENID_NUM) {
             operand1->value.int_value = operand1->value.int_value + operand2->value.int_value;
-         } else if ((operand1->id == TOKENID_NUM_DECIMAL)) {
+         } else if (operand1->id == TOKENID_NUM_DECIMAL) {
             operand1->value.decimal_value = operand1->value.decimal_value + operand2->value.decimal_value;
-         } else {
+         } else if (operand1->id == TOKENID_STRING_LITERAL) {
             int len = strlen(operand1->value.string_value) + strlen(operand2->value.string_value) + 1;
             operand1->value.string_value = safe_realloc(operand1->value.string_value, sizeof(char) * len);
             strcat(operand1->value.string_value, operand2->value.string_value);
