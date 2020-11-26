@@ -28,7 +28,7 @@ int digits_count(int n) {
 char* labelgen_new() {
    static int lastid = 0;
    char* label = safe_alloc(2 + digits_count(lastid));
-   sprintf(label, "L%d", lastid);
+   sprintf(label, "!L%d", lastid);
    lastid++;
    return label;
 }

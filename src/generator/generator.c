@@ -70,7 +70,7 @@ void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fn
       generate_returns_pops(node, vartable);
    } else {
       for (int i = 0; i < node->ids_count; i++) {
-         generate_assign_expression(node->left_ids[i], node->right_expressions[i], vartable);
+         generate_assign_expression(node->left_ids[i]->value.string_value, node->right_expressions[i], vartable);
       }
    }
 }

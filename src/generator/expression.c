@@ -21,7 +21,7 @@ bool should_use_float_ops(astnode_exp_t* exp, vartable_t* vartable) {
          return true;
       }
       if (exp->tokens[i]->id == TOKENID_IDENTIFIER) {
-         if (vartable_find(vartable, exp->tokens[i]->value.string_value)->type == VT_INT) {
+         if (vartable_find(vartable, exp->tokens[i]->value.string_value)->type == VT_FLOAT) {
             return true;
          }
       }
@@ -184,7 +184,7 @@ void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t*
             printcm("MUL %s %s %s", var, op1, op2);
             break;
          case TOKENID_OPERATOR_DIV:
-            printcm("%s %s %s %s", should_use_float_ops(exp, vartable)? "IDIV" : "DIV", var, op1, op2);
+            printcm("%s %s %s %s", should_use_float_ops(exp, vartable) ? "IDIV" : "DIV", var, op1, op2);
             break;
          case TOKENID_OPERATOR_AND:
             printcm("AND %s %s %s", var, op1, op2);
