@@ -19,8 +19,7 @@
 - [x] Tabulka symbolů
 - [x] Lexikální analyzátor (scanner)
 - [ ] Syntaktický analyzátor (parser)
-- [ ] Sémantický analyzátor
-- [ ] Generátor vnitřního kódu (?)
+- [ ] Sémantický analyzátor (Generátor vnitřního kódu)
 - [ ] Generátor konečného kódu
 
 ### Rozdělení práce
@@ -31,7 +30,6 @@
    - Syntaktický analyzátor
 - **Franta**
    - Lexikální analyzátor
-   - Generátor vnitřního kódu (?)
 - **Michal**
    - Sémantický analyzátor
 
@@ -44,13 +42,19 @@
 
 ### Makefile příkazy
 
-##### make
+##### make run
 - Zkompiluje projekt
-- Spustí */bin/main* bez vstupu
+- Spustí */main* bez vstupu
 
 ##### make try FILE=*vstupni_soubor*
 - Zkompiluje projekt
-- Spustí */bin/main* se standartním vstupem ze souboru *vstupni_soubor*
+- Spustí */main* se standartním vstupem ze souboru *vstupni_soubor*
+- Po skončení vypíše návratový kód kompilátoru
+
+##### make gen IN=*vstupni_soubor* OUT=*vystupni_soubor*
+- Zkompiluje projekt
+- Spustí */main* se standartním vstupem ze souboru *vstupni_soubor*
+- Výstup souboru je přesměrován do souboru *vystupni_soubor*
 - Po skončení vypíše návratový kód kompilátoru
 
 ### Registrovaná rozšíření
@@ -62,5 +66,5 @@ Možnost zápisu celých čísel v binární, hexadecimální a octalové sousta
 Podpora boolenovských typů a literálů true, false. 
 Podpora zjednodušeného podmíněného příkaz if bez části else.
 
-##### UNARY (0.5b)
+##### ~~UNARY (0.5b)~~
 Operátory +=, -=, *=, /=, unární - a +.

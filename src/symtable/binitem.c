@@ -66,7 +66,7 @@ bool binitem_insert_child(binitem_t* item, symbol_t* value) {
          }
          break;
       case IC_LEFT:
-         if (item->left != NULL) {
+         if (item->left == NULL) {
             item->left = binitem_ctor(value);
             return true;
          } else {
