@@ -104,6 +104,7 @@ void builtin_len(vartable_t* vartable, token_t* param) {
 }
 
 void builtin_chr(vartable_t* vartable, token_t* param) {
+   pcomment("Built-in chr start");
    if (is_const_tokenid(param->id)) {
       int value = param->value.int_value;
       if (value < 0 || value > 255) {
@@ -139,13 +140,15 @@ void builtin_chr(vartable_t* vartable, token_t* param) {
       printcm("PUSHS int@1");
       printcm("LABEL %s", l2);
    }
+   pcomment("Built-in len end");
 }
 
-void builtin_chr(vartable_t* vartable, token_t** params) {
+void builtin_ord(vartable_t* vartable, token_t** params) {
+   pcomment("Built-in ord start");
    if (is_const_tokenid(params[0]->id) && is_const_tokenid(params[1]->id)) {
       char* s = params[0]->value.string_value;
       int i = params[1]->value.int_value;
-      if (i >= strlen(s) || i < 0) {
+      if (i >= (int)strlen(s) || i < 0) {
          printcm("PUSHS int@0");
          printcm("PUSHS int@1");
       } else {
@@ -208,33 +211,7 @@ void builtin_chr(vartable_t* vartable, token_t** params) {
       free(var_s);
       free(var_i);
    }
+   pcomment("Built-in ord end");
 }
 
-/*
-# (when x/i/n is not const)
-   STRLEN GF@$tmp LF@<x>
-   # i < 0 || !(i < strlen(x))
-   PUSHS <i>
-   PUSHS int@0
-   LTS
-   PUSHS <i>
-   PUSHS GF@$tmp
-   LTS
-   NOTS
-   ORS
-   PUSHS bool@true
-   JUMPIFEQS L0
-   STRI2INT GF@$tmp <x> <i>
-   PUSHS GF@$tmp
-   PUSHS int@0
-   JUMP L1 
-  LABEL L0
-   PUSHS string@
-   PUSHS int@1
-  LABEL L1 
-
-
-*/
-
-
-// TODO: ord, substr
+// TODO: substr
