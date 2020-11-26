@@ -9,6 +9,7 @@
 #include "vargen.h"
 #include "utils.h"
 #include "vartable.h"
+#include "builtins.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -35,31 +36,31 @@ void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
 }
 
 void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t* fntable, bool clears) {
-   symbol_t* fn_declaration = bintree_find(fntable, node->name);
+   if (is_builtin(node->name)) {
+      generate_builtin(node->name, node->params, node->params_count, vartable);
+   } else {
+      symbol_t* fn_declaration = bintree_find(fntable, node->name);
+      printcm("PUSHFRAME");
+      printcm("CREATEFRAME");
+      for (int i = 0; i < node->params_count; i++) {
+         char* param = generate_var_str(fn_declaration->value.fn->arg_names[i], FT_TF, 0);
+         printcm("DEFVAR %s", param);
 
-   printcm("PUSHFRAME");
-   printcm("CREATEFRAME");
-
-   for (int i = 0; i < node->params_count; i++) {
-      char* param = generate_var_str(fn_declaration->value.fn->arg_names[i], FT_TF, 0);
-      printcm("DEFVAR %s", param);
-
-      if (is_const_tokenid(node->params[i]->id)) {
-         printcm("MOVE %s %s", param, generate_const_str(node->params[i]));
-      } else {
-         int depth = vartable_find(vartable, node->params[i]->value.string_value)->depth;
-         char* var = generate_var_str(node->params[i]->value.string_value, FT_TF, depth);
-         printcm("MOVE %s %s", param, var);
-         free(var);
+         if (is_const_tokenid(node->params[i]->id)) {
+            printcm("MOVE %s %s", param, generate_const_str(node->params[i]));
+         } else {
+            int depth = vartable_find(vartable, node->params[i]->value.string_value)->depth;
+            char* var = generate_var_str(node->params[i]->value.string_value, FT_TF, depth);
+            printcm("MOVE %s %s", param, var);
+            free(var);
+         }
+         free(param);
       }
-      free(param);
-   }
-
-   printcm("CALL %s", node->name);
-   printcm("POPFRAME");
-
-   if (clears && fn_declaration->value.fn->ret_count > 0) {
-      printcm("CLEARS");
+      printcm("CALL %s", node->name);
+      printcm("POPFRAME");
+      if (clears && fn_declaration->value.fn->ret_count > 0) {
+         printcm("CLEARS");
+      }
    }
 }
 
