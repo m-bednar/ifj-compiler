@@ -21,6 +21,11 @@ typedef enum frametype_e {
 char* labelgen_new();
 
 /**
+ * Converts given string to constant format.
+ */
+char* convert_string(char* str);
+
+/**
  * Returns true, if id belongs to token with constant value.
  */
 bool is_const_tokenid(tokenid_e id);

@@ -33,6 +33,29 @@ char* labelgen_new() {
    return label;
 }
 
+char* convert_string(char* str) {
+   const int csize = 4; // Size of special ascii code
+   char* out;
+   int len = strlen(str);
+   for (int i = 0; i < (int)strlen(str); i++) {
+      if ((str[i] >= 0 && str[i] <= 32) || str[i] == 35 || str[i] == 92) {
+         len += csize;
+      }
+   }
+   out = safe_alloc(sizeof(char) * len + 1);
+   len = 0;
+   for (int i = 0; i < (int)strlen(str); i++) {
+      if ((str[i] >= 0 && str[i] <= 32) || str[i] == 35 || str[i] == 92) {
+         sprintf(out + len * sizeof(char), "\\%03d", (int)str[i]);
+         len += csize;
+      } else {
+         out[len] = str[i];
+         len++;
+      }
+   }
+   return out;
+}
+
 bool is_const_tokenid(tokenid_e id) {
    return id == TOKENID_NUM_DECIMAL || id == TOKENID_NUM || id == TOKENID_STRING_LITERAL || id == TOKENID_BOOL_LITERAL;
 }
@@ -46,7 +69,9 @@ char* generate_const_str(token_t* token) {
          break;
       case TOKENID_STRING_LITERAL:
          var = safe_alloc(sizeof(char) * (STR_CONST_PREFIX + strlen(token->value.string_value)));
-         sprintf(var, "string@%s", token->value.bool_value ? "true" : "false");
+         char* str = convert_string(token->value.string_value);
+         sprintf(var, "string@%s", str);
+         free(str);
          break;
       case TOKENID_NUM:
          var = safe_alloc(sizeof(char) * (INT_CONST_PREFIX + digits_count(token->value.int_value)));
