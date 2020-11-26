@@ -57,3 +57,10 @@ void tokenvector_push(tokenvector_t* vector, token_t* token){
 int tokenvector_get_lenght(tokenvector_t* vector){
    return vector->length;
 }
+
+void tokenvector_print(tokenvector_t* vector){
+   for(int i = 0; i < vector->length; i++){
+      printf("Tokens: %s", vector->memory[i]->value.string_value);
+   }
+   printf("\n");
+}
