@@ -25,3 +25,5 @@ void tokenvector_push(tokenvector_t* vector, token_t* token);
 int tokenvector_get_lenght(tokenvector_t* vector);
 
 void tokenvector_print(tokenvector_t* vector);
+
+token_t** tokenvector_get_array(tokenvector_t* vector, int* size);
