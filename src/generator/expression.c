@@ -101,7 +101,7 @@ void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
             printcm("MULS");
             break;
          case TOKENID_OPERATOR_DIV:
-            printcm(determine_expression_type(exp, vartable) == VT_FLOAT ? "IDIVS" : "DIVS");
+            determine_expression_type(exp, vartable) == VT_FLOAT ? printcm("IDIVS") : printcm("DIVS");
             break;
          case TOKENID_OPERATOR_AND:
             printcm("ANDS");
@@ -170,7 +170,7 @@ void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t*
             printcm("MUL %s %s %s", var, op1, op2);
             break;
          case TOKENID_OPERATOR_DIV:
-            printcm(determine_expression_type(exp, vartable) == VT_FLOAT ? "IDIV" : "DIV");
+            determine_expression_type(exp, vartable) == VT_FLOAT ? printcm("IDIV") : printcm("DIV");
             break;
          case TOKENID_OPERATOR_AND:
             printcm("AND %s %s %s", var, op1, op2);

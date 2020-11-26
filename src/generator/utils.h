@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define dprint(s, ...) fprintf(stderr,"%s:%d: ", __FILE__, __LINE__); fprintf(stderr, s,##__VA_ARGS__); fprintf(stderr, "\n")
-#define pcomment(s, ...) printf("   # "); printf(s,##__VA_ARGS__); printf("\n")  // Print comment function
-#define printcm(s, ...) printf("   "); printf(s,##__VA_ARGS__); printf("\n")  // Print command function
-#define printlb(s, ...) printf(s,##__VA_ARGS__); printf("\n")   // Print label function
+#define dprint(f, ...) fprintf(stderr,"%s:%d: "f"\n", __FILE__, __LINE__,##__VA_ARGS__)
+#define pcomment(f, ...) printf("   # "f"\n",##__VA_ARGS__)  // Print comment function
+#define printcm(f, ...) printf("   "f"\n",##__VA_ARGS__)  // Print command function
+#define printlb(f, ...) printf(f"\n",##__VA_ARGS__)   // Print label function
