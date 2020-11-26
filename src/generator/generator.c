@@ -69,7 +69,9 @@ void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fn
       generate_funccall(node->right_function, vartable, fntable, false);
       generate_returns_pops(node, vartable);
    } else {
-      // TODO:
+      for (int i = 0; i < node->ids_count; i++) {
+         generate_assign_expression(node->left_ids[i], node->right_expressions[i], vartable);
+      }
    }
 }
 
