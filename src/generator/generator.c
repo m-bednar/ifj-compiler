@@ -15,14 +15,14 @@
 void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
    int clears_from = node->ids_count;
    for (int i = node->ids_count - 1; i >= 0; i--) {
-      if (strcmp(node->left_ids[i]->value.string_value, "_") == 0) {
+      if (streq(node->left_ids[i]->value.string_value, "_")) {
          clears_from = i;
       } else {
          break;
       }
    }
    for (int i = 0; i < clears_from; i++) {
-      if (strcmp(node->left_ids[i]->value.string_value, "_") != 0) {
+      if (!streq(node->left_ids[i]->value.string_value, "_")) {
          int depth = vartable_find(vartable, node->left_ids[i]->value.string_value)->depth;
          printcm("POPS %s", generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth));
       } else {

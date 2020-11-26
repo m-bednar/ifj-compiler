@@ -63,7 +63,7 @@ vardata_t* vartable_find(vartable_t* vartable, char* identifier) {
    int max = -1;
    vardata_t* item = NULL;
    for (int i = 0; i < vartable->lenght; i++) {
-      if (strcmp(identifier, vartable->data[i]->identifier) == 0) {
+      if (streq(identifier, vartable->data[i]->identifier)) {
          if (vartable->data[i]->depth > max && vartable->data[i]->depth <= vartable->depth) {
             item = vartable->data[i];
          }
