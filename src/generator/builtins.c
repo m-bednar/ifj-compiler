@@ -13,7 +13,8 @@ void builtin_input(char* type) {
    char* l2 = labelgen_new();
    printcm("READ GF@$tmp %s", type);
    printcm("PUSHS GF@$tmp");
-   printcm("JUMPIFEQ %s GF@$tmp nil@nil", l1);
+   printcm("TYPE GF@$tmp2 GF@$tmp");
+   printcm("JUMPIFEQ %s GF@$tmp2 string@nil", l1);
    printcm("PUSHS int@0");
    printcm("JUMP %s", l2);
    printcm("LABEL %s", l1);
