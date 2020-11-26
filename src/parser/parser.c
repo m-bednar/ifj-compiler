@@ -5,6 +5,7 @@
  */
 
 #include "parser.h"
+#include "semantic.h"
 
 
 /**
@@ -644,7 +645,7 @@ void add_operator_and_shift(token_t** token, token_t** token_next, ntposymstack_
    }
 
    ntposymstack_push(stack, ntposymbol_ctor(input_terminal_id, TERMINAL));
-   token_dtor((*token));
+   //token_dtor((*token));
    (*token) = (*token_next);
    if ((*token)->id != TOKENID_END_OF_FILE) {
       (*token_next) = get_next_token();
@@ -658,7 +659,7 @@ void add_operator_and_shift(token_t** token, token_t** token_next, ntposymstack_
  */
 void shift(token_t** token, token_t** token_next, ntposymstack_t* stack, int input_terminal_id) {
    ntposymstack_push(stack, ntposymbol_ctor(input_terminal_id, TERMINAL));
-   token_dtor((*token));
+   //token_dtor((*token));
    (*token) = (*token_next);
    if ((*token)->id != TOKENID_END_OF_FILE) {
       (*token_next) = get_next_token();
@@ -698,11 +699,11 @@ bool precedence_parser(token_t** token, token_t** token_next, nonterminalid_e no
 
       switch (precedence_table[stack_top_terminal_id][input_terminal_id]) {
          case PT_E:
-            // call semantic(token, nonterminal_flag, false);
+            semantic((*token), nonterminal_flag, false);
             shift(token, token_next, stack, input_terminal_id);
             break;
          case PT_L:
-            // call semantic(token, nonterminal_flag, false);
+            semantic((*token), nonterminal_flag, false);
             add_operator_and_shift(token, token_next, stack, help_stack, input_terminal_id, stack_top_terminal_id);
             break;
          case PT_G:
@@ -829,7 +830,7 @@ void parse() {
       stack_top = ntsymstack_top(stack);
       if (eol_flag) {
          if (token->id == TOKENID_NEWLINE) {
-            token_dtor(token);
+            //token_dtor(token);
             token = token_next;
             if (token->id != TOKENID_END_OF_FILE) {
                token_next = get_next_token();
@@ -840,15 +841,15 @@ void parse() {
       } else if (stack_top->is_terminal && stack_top->id == TOKENID_END_OF_FILE) {
          if (token->id == TOKENID_END_OF_FILE) {
             ntsymbol_dtor(ntsymstack_pop(stack));
-            token_dtor(token);
+            //token_dtor(token);
          } else {
             error = true;
          }
       } else if (stack_top->is_terminal) {
          if ((tokenid_e)stack_top->id == token->id) {
             eol_flag = (token->id == TOKENID_NEWLINE) ? true : false;
-            // call semantic(token, nonterminal_flag, eol_flag);
-            token_dtor(token);
+            semantic(token, nonterminal_flag, eol_flag);
+            //token_dtor(token);
             ntsymbol_dtor(ntsymstack_pop(stack));
             token = token_next;
             if (token->id != TOKENID_END_OF_FILE) {
