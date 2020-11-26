@@ -37,8 +37,9 @@ void builtin_print(vartable_t* vartable, token_t** params, int param_count) {
          printcm("WRITE %s", generate_const_str(params[i]));
       } else {
          char* identifier = params[i]->value.string_value;
-         int depth = vartable_depth(vartable, identifier);
-         printcm("WRITE %s", generate_var_str(identifier, FT_TF, depth));
+         char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+         printcm("WRITE %s", var);
+         free(var);
       }
    }
 }
@@ -50,9 +51,10 @@ void builtin_int2float(vartable_t* vartable, token_t* param) {
       printcm("PUSHS %s", generate_const_str(param));
    } else {
       char* identifier = param->value.string_value;
-      int depth = vartable_depth(vartable, identifier);
-      printcm("PUSHS %s", generate_var_str(identifier, FT_TF, depth));
+      char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+      printcm("PUSHS %s", var);
       printcm("INT2FLOATS");
+      free(var);
    }
 }
 
@@ -63,9 +65,10 @@ void builtin_float2int(vartable_t* vartable, token_t* param) {
       printcm("PUSHS %s", generate_const_str(param));
    } else {
       char* identifier = param->value.string_value;
-      int depth = vartable_depth(vartable, identifier);
-      printcm("PUSHS %s", generate_var_str(identifier, FT_TF, depth));
+      char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+      printcm("PUSHS %s", var);
       printcm("FLOAT2INTS");
+      free(var);
    }
 }
 
@@ -74,9 +77,10 @@ void builtin_len(vartable_t* vartable, token_t* param) {
       printcm("PUSHS %s", strlen(param->value.string_value));
    } else {
       char* identifier = param->value.string_value;
-      int depth = vartable_depth(vartable, identifier);
-      printcm("STRLEN GF@$tmp %s", generate_var_str(identifier, FT_TF, depth));
+      char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+      printcm("STRLEN GF@$tmp %s", var);
       printcm("PUSHS GF@$tmp");
+      free(var);
    }
 }
 
