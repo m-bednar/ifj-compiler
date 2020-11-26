@@ -102,4 +102,138 @@ void builtin_len(vartable_t* vartable, token_t* param) {
    pcomment("Built-in len end");
 }
 
-// TODO: ord, chr, substr
+void builtin_chr(vartable_t* vartable, token_t* param) {
+   if (is_const_tokenid(param->id)) {
+      int value = param->value.int_value;
+      if (value < 0 || value > 255) {
+         printcm("PUSHS string@");
+         printcm("PUSHS int@1");
+      } else {
+         char str[] = { (char)value, '\0' };
+         char* converted = convert_string(str);
+         printcm("PUSHS string@%s", converted);
+         printcm("PUSHS int@0");
+         free(converted);
+      }
+   } else {
+      char* identifier = param->value.string_value;
+      char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+      char* l1 = labelgen_new();
+      char* l2 = labelgen_new();
+      printcm("PUSHS string@");
+      printcm("PUSHS %s", var);
+      printcm("LTS");
+      printcm("PUSHS %s", var);
+      printcm("PUSHS int@255");
+      printcm("GTS");
+      printcm("ORS");
+      printcm("PUSHS bool@true");
+      printcm("JUMPIFEQS %s", l1);
+      printcm("PUSHS %s", var);
+      printcm("INT2CHARS");
+      printcm("PUSHS int@0");
+      printcm("JUMP %s", l2);
+      printcm("LABEL %s", l1);
+      printcm("PUSHS string@");
+      printcm("PUSHS int@1");
+      printcm("LABEL %s", l2);
+   }
+}
+
+void builtin_chr(vartable_t* vartable, token_t** params) {
+   if (is_const_tokenid(params[0]->id) && is_const_tokenid(params[1]->id)) {
+      char* s = params[0]->value.string_value;
+      int i = params[1]->value.int_value;
+      if (i >= strlen(s) || i < 0) {
+         printcm("PUSHS int@0");
+         printcm("PUSHS int@1");
+      } else {
+         printcm("PUSHS int@%d", (int)s[i]);
+         printcm("PUSHS int@0");
+      }
+   } else if (is_const_tokenid(params[1]->id)) {
+      if (params[1]->value.int_value < 0) {
+         printcm("PUSHS int@0");
+         printcm("PUSHS int@1");
+         return;
+      } else {
+         char* l1 = labelgen_new();
+         char* l2 = labelgen_new();
+         char* identifier = params[0]->value.string_value;
+         char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+         printcm("STRLEN GF@$tmp %s", var);
+         printcm("LT GF@$tmp GF@$tmp int@%d");
+         printcm("JUMPIFEQ GF@$tmp GF@$false %s", l1);
+         printcm("STRI2INT GF@$tmp %s int@%d", var, params[1]->value.int_value);
+         printcm("PUSHS GF@$tmp");
+         printcm("PUSHS int@0");
+         printcm("JUMP %s", l2);
+         printcm("LABEL %s", l1);
+         printcm("PUSHS string@");
+         printcm("PUSHS int@1");
+         printcm("LABEL %s", l2);
+         free(l1);
+         free(l2);
+         free(var);
+      }
+   } else {
+      char* l1 = labelgen_new();
+      char* l2 = labelgen_new();
+      char* id1 = params[0]->value.string_value;
+      char* id2 = params[1]->value.string_value;
+      char* var_i = generate_var_str(id1, FT_TF, vartable_depth(vartable, id1));
+      char* var_s = generate_var_str(id2, FT_TF, vartable_depth(vartable, id2));
+      printcm("STRLEN GF@$tmp %s", var_s);
+      printcm("PUSHS %s", var_i);
+      printcm("PUSHS int@0", var_i);
+      printcm("LTS");
+      printcm("PUSHS %s", var_i);
+      printcm("PUSHS GF@$tmp");
+      printcm("LTS");
+      printcm("NOTS");
+      printcm("ORS");
+      printcm("PUSHS bool@$true");
+      printcm("JUMPIFEQS %s", l1);
+      printcm("STRI2INT GF@$tmp %s %s", var_s, var_i);
+      printcm("PUSHS GF@$tmp");
+      printcm("PUSHS int@0");
+      printcm("JUMP %s", l2);
+      printcm("LABEL %s", l1);
+      printcm("PUSHS string@");
+      printcm("PUSHS int@1");
+      printcm("LABEL %s", l2);
+      free(l1);
+      free(l2);
+      free(var_s);
+      free(var_i);
+   }
+}
+
+/*
+# (when x/i/n is not const)
+   STRLEN GF@$tmp LF@<x>
+   # i < 0 || !(i < strlen(x))
+   PUSHS <i>
+   PUSHS int@0
+   LTS
+   PUSHS <i>
+   PUSHS GF@$tmp
+   LTS
+   NOTS
+   ORS
+   PUSHS bool@true
+   JUMPIFEQS L0
+   STRI2INT GF@$tmp <x> <i>
+   PUSHS GF@$tmp
+   PUSHS int@0
+   JUMP L1 
+  LABEL L0
+   PUSHS string@
+   PUSHS int@1
+  LABEL L1 
+
+
+*/
+
+
+// TODO: ord, substr

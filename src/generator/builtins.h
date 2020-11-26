@@ -43,3 +43,8 @@ void builtin_float2int(vartable_t* vartable, token_t* param);
  * Generates built-in function call 'len'.
  */
 void builtin_len(vartable_t* vartable, token_t* param);
+
+/**
+ * Generates built-in function call 'chr'.
+ */
+void builtin_chr(vartable_t* vartable, token_t* param);
