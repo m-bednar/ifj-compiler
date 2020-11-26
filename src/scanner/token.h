@@ -26,13 +26,9 @@ typedef enum tokenid_e {
    TOKENID_NUM,                        // integer number
    TOKENID_NUM_DECIMAL,                // decimal number
    TOKENID_OPERATOR_ADD,               // +
-   TOKENID_OPERATOR_ADD_AND_ASSIGN,    // +=
    TOKENID_OPERATOR_SUB,               // -
-   TOKENID_OPERATOR_SUB_AND_ASSIGN,    // -=
    TOKENID_OPERATOR_MUL,               // *
-   TOKENID_OPERATOR_MUL_AND_ASSIGN,    // *=
    TOKENID_OPERATOR_DIV,               // /
-   TOKENID_OPERATOR_DIV_AND_ASSIGN,    // /=
    TOKENID_OPERATOR_LESS,              // <
    TOKENID_OPERATOR_LESS_OR_EQUAL,     // <=
    TOKENID_OPERATOR_GREATER,           // >
