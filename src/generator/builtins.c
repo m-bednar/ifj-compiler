@@ -8,6 +8,42 @@
 #include "vargen.h"
 #include "utils.h"
 
+bool is_builtin(char* identifier) {
+   char* names[] = {
+      "inputs", "inputi", "inputf", "print", "int2float", "float2int", "len", "chr", "ord", "substr"
+   };
+   for (int i = 0; i < sizeof(names) / sizeof(char*); i++) {
+      if (streq(identifier, names[i])) {
+         return true;
+      }
+   }
+   return false;
+}
+
+bool generate_builtin(char* identifier, token_t** params, int param_count, vartable_t* vartable) {
+   if (streq(identifier, "inputs") == 0) {
+      builtin_inputs();
+   } else if (streq(identifier, "inputi")) {
+      builtin_inputi();
+   } else if (streq(identifier, "inputf")) {
+      builtin_inputf();
+   } else if (streq(identifier, "print")) {
+      builtin_print(vartable, params, param_count);
+   } else if (streq(identifier, "int2float")) {
+      builtin_int2float(vartable, params[0]);
+   } else if (streq(identifier, "float2int")) {
+      builtin_float2int(vartable, params[0]);
+   } else if (streq(identifier, "len")) {
+      builtin_len(vartable, params[0]);
+   } else if (streq(identifier, "chr")) {
+      builtin_chr(vartable, params[0]);
+   } else if (streq(identifier, "ord")) {
+      builtin_ord(vartable, params);
+   } else if (streq(identifier, "substr")) {
+      // TODO:
+   }
+}
+
 void builtin_input(char* type) {
    char* l1 = labelgen_new();
    char* l2 = labelgen_new();

@@ -10,41 +10,11 @@
 #include "../scanner/token.h"
 
 /**
- * Generates built-in function call 'inputs'.
+ * Returns true if given function identifier is name of built-in function.
  */
-void builtin_inputs();
+bool is_builtin(char* identifier);
 
 /**
- * Generates built-in function call 'inputi'.
+ * Generates built-in function call.
  */
-void builtin_inputi();
-
-/**
- * Generates built-in function call 'inputf'.
- */
-void builtin_inputf();
-
-/**
- * Generates built-in function call 'print'.
- */
-void builtin_print(vartable_t* vartable, token_t** params, int param_count);
-
-/**
- * Generates built-in function call 'int2float'.
- */
-void builtin_int2float(vartable_t* vartable, token_t* param);
-
-/**
- * Generates built-in function call 'float2int'.
- */
-void builtin_float2int(vartable_t* vartable, token_t* param);
-
-/**
- * Generates built-in function call 'len'.
- */
-void builtin_len(vartable_t* vartable, token_t* param);
-
-/**
- * Generates built-in function call 'chr'.
- */
-void builtin_chr(vartable_t* vartable, token_t* param);
+bool generate_builtin(char* identifier, token_t** params, int param_count, vartable_t* vartable);
