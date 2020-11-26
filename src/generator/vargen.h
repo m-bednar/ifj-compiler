@@ -15,9 +15,10 @@ typedef enum frametype_e {
    FT_GF
 } frametype_e;
 
+/**
+ * Creates new label according to last label's id.
+ */
 char* labelgen_new();
-
-char* labelgen_use();
 
 /**
  * Returns true, if id belongs to token with constant value.

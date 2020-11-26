@@ -16,10 +16,6 @@ static const int STR_CONST_PREFIX = 8;
 static const int INT_CONST_PREFIX = 5;
 static const int FLOAT_CONST_MAX_SIZE = 35;
 
-static int labelgen_lastid = 0;
-static int labelgen_lenght = 0;
-static int* labelgen_stack = NULL;
-
 int digits_count(int n) {
    int count = 0;
    do {
@@ -30,20 +26,10 @@ int digits_count(int n) {
 }
 
 char* labelgen_new() {
-   char* label = safe_alloc(2 + digits_count(labelgen_lastid));
-   sprintf(label, "L%d", labelgen_lastid);
-   labelgen_stack = safe_realloc(labelgen_stack, sizeof(int) * (labelgen_lenght + 1));
-   labelgen_stack[labelgen_lenght] = labelgen_lastid;
-   labelgen_lenght++;
-   labelgen_lastid++;
-   return label;
-}
-
-char* labelgen_use() {
-   int id = labelgen_stack[labelgen_lenght - 1];
-   char* label = safe_alloc(2 + digits_count(id));
-   sprintf(label, "L%d", id);
-   labelgen_lenght--;
+   static int lastid = 0;
+   char* label = safe_alloc(2 + digits_count(lastid));
+   sprintf(label, "L%d", lastid);
+   lastid++;
    return label;
 }
 
