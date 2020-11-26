@@ -15,6 +15,34 @@ bool is_bool_operator(tokenid_e id) {
       || id == TOKENID_OPERATOR_GREATER_OR_EQUAL;
 }
 
+bool should_use_float_ops(astnode_exp_t* exp, vartable_t* vartable) {
+   for (int i = 0; i < exp->tokens_count; i++) {
+      if (exp->tokens[i]->id == TOKENID_NUM_DECIMAL) {
+         return true;
+      }
+      if (exp->tokens[i]->id == TOKENID_IDENTIFIER) {
+         if (vartable_find(vartable, exp->tokens[i]->value.string_value)->type == VT_INT) {
+            return true;
+         }
+      }
+   }
+   return false;
+}
+
+bool should_use_string_ops(astnode_exp_t* exp, vartable_t* vartable) {
+   for (int i = 0; i < exp->tokens_count; i++) {
+      if (exp->tokens[i]->id == TOKENID_STRING_LITERAL) {
+         return true;
+      }
+      if (exp->tokens[i]->id == TOKENID_IDENTIFIER) {
+         if (vartable_find(vartable, exp->tokens[i]->value.string_value)->type == VT_STRING) {
+            return true;
+         }
+      }
+   }
+   return false;
+}
+
 vartype_e determine_token_type(token_t* token, vartable_t* vartable) {
    switch (token->id) {
       case TOKENID_IDENTIFIER:
@@ -53,6 +81,25 @@ void print_pushs_identifier(char* identifier, vartable_t* vartable) {
    free(var);
 }
 
+char* generate_op_str(token_t* op, vartable_t* vartable) {
+   if (is_const_tokenid(op->id)) {
+      return generate_const_str(op);
+   } else {
+      return generate_var_str(op->value.string_value, FT_TF, vartable_depth(vartable, op->value.string_value)); 
+   }
+}
+
+void generate_multi_concatenation(astnode_exp_t* exp, vartable_t* vartable) {
+   printcm("MOVE GF@$tmp string@");
+
+   exp = exp;
+   vartable = vartable;
+
+   for (int i = 0; i < exp->tokens_count; i++) {
+      // TODO:
+   }
+}
+
 void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
    for (int i = 0; i < exp->tokens_count; i++) {
       switch (exp->tokens[i]->id) {
@@ -78,7 +125,7 @@ void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
             printcm("MULS");
             break;
          case TOKENID_OPERATOR_DIV:
-            determine_expression_type(exp, vartable) == VT_FLOAT ? printcm("IDIVS") : printcm("DIVS");
+            printcm("%s", should_use_float_ops(exp, vartable) ? "IDIVS" : "DIVS");
             break;
          case TOKENID_OPERATOR_AND:
             printcm("ANDS");
@@ -124,21 +171,11 @@ void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t*
       printcm("NOT %s %s", var, op1);
       free(op1);
    } else {
-      char* op1; 
-      char* op2;
-      if (is_const_tokenid(exp->tokens[0]->id)) {
-         op1 = generate_const_str(exp->tokens[0]);
-      } else {
-         op1 = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, vartable_depth(vartable, identifier)); 
-      }
-      if (is_const_tokenid(exp->tokens[1]->id)) {
-         op2 = generate_const_str(exp->tokens[1]);
-      } else {
-         op2 = generate_var_str(exp->tokens[1]->value.string_value, FT_TF, vartable_depth(vartable, identifier)); 
-      }
+      char* op1 = generate_op_str(exp->tokens[0], vartable); 
+      char* op2 = generate_op_str(exp->tokens[1], vartable); 
       switch (exp->tokens[2]->id) {
          case TOKENID_OPERATOR_ADD:
-            printcm("ADD %s %s %s", var, op1, op2);
+            printcm("%s %s %s %s", should_use_string_ops(exp, vartable)? "CONCAT" : "ADD", var, op1, op2);
             break;
          case TOKENID_OPERATOR_SUB:
             printcm("SUB %s %s %s", var, op1, op2);
@@ -147,7 +184,7 @@ void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t*
             printcm("MUL %s %s %s", var, op1, op2);
             break;
          case TOKENID_OPERATOR_DIV:
-            determine_expression_type(exp, vartable) == VT_FLOAT ? printcm("IDIV") : printcm("DIV");
+            printcm("%s %s %s %s", should_use_float_ops(exp, vartable)? "IDIV" : "DIV", var, op1, op2);
             break;
          case TOKENID_OPERATOR_AND:
             printcm("AND %s %s %s", var, op1, op2);
@@ -190,28 +227,36 @@ void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t*
 
 void generate_const_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
    char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
-   char* val;
-   if (is_const_tokenid(exp->tokens[0]->id)) {
-      val = generate_const_str(exp->tokens[0]);
-   } else {
-      val = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, vartable_depth(vartable, exp->tokens[0]->value.string_value));
-   }
+   char* val = generate_op_str(exp->tokens[0], vartable);
    printcm("MOVE %s %s", var, val);
    free(var);
    free(val);
 }
 
 void generate_assign_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
-   infix_to_postfix(exp);
-   
-   if (exp->tokens_count == 1) {
-      generate_const_expression(identifier, exp, vartable);
-   } else if (exp->tokens_count == 2 || exp->tokens_count == 3) {
-      generate_local_expression(identifier, exp, vartable);
+   if (should_use_string_ops(exp, vartable)) {
+      if (exp->tokens_count == 1) {
+         generate_const_expression(identifier, exp, vartable);
+      } else if (exp->tokens_count <= 3) {
+         infix_to_postfix(exp);
+         generate_local_expression(identifier, exp, vartable);
+      } else {
+         generate_multi_concatenation(exp, vartable);
+         char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+         printcm("MOVE %s GF@$tmp", var);
+         free(var);
+      }
    } else {
-      generate_stack_expression(exp, vartable);
-      char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
-      printcm("POPS %s", var);
-      free(var);
+      infix_to_postfix(exp);
+      if (exp->tokens_count == 1) {
+         generate_const_expression(identifier, exp, vartable);
+      } else if (exp->tokens_count <= 3) {
+         generate_local_expression(identifier, exp, vartable);
+      } else {
+         generate_stack_expression(exp, vartable);
+         char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+         printcm("POPS %s", var);
+         free(var);
+      }
    }
 }
