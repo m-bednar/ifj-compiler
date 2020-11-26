@@ -105,3 +105,11 @@ astnode_funcdecl_t* astnode_funcdecl_ctor(char* name);
 astnode_exp_t* astnode_exp_ctor(token_t** tokens, int token_count);
 
 astnode_generic_t* astnode_defvar_ctor(token_t* variable, astnode_exp_t* expression);
+
+void astnode_funcdecl_add(astnode_funcdecl_t* func, astnode_generic_t* child);
+
+astnode_generic_t* astnode_ret_ctor();
+
+void astnode_ret_add_exp(astnode_generic_t* ret, astnode_exp_t* exp);
+
+astnode_exp_t* astnode_exp_ctor(token_t** tokens, int token_count);
