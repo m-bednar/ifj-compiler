@@ -17,4 +17,4 @@ bool is_builtin(char* identifier);
 /**
  * Generates built-in function call.
  */
-bool generate_builtin(char* identifier, token_t** params, int param_count, vartable_t* vartable);
+void generate_builtin(char* identifier, token_t** params, int param_count, vartable_t* vartable);
