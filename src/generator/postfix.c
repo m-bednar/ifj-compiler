@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include "postfix.h"
 #include "vargen.h"
+#include "utils.h"
 #include "../error.h"
 #include "../memory.h"
 
@@ -209,7 +210,8 @@ void replace_three_tokens(astnode_exp_t* exp, token_t* token, int index) {
    exp->tokens_count -= 2;
 }
 
-void optimize_by_evaluation(astnode_exp_t* exp) {
+bool optimize_by_evaluation(astnode_exp_t* exp) {
+   bool flag = false; 
    bool optimized;
    do {
       optimized = false;
@@ -222,7 +224,11 @@ void optimize_by_evaluation(astnode_exp_t* exp) {
             optimized = true;
          }
       }
+      if (optimized) {
+         flag = true;
+      }
    } while (optimized);
+   return flag;
 }
 
 bool is_zero_value(token_t* t) {
@@ -235,7 +241,8 @@ bool is_unary_value(token_t* t) {
       (t->id == TOKENID_NUM_DECIMAL && t->value.decimal_value == 1.0);
 }
 
-void optimize_by_arithmetics(astnode_exp_t* exp) {
+bool optimize_by_arithmetics(astnode_exp_t* exp) {
+   bool flag = false; 
    bool optimized;
    do {
       optimized = false;
@@ -248,33 +255,42 @@ void optimize_by_arithmetics(astnode_exp_t* exp) {
                case TOKENID_OPERATOR_MUL:
                   if (is_zero_value(t1)) {
                      replace_three_tokens(exp, t1, i);
+                     optimized = true;
                   } else if (is_zero_value(t2)) {
                      replace_three_tokens(exp, t2, i);
+                     optimized = true;
                   } else if (is_unary_value(t1)) {
                      replace_three_tokens(exp, t2, i);
+                     optimized = true;
                   } else if (is_unary_value(t2)) {
                      replace_three_tokens(exp, t1, i);
+                     optimized = true;
                   }
                   break;
                case TOKENID_OPERATOR_DIV:
                   if (is_zero_value(t1)) {
                      replace_three_tokens(exp, t1, i);
+                     optimized = true;
                   } else if (is_zero_value(t2)) {
-                     // TODO: error, zero division
+                     exit(ERRCODE_ZERO_DIVISION_ERROR);
                   } else if (is_unary_value(t2)) {
                      replace_three_tokens(exp, t1, i);
+                     optimized = true;
                   }
                   break;
                case TOKENID_OPERATOR_ADD:
                   if (is_zero_value(t1)) {
                      replace_three_tokens(exp, t2, i);
+                     optimized = true;
                   } else if (is_zero_value(t2)) {
                      replace_three_tokens(exp, t1, i);
+                     optimized = true;
                   }
                   break;
                case TOKENID_OPERATOR_SUB:
                   if (is_zero_value(t2)) {
                      replace_three_tokens(exp, t1, i);
+                     optimized = true;
                   }
                   break;
                default:
@@ -282,12 +298,15 @@ void optimize_by_arithmetics(astnode_exp_t* exp) {
             }
          }
       }
+      if (optimized) {
+         flag = true;
+      }
    } while (optimized);
+   return flag;
 }
 
 void optimize_postfix(astnode_exp_t* exp) {
-   optimize_by_arithmetics(exp);
-   optimize_by_evaluation(exp);
+   while (optimize_by_arithmetics(exp) || optimize_by_evaluation(exp));
 }
 
 void infix_to_postfix(astnode_exp_t* exp) {
