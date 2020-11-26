@@ -70,9 +70,8 @@ typedef struct astnode_if_t {
 
 typedef struct astnode_for_t {
    astnode_exp_t* condition;
-   astnode_defvar_t* defvar;  // NULL if assign is used or first statement is empty
-   astnode_assign_t* assign;  // NULL if defvar is used or first statement is empty
-   astnode_exp_t* varchange;  // evaluated after each loop
+   astnode_defvar_t* defvar;
+   astnode_exp_t* assign;  // evaluated after each loop
    astnode_codeblock_t* body;
 } astnode_for_t;
 
