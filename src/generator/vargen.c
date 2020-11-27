@@ -28,21 +28,23 @@ int digits_count(int n) {
 char* labelgen_new() {
    static int lastid = 0;
    char* label = safe_alloc(2 + digits_count(lastid));
-   sprintf(label, "!L%d", lastid);
+   sprintf(label, "$L%d", lastid);
    lastid++;
    return label;
 }
 
 char* convert_string(char* str) {
-   const int csize = 4; // Size of special ascii code
+   const int csize = 4; // Size of escaped ascii code
    char* out;
    int len = strlen(str);
+   
    for (int i = 0; i < (int)strlen(str); i++) {
       if ((str[i] >= 0 && str[i] <= 32) || str[i] == 35 || str[i] == 92) {
          len += csize;
+         
       }
    }
-   out = safe_alloc(sizeof(char) * len + 1);
+   out = safe_alloc(sizeof(char) * (len + 1));
    len = 0;
    for (int i = 0; i < (int)strlen(str); i++) {
       if ((str[i] >= 0 && str[i] <= 32) || str[i] == 35 || str[i] == 92) {
@@ -53,6 +55,7 @@ char* convert_string(char* str) {
          len++;
       }
    }
+   out[len] = '\0';
    return out;
 }
 
