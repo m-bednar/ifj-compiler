@@ -88,6 +88,12 @@ void tokenvector_print(tokenvector_t* vector){
          case TOKENID_KEYWORD_RETURN:
             printf("return ");
             break;
+         case TOKENID_OPERATOR_ASSIGN:
+            printf("= ");
+            break;
+         case TOKENID_OPERATOR_DECLARE:
+            printf(":= ");
+            break;
          
          default:
          break;
