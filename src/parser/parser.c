@@ -817,7 +817,9 @@ void parse() {
    ntsymbol_t* stack_top;
    bool error = false;
    bool eol_flag = true;
+   int semantic_error = 0;
    nonterminalid_e nonterminal_flag;
+
 
    ntsymstack_push(stack, ntsymbol_ctor(TOKENID_END_OF_FILE, true));
    ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_PROGRAM, false));
@@ -848,7 +850,7 @@ void parse() {
       } else if (stack_top->is_terminal) {
          if ((tokenid_e)stack_top->id == token->id) {
             eol_flag = (token->id == TOKENID_NEWLINE) ? true : false;
-            semantic(token, nonterminal_flag, eol_flag);
+            semantic_error = semantic(token, nonterminal_flag, eol_flag);
             //token_dtor(token);
             ntsymbol_dtor(ntsymstack_pop(stack));
             token = token_next;
@@ -863,6 +865,10 @@ void parse() {
       }
    }
    ntsymstack_dtor(stack);
+
+   if(semantic_error){
+      exit(semantic_error);
+   }
 
    if (error) {
       token_dtor(token);
