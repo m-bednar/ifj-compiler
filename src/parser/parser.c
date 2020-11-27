@@ -7,7 +7,8 @@
 #include "parser.h"
 #include "semantic.h"
 
-
+astnode_generic_t* ast;
+bintree_t* symtable_global;
 /**
  * Nonterminal derivations for predictive parsing.
  * Derivates nonterminals based on LL grammar rules.
@@ -699,11 +700,11 @@ int precedence_parser(token_t** token, token_t** token_next, nonterminalid_e non
 
       switch (precedence_table[stack_top_terminal_id][input_terminal_id]) {
          case PT_E:
-            error = semantic((*token), nonterminal_flag, false);
+            error = semantic((*token), nonterminal_flag, false, ast, symtable_global);
             shift(token, token_next, stack, input_terminal_id);
             break;
          case PT_L:
-            error = semantic((*token), nonterminal_flag, false);
+            error = semantic((*token), nonterminal_flag, false, ast, symtable_global);
             add_operator_and_shift(token, token_next, stack, help_stack, input_terminal_id, stack_top_terminal_id);
             break;
          case PT_G:
@@ -810,7 +811,7 @@ int find_derivation(int stack_top_id, ntsymstack_t* stack, token_t** token, toke
 /**
  * Predictive syntax analysis.
  */
-void parse() {
+void parse(astnode_generic_t* ast_root, bintree_t* symtable) {
    ntsymstack_t* stack = ntsymstack_ctor();
    token_t* token = get_next_token();
    token_t* token_next = token;
@@ -819,6 +820,8 @@ void parse() {
    bool eol_flag = true;
    nonterminalid_e nonterminal_flag;
 
+   ast = ast_root;
+   symtable_global = symtable;
 
    ntsymstack_push(stack, ntsymbol_ctor(TOKENID_END_OF_FILE, true));
    ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_PROGRAM, false));
@@ -849,7 +852,7 @@ void parse() {
       } else if (stack_top->is_terminal) {
          if ((tokenid_e)stack_top->id == token->id) {
             eol_flag = (token->id == TOKENID_NEWLINE) ? true : false;
-            error = semantic(token, nonterminal_flag, eol_flag);
+            error = semantic(token, nonterminal_flag, eol_flag, ast, symtable_global);
             //token_dtor(token);
             ntsymbol_dtor(ntsymstack_pop(stack));
             token = token_next;
@@ -872,6 +875,7 @@ void parse() {
       token_dtor(token_next);
       exit(error);
    } else if (error) {
+      printf("err %d", error);
       exit(error);
    }
 
