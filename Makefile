@@ -6,11 +6,11 @@
 GCC_ARGS = -std=c99 -Wall -Wno-format -Wextra -Werror
 
 MAIN_FILENAME = main
-SOURCE_DIR = src
-LIBS := src/memory.c $(wildcard src/**/*.c)
+SOURCE_DIR = src/
+LIBS := $(SOURCE_DIR)memory.c $(wildcard $(SOURCE_DIR)**/*.c)
 
 compile:
-	@gcc $(GCC_ARGS) $(SOURCE_DIR)/$(MAIN_FILENAME).c $(LIBS) -o $(MAIN_FILENAME) && echo Compiled!
+	@gcc $(GCC_ARGS) $(SOURCE_DIR)$(MAIN_FILENAME).c $(LIBS) -o $(MAIN_FILENAME) && echo Compiled!
 	@echo
 
 run: compile

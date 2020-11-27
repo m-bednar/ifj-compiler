@@ -96,3 +96,45 @@ typedef struct astnode_generic_t {
  * Allocate new AST
  */
 astnode_generic_t* ast_ctor();
+
+void ast_global_add_func(astnode_generic_t* global, astnode_funcdecl_t* funcdecl);
+
+astnode_funcdecl_t* astnode_funcdecl_ctor(char* name);
+
+astnode_exp_t* astnode_exp_ctor(token_t** tokens, int token_count);
+
+astnode_defvar_t* astnode_defvar_ctor(token_t* variable, astnode_exp_t* expression);
+
+astnode_generic_t* astnode_generic_defvar_ctor(astnode_defvar_t* def);
+
+void astnode_funcdecl_add(astnode_funcdecl_t* func, astnode_generic_t* child);
+
+astnode_generic_t* astnode_ret_ctor();
+
+void astnode_ret_add_exp(astnode_generic_t* ret, astnode_exp_t* exp);
+
+astnode_exp_t* astnode_exp_ctor(token_t** tokens, int token_count);
+
+astnode_generic_t* astnode_if_ctor(astnode_exp_t* condition);
+
+void astnode_if_add_truebody(astnode_generic_t* ast_node, astnode_generic_t* new_node);
+
+void astnode_if_add_elsebody(astnode_generic_t* ast_node, astnode_generic_t* new_node);
+
+astnode_generic_t* astnode_for_ctor(astnode_exp_t* condition,  astnode_defvar_t* defvar, astnode_assign_t* assign);
+
+void astnode_for_add_body(astnode_generic_t* ast_node, astnode_generic_t* new_node);
+
+astnode_assign_t* astnode_assign_ctor();
+
+astnode_generic_t* astnode_generic_assign_ctor(astnode_assign_t* assign);
+
+void astnode_assign_add_ids(astnode_assign_t* ast_node, token_t** ids, int ids_count);
+
+void astnode_assign_add_exp(astnode_assign_t* ast_node, astnode_exp_t* exp);
+
+void astnode_assign_add_funccall(astnode_assign_t* ast_node, astnode_funccall_t* funccall);
+
+astnode_funccall_t* astnode_funccall_ctor(char* name, token_t** params, int params_count);
+
+astnode_generic_t* astnode_generic_funccall_ctor(astnode_funccall_t* funccall);

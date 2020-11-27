@@ -4,7 +4,7 @@
  * @authors Martin Bednář (xbedna77)
  */
 
-#pragma once 
+#pragma once
 
 #include "symtable.h"
 
