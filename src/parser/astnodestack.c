@@ -66,3 +66,7 @@ void astnodestack_push(astnodestack_t* stack, astnode_generic_t* astnode){
    stack->length++;   
 }
 
+int astnodestack_lenght(astnodestack_t* stack){
+   guard(stack != NULL);
+   return stack->length;
+}

@@ -22,3 +22,5 @@ astnode_generic_t* astnodestack_pop(astnodestack_t* stack);
 
 void astnodestack_push(astnodestack_t* stack, astnode_generic_t* astnode);
 
+int astnodestack_lenght(astnodestack_t* stack);
+
