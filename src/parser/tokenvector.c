@@ -35,7 +35,7 @@ token_t* tokenvector_get(tokenvector_t* vector, int index){
    guard(vector != NULL);
    guard(vector->length > index && index >= 0);
    token_t* token = vector->memory[index];
-   
+
    return token;
 }
 
@@ -81,6 +81,9 @@ void tokenvector_print(tokenvector_t* vector){
             break;
          case TOKENID_RIGHT_BRACKET:
             printf("} ");
+            break;
+         case TOKENID_LEFT_BRACKET:
+            printf("{ ");
             break;
          case TOKENID_KEYWORD_RETURN:
             printf("return ");
