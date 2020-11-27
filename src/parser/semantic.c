@@ -8,7 +8,6 @@
 #include <string.h>
 #include <stdio.h>
 #include "semantic.h"
-#include "tokenstack.h"
 #include "tokenvector.h"
 #include "astnodestack.h"
 #include "../error.h"
