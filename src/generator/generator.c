@@ -93,8 +93,12 @@ void generate_if(astnode_if_t* node) {
    node = node;
 }
 
-void generate_ret(astnode_ret_t* node) {
-   node = node;
+void generate_ret(astnode_ret_t* node, vartable_t* vartable) {
+   for (int i = 0; i < node->expressions_count; i++) {
+      if (!generate_expression(node->expressions[i], vartable, true)) {
+         printcm("PUSHS GF@$tmp");
+      }
+   }
 }
 
 void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* fntable) {
@@ -129,7 +133,7 @@ void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* 
          break;
       case ANT_RET:
          pcomment("Return start");
-         generate_ret(node->value.returnval);
+         generate_ret(node->value.returnval, vartable);
          pcomment("Return end");
          break;
       default: 
@@ -155,6 +159,7 @@ void generate(astnode_global_t* global, bintree_t* fntable) {
 
    printlb(".IFJcode20");
    printcm("DEFVAR GF@$tmp");
+   printcm("DEFVAR GF@$tmp2");
    printcm("CREATEFRAME");
    printcm("CALL main");
    printcm("EXIT int@0");
