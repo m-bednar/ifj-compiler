@@ -71,7 +71,7 @@ typedef struct astnode_if_t {
 typedef struct astnode_for_t {
    astnode_exp_t* condition;
    astnode_defvar_t* defvar;
-   astnode_exp_t* assign;  // evaluated after each loop
+   astnode_assign_t* assign;  // evaluated after each loop
    astnode_codeblock_t* body;
 } astnode_for_t;
 
