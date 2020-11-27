@@ -124,3 +124,10 @@ void astnode_if_add_elsebody(astnode_generic_t* ast_node, astnode_generic_t* new
 astnode_generic_t* astnode_for_ctor(astnode_exp_t* condition,  astnode_defvar_t* defvar, astnode_assign_t* assign);
 
 void astnode_for_add_body(astnode_generic_t* ast_node, astnode_generic_t* new_node);
+
+astnode_assign_t* astnode_assign_ctor();
+
+void astnode_assign_add_ids(astnode_assign_t* ast_node, token_t** ids, int ids_count);
+
+void astnode_assign_add_exp(astnode_assign_t* ast_node, astnode_exp_t* exp);
+

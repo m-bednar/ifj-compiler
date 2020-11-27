@@ -131,3 +131,29 @@ void astnode_if_add_truebody(astnode_generic_t* ast_node, astnode_generic_t* new
 void astnode_if_add_elsebody(astnode_generic_t* ast_node, astnode_generic_t* new_node){
    astnode_codeblock_insert(ast_node->value.ifval->else_body, new_node);
 }
+
+astnode_assign_t* astnode_assign_ctor(){
+   astnode_assign_t* ast_node = safe_alloc(sizeof(astnode_assign_t));
+   ast_node->expressions_count = 0;
+   ast_node->ids_count = 0;
+   ast_node->left_ids = NULL;
+   ast_node->right_expressions = NULL;
+   ast_node->right_function = NULL;
+   return ast_node;
+}
+
+void astnode_assign_add_ids(astnode_assign_t* ast_node, token_t** ids, int ids_count){
+   ast_node->left_ids = ids;
+   ast_node->ids_count = ids_count;
+}
+
+void astnode_assign_add_exp(astnode_assign_t* ast_node, astnode_exp_t* exp){
+   if(ast_node->right_expressions == NULL){
+      ast_node->right_expressions = safe_alloc(sizeof(astnode_exp_t*));
+   }
+   else{
+      ast_node->right_expressions = safe_realloc(ast_node->right_expressions, sizeof(astnode_exp_t*) * (ast_node->expressions_count + 1));
+   }
+   ast_node->right_expressions[ast_node->expressions_count] = exp;
+   ast_node->expressions_count++;
+}
