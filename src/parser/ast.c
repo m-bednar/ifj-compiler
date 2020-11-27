@@ -67,6 +67,10 @@ astnode_generic_t* astnode_for_ctor(astnode_exp_t* condition,  astnode_defvar_t*
    return ast_node;
 }
 
+void astnode_for_add_body(astnode_generic_t* ast_node, astnode_generic_t* new_node){
+   astnode_codeblock_insert(ast_node->value.forval->body, new_node);
+}
+
 astnode_exp_t* astnode_exp_ctor(token_t** tokens, int token_count) {
    astnode_exp_t* ast_node = safe_alloc(sizeof(astnode_exp_t));
    ast_node->tokens = tokens;
@@ -106,11 +110,24 @@ void astnode_funcdecl_add(astnode_funcdecl_t* func, astnode_generic_t* child){
    astnode_codeblock_insert(func->body, child);
 }
 
-astnode_generic_t* astnode_defvar_ctor(token_t* variable, astnode_exp_t* expression){
+astnode_defvar_t* astnode_defvar_ctor(token_t* variable, astnode_exp_t* expression){
+   astnode_defvar_t* ast_node = safe_alloc(sizeof(astnode_defvar_t));
+   ast_node->expression = expression;
+   ast_node->variable = variable;
+   return ast_node;
+}
+
+astnode_generic_t* astnode_generic_defvar_ctor(astnode_defvar_t* def){
    astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
    ast_node->type = ANT_DEFVAR;
-   ast_node->value.defvarval = safe_alloc(sizeof(astnode_defvar_t));
-   ast_node->value.defvarval->expression = expression;
-   ast_node->value.defvarval->variable = variable;
+   ast_node->value.defvarval = def;
    return ast_node;
+}
+
+void astnode_if_add_truebody(astnode_generic_t* ast_node, astnode_generic_t* new_node){
+   astnode_codeblock_insert(ast_node->value.ifval->true_body, new_node);
+}
+
+void astnode_if_add_elsebody(astnode_generic_t* ast_node, astnode_generic_t* new_node){
+   astnode_codeblock_insert(ast_node->value.ifval->else_body, new_node);
 }
