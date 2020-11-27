@@ -35,7 +35,7 @@ void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
    }
 }
 
-void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t* fntable, bool clears) {
+void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t* fntable) {
    if (is_builtin(node->name)) {
       generate_builtin(node->name, node->params, node->params_count, vartable);
    } else {
@@ -58,15 +58,12 @@ void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t
       }
       printcm("CALL %s", node->name);
       printcm("POPFRAME");
-      if (clears && fn_declaration->value.fn->ret_count > 0) {
-         printcm("CLEARS");
-      }
    }
 }
 
 void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fntable) {
    if (node->right_function != NULL) {
-      generate_funccall(node->right_function, vartable, fntable, false);
+      generate_funccall(node->right_function, vartable, fntable);
       generate_returns_pops(node, vartable);
    } else {
       for (int i = 0; i < node->ids_count; i++) {
@@ -76,6 +73,8 @@ void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fn
 }
 
 void generate_defvar(astnode_defvar_t* node, vartable_t* vartable) {
+   guard(node != NULL);
+   guard(vartable != NULL);
    vartype_e exptype = determine_expression_type(node->expression, vartable);
    if (vartable_should_define(vartable, node->variable->value.string_value, exptype)) {
       vartable_add(vartable, node->variable->value.string_value, exptype);
@@ -99,7 +98,9 @@ void generate_ret(astnode_ret_t* node) {
 }
 
 void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* fntable) {
-   fntable = fntable; // TODO: Remove when fntable is used
+   guard(node != NULL);
+   guard(vartable != NULL);
+   guard(fntable != NULL);
    switch (node->type) {
       case ANT_ASSIGN:
          pcomment("Assigment start");
@@ -123,7 +124,7 @@ void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* 
          break;
       case ANT_FUNCCALL:
          pcomment("Funccall start");
-         generate_funccall(node->value.funccallval, vartable, fntable, true);
+         generate_funccall(node->value.funccallval, vartable, fntable);
          pcomment("Funccall end");
          break;
       case ANT_RET:
@@ -136,17 +137,22 @@ void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* 
    }
 }
 
-void generate_funcdecl(astnode_funcdecl_t* func, bintree_t* fntable) {
-   printlb("LABEL %s", func->name);
+void generate_funcdecl(astnode_funcdecl_t* node, bintree_t* fntable) {
+   guard(node != NULL);
+   guard(fntable != NULL);
+   printlb("LABEL %s", node->name);
    vartable_t* vartable = vartable_ctor();
-   for (int i = 0; i < func->body->children_count; i++) {
-      generate_generic(func->body->children[i], vartable, fntable);
+   for (int i = 0; i < node->body->children_count; i++) {
+      generate_generic(node->body->children[i], vartable, fntable);
    }
    vartable_dtor(vartable);
    printcm("RETURN");
 }
 
 void generate(astnode_global_t* global, bintree_t* fntable) {
+   guard(global != NULL);
+   guard(fntable != NULL);
+
    printlb(".IFJcode20");
    printcm("DEFVAR GF@$tmp");
    printcm("CREATEFRAME");
