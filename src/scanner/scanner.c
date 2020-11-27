@@ -17,11 +17,15 @@ typedef enum state_e {
    STATE_START,
    STATE_IDENTIFIER_KEYWORD,
    STATE_NUM,
+   STATE_NUM_UNDERSCORE,
    STATE_NUM_ZERO,
    STATE_DECIMAL,
+   STATE_DECIMAL_UNDERSCORE,
    STATE_BASE,
+   STATE_BASE_UNDERSCORE,
    STATE_EXP_START,
    STATE_EXP,
+   STATE_EXP_UNDERSCORE,
    STATE_OPERATOR_ADD,
    STATE_OPERATOR_SUB,
    STATE_OPERATOR_MUL,
@@ -190,6 +194,20 @@ bool str_to_bool(char* str) {
    return strcmp(str, "true") == 0 ? true : false;
 }
 
+/**
+ * Returns true if char c belongs to given base, otherwise returns false
+ */
+bool char_belongs_to_base(char c, int base) {
+   if (base == BASE_BIN && c >= '0' && c <= '1') {
+      return true;
+   } else if (base == BASE_OCT && c >= '0' && c <= '7') {
+      return true;
+   } else if (base == BASE_HEX && (isdigit(c) || (toupper(c) >= 'A' && toupper(c) <= 'F'))) {
+      return true;
+   }
+   return false;
+}
+
 token_t* get_next_token() {
    state_e state = STATE_START;
    int c = '\0';
@@ -237,8 +255,25 @@ token_t* get_next_token() {
             } else if ((c == 'e') || (c == 'E')) {
                buffer = append((char)c, buffer);
                state = STATE_EXP_START;
+            } else if (c == '_') {
+               state = STATE_NUM_UNDERSCORE;
             } else { // end of num
                prev = c;
+               char* pEnd;
+               value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
+               free(buffer);
+               return token_ctor(TOKENID_NUM, value);
+            }
+            break;
+         case STATE_NUM_UNDERSCORE:
+            if(isdigit(c)) {
+               prev = c;
+               state = STATE_NUM;
+            } else if (c == '_') {
+               exit(ERRCODE_LEXICAL_ERROR);
+            } else { // _ is start of new token
+               ungetc(c, stdin);
+               prev = '_';
                char* pEnd;
                value.int_value = (int64_t) strtoll(buffer, &pEnd, base);
                free(buffer);
@@ -255,7 +290,7 @@ token_t* get_next_token() {
                buffer = append((char)'0', buffer);
                buffer = append((char)c, buffer);
                state = STATE_EXP_START;
-            } else if (isdigit(c)) { // other digits after 0 not allowed ->error
+            } else if (isdigit(c)) { // other digits after 0 not allowed
                exit(ERRCODE_LEXICAL_ERROR);
             } else { // just 0
                prev = c;
@@ -272,6 +307,11 @@ token_t* get_next_token() {
                }
                buffer = append((char)c, buffer);
                state = STATE_EXP_START;
+            } else if (c == '_') {
+               if (!isdigit(buffer[strlen(buffer)-1])) {
+                  exit(ERRCODE_LEXICAL_ERROR);
+               }
+               state = STATE_DECIMAL_UNDERSCORE;
             } else {
                if (!are_decimal_numbers_present(buffer)) {
                   exit(ERRCODE_LEXICAL_ERROR);
@@ -283,14 +323,46 @@ token_t* get_next_token() {
                return token_ctor(TOKENID_NUM_DECIMAL, value);
             }
             break;
+         case STATE_DECIMAL_UNDERSCORE:
+            if (isdigit(c)) {
+               prev = c;
+               state = STATE_DECIMAL;
+            } else if (c == '_') {
+               exit(ERRCODE_LEXICAL_ERROR);
+            } else {
+               ungetc(c, stdin);
+               prev = '_';
+               char* pEnd;
+               value.decimal_value = (double) strtod(buffer, &pEnd);
+               free(buffer);
+               return token_ctor(TOKENID_NUM_DECIMAL, value);
+            }
+            break;
          case STATE_BASE:
-            if (isdigit(c) || c == '_' ||
-               (base == BASE_HEX && toupper(c) >= 'A' && toupper(c) <= 'F')) {
-               if (c != '_') {
-                  buffer = append((char) c, buffer);
-               }
+            if (char_belongs_to_base(c, base)) {
+               buffer = append((char) c, buffer);
+            } else if (c == '_') {
+                  if (buffer == NULL) { // underscore at the start of num (after 0x)
+                     exit(ERRCODE_LEXICAL_ERROR);
+                  }
+               state = STATE_BASE_UNDERSCORE;
             } else {
                prev = c;
+               char* pEnd;
+               value.int_value = (int64_t) strtoll(buffer, & pEnd, base);
+               free(buffer);
+               return token_ctor(TOKENID_NUM, value);
+            }
+            break;
+         case STATE_BASE_UNDERSCORE:
+            if (char_belongs_to_base(c, base)) {
+               prev = c;
+               state = STATE_BASE;
+            } else if (c == '_') {
+               exit(ERRCODE_LEXICAL_ERROR);
+            } else {
+               ungetc(c, stdin); // return char after _ to stream
+               prev = '_';
                char* pEnd;
                value.int_value = (int64_t) strtoll(buffer, & pEnd, base);
                free(buffer);
@@ -312,6 +384,11 @@ token_t* get_next_token() {
          case STATE_EXP:
             if (isdigit(c)) {
                buffer = append((char) c, buffer);
+            } else if (c == '_') {
+               if (!isdigit(buffer[strlen(buffer)-1])) {
+                  exit(ERRCODE_LEXICAL_ERROR);
+               }
+               state = STATE_EXP_UNDERSCORE;
             } else {
                if (strlen(buffer) == 0 || (strlen(buffer) == 1 && buffer[0] == '-')) { // No digits were read as an exponent
                   exit(ERRCODE_LEXICAL_ERROR);
@@ -321,27 +398,30 @@ token_t* get_next_token() {
                return token_ctor(TOKENID_NUM_DECIMAL, value);
             }
             break;
-         case STATE_OPERATOR_ADD:
-            if (c == '=') {
-               return token_ctor(TOKENID_OPERATOR_ADD_AND_ASSIGN, value);
+         case STATE_EXP_UNDERSCORE:
+            if (isdigit(c)) {
+               prev = c;
+               state = STATE_EXP;
+            } else if (c == '_') {
+               exit(ERRCODE_LEXICAL_ERROR);
             } else {
+               ungetc(c, stdin); // return char after _ to stream
+               prev = '_';
+               char* pEnd;
+               value.decimal_value = strtod(buffer, &pEnd);
+               free(buffer);
+               return token_ctor(TOKENID_NUM_DECIMAL, value);
+            }
+            break;
+         case STATE_OPERATOR_ADD:
                prev = c;
                return token_ctor(TOKENID_OPERATOR_ADD, value);
-            }
          case STATE_OPERATOR_SUB:
-            if (c == '=') {
-               return token_ctor(TOKENID_OPERATOR_SUB_AND_ASSIGN, value);
-            } else {
                prev = c;
                return token_ctor(TOKENID_OPERATOR_SUB, value);
-            }
          case STATE_OPERATOR_MUL:
-            if (c == '=') {
-               return token_ctor(TOKENID_OPERATOR_MUL_AND_ASSIGN, value);
-            } else {
                prev = c;
                return token_ctor(TOKENID_OPERATOR_MUL, value);
-            }
          case STATE_OPERATOR_LESS:
             if (c == '=') {
                return token_ctor(TOKENID_OPERATOR_LESS_OR_EQUAL, value);
@@ -361,8 +441,6 @@ token_t* get_next_token() {
                state = STATE_COMMENT;
             } else if (c == '*') {
                state = STATE_BLOCK_COMMENT;
-            } else if (c == '=') {
-               return token_ctor(TOKENID_OPERATOR_DIV_AND_ASSIGN, value);
             } else {
                prev = c;
                return token_ctor(TOKENID_OPERATOR_DIV, value);
@@ -376,7 +454,7 @@ token_t* get_next_token() {
             }
             break;
          case STATE_OPERATOR_ASSIGN:
-            if(c == '=') {
+            if (c == '=') {
                return token_ctor(TOKENID_OPERATOR_EQUALS, value);
             } else {
                prev = c;
@@ -486,7 +564,7 @@ token_t* get_next_token() {
             // prev = c;
             return token_ctor(TOKENID_END_OF_FILE, value);
          case STATE_COMMENT:
-            if (c == '\n') {
+            if (c == '\n' || c == EOF) {
                prev = c;
                state = STATE_START;
             }
@@ -494,11 +572,16 @@ token_t* get_next_token() {
          case STATE_BLOCK_COMMENT:
             if (c == '*') {
                state = STATE_BLOCK_COMMENT_END;
+            } else if (c == EOF) {
+               exit(ERRCODE_LEXICAL_ERROR);
             }
             break;
          case STATE_BLOCK_COMMENT_END:
             if (c == '/') {
                state = STATE_START;
+            } else if (c == EOF) {
+               exit(ERRCODE_LEXICAL_ERROR);
+
             } else {
                state = STATE_BLOCK_COMMENT;
             }
