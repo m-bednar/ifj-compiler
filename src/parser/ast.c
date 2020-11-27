@@ -109,6 +109,7 @@ void astnode_funcdecl_add(astnode_funcdecl_t* func, astnode_generic_t* child){
 astnode_generic_t* astnode_defvar_ctor(token_t* variable, astnode_exp_t* expression){
    astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
    ast_node->type = ANT_DEFVAR;
+   ast_node->value.defvarval = safe_alloc(sizeof(astnode_defvar_t));
    ast_node->value.defvarval->expression = expression;
    ast_node->value.defvarval->variable = variable;
    return ast_node;
