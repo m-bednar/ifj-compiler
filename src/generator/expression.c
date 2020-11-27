@@ -85,18 +85,8 @@ char* generate_op_str(token_t* op, vartable_t* vartable) {
    if (is_const_tokenid(op->id)) {
       return generate_const_str(op);
    } else {
+      guard(op->id == TOKENID_IDENTIFIER);
       return generate_var_str(op->value.string_value, FT_TF, vartable_depth(vartable, op->value.string_value)); 
-   }
-}
-
-void generate_multi_concatenation(astnode_exp_t* exp, vartable_t* vartable) {
-   printcm("MOVE GF@$tmp string@");
-
-   exp = exp;
-   vartable = vartable;
-
-   for (int i = 0; i < exp->tokens_count; i++) {
-      // TODO:
    }
 }
 
@@ -163,11 +153,11 @@ void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
    }
 }
 
-void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
-   char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+void generate_local_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
+   char* var = generate_var_str(asignee, FT_TF, vartable_depth(vartable, asignee));
    if (exp->tokens_count == 2) {
       guard(exp->tokens[0]->id == TOKENID_IDENTIFIER && exp->tokens[1]->id == TOKENID_OPERATOR_NOT);
-      char* op1 = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, vartable_depth(vartable, identifier));
+      char* op1 = generate_var_str(exp->tokens[0]->value.string_value, FT_TF, vartable_depth(vartable, asignee));
       printcm("NOT %s %s", var, op1);
       free(op1);
    } else {
@@ -225,38 +215,68 @@ void generate_local_expression(char* identifier, astnode_exp_t* exp, vartable_t*
    free(var);
 }
 
-void generate_const_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
-   char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
+void generate_const_assign_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
+   char* var = generate_var_str(asignee, FT_TF, vartable_depth(vartable, asignee));
    char* val = generate_op_str(exp->tokens[0], vartable);
    printcm("MOVE %s %s", var, val);
    free(var);
    free(val);
 }
 
-void generate_assign_expression(char* identifier, astnode_exp_t* exp, vartable_t* vartable) {
+void generate_string_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
+   exp = exp;
+   vartable = vartable;
+   asignee = asignee;
+
+   for (int i = 0; i < exp->tokens_count; i++) {
+      // TODO:
+   }
+}
+
+bool generate_const_expression(astnode_exp_t* exp, vartable_t* vartable, bool force_stack) {
+   char* var = generate_op_str(exp->tokens[0], vartable);
+   if (force_stack) {
+      printcm("PUSH %s", var);
+   } else {
+      printcm("MOVE GF@$tmp %s", var);
+   }
+   free(var);
+   return force_stack;
+}
+
+bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_stack) {
    if (should_use_string_ops(exp, vartable)) {
-      if (exp->tokens_count == 1) {
-         generate_const_expression(identifier, exp, vartable);
-      } else if (exp->tokens_count <= 3) {
-         infix_to_postfix(exp);
-         generate_local_expression(identifier, exp, vartable);
+      generate_string_expression("GF@$tmp", exp, vartable);
+      return false;
+   } else {
+      infix_to_postfix(exp);
+      if (exp->tokens_count == 1) { 
+         return generate_const_expression(exp, vartable, prefer_stack);
+      } else if (exp->tokens_count <= 3 && !prefer_stack) {
+         generate_local_expression("GF@$tmp", exp, vartable);
+         return false;
       } else {
-         generate_multi_concatenation(exp, vartable);
-         char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
-         printcm("MOVE %s GF@$tmp", var);
-         free(var);
+         generate_stack_expression(exp, vartable);
+         return true;
       }
+   }
+}
+
+void generate_assign_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
+   if (should_use_string_ops(exp, vartable)) {
+      generate_string_expression(asignee, exp, vartable);
    } else {
       infix_to_postfix(exp);
       if (exp->tokens_count == 1) {
-         generate_const_expression(identifier, exp, vartable);
+         generate_const_assign_expression(asignee, exp, vartable);
       } else if (exp->tokens_count <= 3) {
-         generate_local_expression(identifier, exp, vartable);
+         generate_local_expression(asignee, exp, vartable);
       } else {
+         char* var = generate_var_str(asignee, FT_TF, vartable_depth(vartable, asignee));
          generate_stack_expression(exp, vartable);
-         char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
          printcm("POPS %s", var);
          free(var);
       }
    }
+   
 }
