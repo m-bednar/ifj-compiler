@@ -223,6 +223,73 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
    return 0;
 }
 
+int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node){
+   tokenvector_t* args = tokenvector_ctor();
+   token_t** args_array;
+   token_t* token;
+   int i;
+   int size;
+
+   i = 2;
+   token = tokenvector_get(token_vector, i);
+   while(token->id != TOKENID_RIGHT_PARENTHESES){
+      if(token -> id == TOKENID_IDENTIFIER){
+         tokenvector_push(args, token);
+      }
+      i++;
+      token = tokenvector_get(token_vector, i);
+   }
+
+   args_array = tokenvector_get_array(args, &size);
+   token = tokenvector_get(token_vector, 0);
+   (*ast_node) = astnode_funccall_ctor(token->value.string_value, args_array, size);
+
+   return 0;
+}
+
+int semantic_assign_funccall(tokenvector_t* token_vector, astnode_assign_t** assign_node){
+   tokenvector_t* funccall = tokenvector_ctor();
+   tokenvector_t* variables = tokenvector_ctor();
+   token_t** variables_array;
+   token_t* token;
+   astnode_funccall_t* funccall_node;
+   //astnode_funccall_t* ast_funccall;
+   int i;
+   int size;
+   int err = 0;
+   (*assign_node) = astnode_assign_ctor();
+
+   i = 0;
+   token = tokenvector_get(token_vector, i);
+   //reading variables
+   while(token->id != TOKENID_OPERATOR_ASSIGN){
+      if(token -> id == TOKENID_IDENTIFIER){
+         tokenvector_push(variables, token);
+      }
+      i++;
+      token = tokenvector_get(token_vector, i);
+   }
+
+   variables_array = tokenvector_get_array(variables, &size);
+   astnode_assign_add_ids((*assign_node), variables_array, size);
+
+   i++;
+   
+   do{
+      token = tokenvector_get(token_vector, i);
+      tokenvector_push(funccall, token);
+      i++;
+   }while(tokenvector_get_lenght(token_vector) > i);
+
+   err = semantic_funcall(funccall, &funccall_node);
+
+   astnode_assign_add_funccall((*assign_node), funccall_node);
+   
+   tokenvector_dtor(funccall);
+   tokenvector_dtor(variables);
+   return err;
+}
+
 int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack, astnode_assign_t** assign_node){
    tokenvector_t* expression = tokenvector_ctor();
    token_t** expression_array;
@@ -530,30 +597,6 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    return 0;
 }
 
-int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node){
-   tokenvector_t* args = tokenvector_ctor();
-   token_t** args_array;
-   token_t* token;
-   int i;
-   int size;
-
-   i = 2;
-   token = tokenvector_get(token_vector, i);
-   while(token->id != TOKENID_RIGHT_PARENTHESES){
-      if(token -> id == TOKENID_IDENTIFIER){
-         tokenvector_push(args, token);
-      }
-      i++;
-      token = tokenvector_get(token_vector, i);
-   }
-
-   args_array = tokenvector_get_array(args, &size);
-   token = tokenvector_get(token_vector, 0);
-   (*ast_node) = astnode_funccall_ctor(token->value.string_value, args_array, size);
-
-   return 0;
-}
-
 int semantic(token_t* token, nonterminalid_e flag, int eol_flag){
    static astnode_generic_t* ast = NULL;
    static astnode_funcdecl_t* function;
@@ -660,6 +703,10 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag){
       case NONTERMINAL_ASSIGNMENT:
          if(!function_call){
             err = semantic_assign(token_vector, symtable_stack, &ast_assign);
+         }
+         else{
+            err = semantic_assign_funccall(token_vector, &ast_assign);
+            function_call = false;
          }
             ast_node_generic = astnode_generic_assign_ctor(ast_assign);
 
