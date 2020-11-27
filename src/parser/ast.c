@@ -27,10 +27,11 @@ void ast_global_add_func(astnode_generic_t* global, astnode_funcdecl_t* funcdecl
    global->value.globalval->functions_count++;
 }
 
-astnode_generic_t* astnode_if_ctor() {
+astnode_generic_t* astnode_if_ctor(astnode_exp_t* condition) {
    astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
    ast_node->type = ANT_IF;
-   ast_node->value.ifval->condition = NULL;
+   ast_node->value.ifval = safe_alloc(sizeof(astnode_if_t));
+   ast_node->value.ifval->condition = condition;
    ast_node->value.ifval->else_body = NULL;
    ast_node->value.ifval->true_body = NULL;
    return ast_node;
@@ -55,11 +56,14 @@ void astnode_codeblock_insert(astnode_codeblock_t* codeblock, astnode_generic_t*
    codeblock->children[codeblock->children_count-1] = node;
 }
 
-astnode_generic_t* astnode_for_ctor() {
+astnode_generic_t* astnode_for_ctor(astnode_exp_t* condition,  astnode_defvar_t* defvar, astnode_assign_t* assign) {
    astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
    ast_node->type = ANT_FOR;
+   ast_node->value.forval = safe_alloc(sizeof(astnode_for_t));
    ast_node->value.forval->body = NULL;
-   ast_node->value.forval->condition = NULL;
+   ast_node->value.forval->condition = condition;
+   ast_node->value.forval->defvar = defvar;
+   ast_node->value.forval->assign = assign;
    return ast_node;
 }
 

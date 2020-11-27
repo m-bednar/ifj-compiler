@@ -70,9 +70,8 @@ typedef struct astnode_if_t {
 
 typedef struct astnode_for_t {
    astnode_exp_t* condition;
-   astnode_defvar_t* defvar;  // NULL if assign is used or first statement is empty
-   astnode_assign_t* assign;  // NULL if defvar is used or first statement is empty
-   astnode_exp_t* varchange;  // evaluated after each loop
+   astnode_defvar_t* defvar;
+   astnode_assign_t* assign;  // evaluated after each loop
    astnode_codeblock_t* body;
 } astnode_for_t;
 
@@ -113,3 +112,7 @@ astnode_generic_t* astnode_ret_ctor();
 void astnode_ret_add_exp(astnode_generic_t* ret, astnode_exp_t* exp);
 
 astnode_exp_t* astnode_exp_ctor(token_t** tokens, int token_count);
+
+astnode_generic_t* astnode_if_ctor(astnode_exp_t* condition);
+
+astnode_generic_t* astnode_for_ctor(astnode_exp_t* condition,  astnode_defvar_t* defvar, astnode_assign_t* assign);
