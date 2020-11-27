@@ -67,7 +67,10 @@ void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fn
       generate_returns_pops(node, vartable);
    } else {
       for (int i = 0; i < node->ids_count; i++) {
-         generate_assign_expression(node->left_ids[i]->value.string_value, node->right_expressions[i], vartable);
+         int depth = vartable_depth(vartable, node->left_ids[i]->value.string_value);
+         char* var = generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth);
+         generate_assign_expression(var, node->right_expressions[i], vartable);
+         free(var);
       }
    }
 }
@@ -76,13 +79,13 @@ void generate_defvar(astnode_defvar_t* node, vartable_t* vartable) {
    guard(node != NULL);
    guard(vartable != NULL);
    vartype_e exptype = determine_expression_type(node->expression, vartable);
+   char* var = generate_var_str(node->variable->value.string_value, FT_TF, vartable->depth);
    if (vartable_should_define(vartable, node->variable->value.string_value, exptype)) {
       vartable_add(vartable, node->variable->value.string_value, exptype);
-      char* var = generate_var_str(node->variable->value.string_value, FT_TF, vartable->depth);
       printcm("DEFVAR %s", var);
-      free(var);
    }
-   generate_assign_expression(node->variable->value.string_value, node->expression, vartable);
+   generate_assign_expression(var, node->expression, vartable);
+   free(var);
 }
 
 void generate_for(astnode_for_t* node) {
