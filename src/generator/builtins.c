@@ -25,25 +25,18 @@ void builtin_input(char* type) {
 }
 
 void builtin_inputs() {
-   pcomment("Built-in inputs start");
    builtin_input("string");
-   pcomment("Built-in inputs end");
 }
 
 void builtin_inputi() {
-   pcomment("Built-in inputi start");
    builtin_input("int");
-   pcomment("Built-in inputi end");
 }
 
 void builtin_inputf() {
-   pcomment("Built-in inputf start");
    builtin_input("float");
-   pcomment("Built-in inputf end");
 }
 
 void builtin_print(vartable_t* vartable, token_t** params, int param_count) {
-   pcomment("Built-in print start");
    for (int i = 0; i < param_count; i++) {
       if (is_const_tokenid(params[i]->id)) {
          printcm("WRITE %s", generate_const_str(params[i]));
@@ -54,11 +47,9 @@ void builtin_print(vartable_t* vartable, token_t** params, int param_count) {
          free(var);
       }
    }
-   pcomment("Built-in print end");
 }
 
 void builtin_int2float(vartable_t* vartable, token_t* param) {
-   pcomment("Built-in int2float start");
    if (is_const_tokenid(param->id)) {
       param->value.decimal_value = (double)param->value.int_value;
       param->id = TOKENID_NUM_DECIMAL;
@@ -70,11 +61,9 @@ void builtin_int2float(vartable_t* vartable, token_t* param) {
       printcm("INT2FLOATS");
       free(var);
    }
-   pcomment("Built-in int2float end");
 }
 
 void builtin_float2int(vartable_t* vartable, token_t* param) {
-   pcomment("Built-in float2int start");
    if (is_const_tokenid(param->id)) {
       param->value.int_value = (int)param->value.decimal_value;
       param->id = TOKENID_NUM;
@@ -86,13 +75,11 @@ void builtin_float2int(vartable_t* vartable, token_t* param) {
       printcm("FLOAT2INTS");
       free(var);
    }
-   pcomment("Built-in float2int end");
 }
 
 void builtin_len(vartable_t* vartable, token_t* param) {
-   pcomment("Built-in len start");
    if (is_const_tokenid(param->id)) {
-      printcm("PUSHS %s", strlen(param->value.string_value));
+      printcm("PUSHS int@%d", (int)strlen(param->value.string_value));
    } else {
       char* identifier = param->value.string_value;
       char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
@@ -100,11 +87,9 @@ void builtin_len(vartable_t* vartable, token_t* param) {
       printcm("PUSHS GF@$tmp");
       free(var);
    }
-   pcomment("Built-in len end");
 }
 
 void builtin_chr(vartable_t* vartable, token_t* param) {
-   pcomment("Built-in chr start");
    if (is_const_tokenid(param->id)) {
       int value = param->value.int_value;
       if (value < 0 || value > 255) {
@@ -144,7 +129,6 @@ void builtin_chr(vartable_t* vartable, token_t* param) {
 }
 
 void builtin_ord(vartable_t* vartable, token_t** params) {
-   pcomment("Built-in ord start");
    if (is_const_tokenid(params[0]->id) && is_const_tokenid(params[1]->id)) {
       char* s = params[0]->value.string_value;
       int i = params[1]->value.int_value;
@@ -211,7 +195,6 @@ void builtin_ord(vartable_t* vartable, token_t** params) {
       free(var_s);
       free(var_i);
    }
-   pcomment("Built-in ord end");
 }
 
 // TODO: substr
@@ -229,7 +212,7 @@ bool is_builtin(char* identifier) {
 }
 
 void generate_builtin(char* identifier, token_t** params, int param_count, vartable_t* vartable) {
-   if (streq(identifier, "inputs") == 0) {
+   if (streq(identifier, "inputs")) {
       builtin_inputs();
    } else if (streq(identifier, "inputi")) {
       builtin_inputi();
