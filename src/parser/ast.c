@@ -142,6 +142,14 @@ astnode_assign_t* astnode_assign_ctor(){
    return ast_node;
 }
 
+astnode_generic_t* astnode_generic_assign_ctor(astnode_assign_t* assign){
+   astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
+   ast_node->type = ANT_ASSIGN;
+   ast_node->value.assignval = assign;
+   return ast_node;
+}
+
+
 void astnode_assign_add_ids(astnode_assign_t* ast_node, token_t** ids, int ids_count){
    ast_node->left_ids = ids;
    ast_node->ids_count = ids_count;
@@ -156,4 +164,18 @@ void astnode_assign_add_exp(astnode_assign_t* ast_node, astnode_exp_t* exp){
    }
    ast_node->right_expressions[ast_node->expressions_count] = exp;
    ast_node->expressions_count++;
+}
+astnode_funccall_t* astnode_funccall_ctor(char* name, token_t** params, int params_count){
+   astnode_funccall_t* ast_node = safe_alloc(sizeof(astnode_funccall_t));
+   ast_node->name = name;
+   ast_node->params = params;
+   ast_node->params_count = params_count;
+   return ast_node;
+}
+
+astnode_generic_t* astnode_generic_funccall_ctor(astnode_funccall_t* funccall){
+   astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
+   ast_node->type = ANT_FUNCCALL;
+   ast_node->value.funccallval = funccall;
+   return ast_node;
 }

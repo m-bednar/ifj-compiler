@@ -127,7 +127,12 @@ void astnode_for_add_body(astnode_generic_t* ast_node, astnode_generic_t* new_no
 
 astnode_assign_t* astnode_assign_ctor();
 
+astnode_generic_t* astnode_generic_assign_ctor(astnode_assign_t* assign);
+
 void astnode_assign_add_ids(astnode_assign_t* ast_node, token_t** ids, int ids_count);
 
 void astnode_assign_add_exp(astnode_assign_t* ast_node, astnode_exp_t* exp);
 
+astnode_funccall_t* astnode_funccall_ctor(char* name, token_t** params, int params_count);
+
+astnode_generic_t* astnode_generic_funccall_ctor(astnode_funccall_t* funccall);
