@@ -18,7 +18,7 @@ vartype_e determine_expression_type(astnode_exp_t* exp, vartable_t* vartable);
  * Evaluates and generates expression to stdout.
  * Returns true, if expression result ends up on stack, false when in $tmp variable.
  */
-bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool tostack);
+bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_stack);
 
 /**
  * Evaluates and generates defvar expression to stdout.
