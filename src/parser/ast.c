@@ -165,6 +165,12 @@ void astnode_assign_add_exp(astnode_assign_t* ast_node, astnode_exp_t* exp){
    ast_node->right_expressions[ast_node->expressions_count] = exp;
    ast_node->expressions_count++;
 }
+
+void astnode_assign_add_funccall(astnode_assign_t* ast_node, astnode_funccall_t* funccall){
+   ast_node->right_function = funccall;
+}
+
+
 astnode_funccall_t* astnode_funccall_ctor(char* name, token_t** params, int params_count){
    astnode_funccall_t* ast_node = safe_alloc(sizeof(astnode_funccall_t));
    ast_node->name = name;
