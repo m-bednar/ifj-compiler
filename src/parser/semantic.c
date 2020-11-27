@@ -391,6 +391,7 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
       ret_count = 0;
    }
 
+   token = tokenvector_get(token_vector, 1);
    //add function declaration to symtable
    symbol = bintree_find(symtable_global, token->value.string_value);
    if(symbol == NULL){
@@ -528,6 +529,10 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    }
    return 0;
 }
+
+/*int semantic_funcall(tokenvector_t* token_vector, astnode_generic_t** ast_node){
+
+}*/
 
 int semantic(token_t* token, nonterminalid_e flag, int eol_flag){
    static astnode_generic_t* ast = NULL;
@@ -728,6 +733,9 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag){
             astnode_funcdecl_add(function, ast_node_generic);
          }
 
+         break;
+      case NONTERMINAL_CALL:
+         printf("\nCALL FUNC");
          break;
       default:
          break;
