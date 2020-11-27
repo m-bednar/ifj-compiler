@@ -29,20 +29,6 @@ bool should_use_float_ops(astnode_exp_t* exp, vartable_t* vartable) {
    return false;
 }
 
-bool should_use_string_ops(astnode_exp_t* exp, vartable_t* vartable) {
-   for (int i = 0; i < exp->tokens_count; i++) {
-      if (exp->tokens[i]->id == TOKENID_STRING_LITERAL) {
-         return true;
-      }
-      if (exp->tokens[i]->id == TOKENID_IDENTIFIER) {
-         if (vartable_find(vartable, exp->tokens[i]->value.string_value)->type == VT_STRING) {
-            return true;
-         }
-      }
-   }
-   return false;
-}
-
 vartype_e determine_token_type(token_t* token, vartable_t* vartable) {
    switch (token->id) {
       case TOKENID_IDENTIFIER:
@@ -84,20 +70,52 @@ char* generate_op_str(token_t* op, vartable_t* vartable) {
    }
 }
 
+bool is_string_value(token_t* token, vartable_t* vartable) {
+   if (token->id == TOKENID_STRING_LITERAL) {
+      return true;
+   }
+   if (token->id == TOKENID_IDENTIFIER) {
+      return vartable_find(vartable, token->value.string_value)->type == VT_STRING;
+   }
+   return false;
+}
+
+void pushs_operand(token_t* token, vartable_t* vartable) {
+   if (!is_string_value(token, vartable)) {
+      char* var = generate_op_str(token, vartable);
+      printcm("PUSHS %s", var);
+      free(var);
+   }
+}
+
 void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
    for (int i = 0; i < exp->tokens_count; i++) {
-      char* var;
       switch (exp->tokens[i]->id) {
          case TOKENID_IDENTIFIER:
          case TOKENID_BOOL_LITERAL:
          case TOKENID_NUM_DECIMAL:
+         case TOKENID_STRING_LITERAL:
          case TOKENID_NUM:
-            var = generate_op_str(exp->tokens[i], vartable);
-            printcm("PUSHS %s", var);
-            free(var);
+            pushs_operand(exp->tokens[i], vartable);
             break;
          case TOKENID_OPERATOR_ADD:
-            printcm("ADDS");
+            if (!is_string_value(exp->tokens[i - 1], vartable)) {
+               printcm("ADDS");
+            } else {
+               if (i > 2 && is_string_value(exp->tokens[i - 2], vartable)) {
+                  char* op1 = generate_op_str(exp->tokens[i - 2], vartable);
+                  char* op2 = generate_op_str(exp->tokens[i - 1], vartable);
+                  printcm("CONCAT GF@&tmp %s %s", op1, op2);
+                  free(op1);
+                  free(op2);
+               } else {
+                  char* op1 = generate_op_str(exp->tokens[i - 1], vartable);
+                  printcm("POPS GF@&tmp");
+                  printcm("CONCAT GF@&tmp GF@&tmp %s", op1);
+                  free(op1);
+               }
+               printcm("PUSHS GF@&tmp");
+            }
             break;
          case TOKENID_OPERATOR_SUB:
             printcm("SUBS");
@@ -155,7 +173,7 @@ void generate_local_expression(char* asignee, astnode_exp_t* exp, vartable_t* va
       char* op2 = generate_op_str(exp->tokens[1], vartable); 
       switch (exp->tokens[2]->id) {
          case TOKENID_OPERATOR_ADD:
-            printcm("%s %s %s %s", should_use_string_ops(exp, vartable)? "CONCAT" : "ADD", asignee, op1, op2);
+            printcm("%s %s %s %s", is_string_value(exp->tokens[0], vartable)? "CONCAT" : "ADD", asignee, op1, op2);
             break;
          case TOKENID_OPERATOR_SUB:
             printcm("SUB %s %s %s", asignee, op1, op2);
@@ -210,65 +228,6 @@ void generate_const_assign_expression(char* asignee, astnode_exp_t* exp, vartabl
    free(val);
 }
 
-bool generate_string_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable, bool prefer_stack) {
-   exp = exp;
-   vartable = vartable;
-   asignee = asignee;
-
-   if (exp->tokens_count == 1) {
-      char* op1 = generate_op_str(exp->tokens[0], vartable);
-      if (prefer_stack) {
-         printcm("PUSHS %s", op1);
-      } else {
-         printcm("MOVE %s %s", asignee, op1);
-      }
-      free(op1);
-      return prefer_stack;
-   }
-
-   if (exp->tokens_count == 3) {
-      bool stack_used = false;
-      char* op1 = generate_op_str(exp->tokens[0], vartable);
-      char* op2 = generate_op_str(exp->tokens[2], vartable);
-      switch (exp->tokens[1]->id) {
-         case TOKENID_OPERATOR_ADD:
-            printcm("CONCAT %s %s %s", asignee, op1, op2);
-            break;
-         case TOKENID_OPERATOR_EQUALS:
-            if (prefer_stack) {
-               printcm("PUSHS %s", op1);
-               printcm("PUSHS %s", op2);
-               printcm("EQS");
-            } else {
-               printcm("EQ %s %s %s", asignee, op1, op2);
-            }
-            stack_used = prefer_stack;
-            break;
-         case TOKENID_OPERATOR_NOT_EQUAL:
-            if (prefer_stack) {
-               printcm("PUSHS %s", op1);
-               printcm("PUSHS %s", op2);
-               printcm("EQS");
-               printcm("NOTS");
-            } else {
-               printcm("EQ %s %s %s", asignee, op1, op2);
-               printcm("NOT %s %s", asignee, asignee);
-            }
-            break;
-         default:
-            error("Wrong operator used on strings.");
-      }
-      free(op1);
-      free(op2);
-      return stack_used;
-   }
-
-   for (int i = 0; i < exp->tokens_count; i++) {
-      // TODO:
-   }
-   return false;
-}
-
 bool generate_const_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_stack) {
    char* var = generate_op_str(exp->tokens[0], vartable);
    if (prefer_stack) {
@@ -281,37 +240,26 @@ bool generate_const_expression(astnode_exp_t* exp, vartable_t* vartable, bool pr
 }
 
 bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_stack) {
-   if (should_use_string_ops(exp, vartable)) {
-      return generate_string_expression("GF@$tmp", exp, vartable, prefer_stack);
+   infix_to_postfix(exp);
+   if (exp->tokens_count == 1) { 
+      return generate_const_expression(exp, vartable, prefer_stack);
+   } else if (exp->tokens_count <= 3 && !prefer_stack) {
+      generate_local_expression("GF@$tmp", exp, vartable);
+      return false;
    } else {
-      infix_to_postfix(exp);
-      if (exp->tokens_count == 1) { 
-         return generate_const_expression(exp, vartable, prefer_stack);
-      } else if (exp->tokens_count <= 3 && !prefer_stack) {
-         generate_local_expression("GF@$tmp", exp, vartable);
-         return false;
-      } else {
-         generate_stack_expression(exp, vartable);
-         return true;
-      }
+      generate_stack_expression(exp, vartable);
+      return true;
    }
 }
 
 void generate_assign_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
-   if (should_use_string_ops(exp, vartable)) {
-      generate_string_expression(asignee, exp, vartable, false);
+   infix_to_postfix(exp);
+   if (exp->tokens_count == 1) {
+      generate_const_assign_expression(asignee, exp, vartable);
+   } else if (exp->tokens_count <= 3) {
+      generate_local_expression(asignee, exp, vartable);
    } else {
-      infix_to_postfix(exp);
-      if (exp->tokens_count == 1) {
-         generate_const_assign_expression(asignee, exp, vartable);
-      } else if (exp->tokens_count <= 3) {
-         generate_local_expression(asignee, exp, vartable);
-      } else {
-         char* var = generate_var_str(asignee, FT_TF, vartable_depth(vartable, asignee));
-         generate_stack_expression(exp, vartable);
-         printcm("POPS %s", var);
-         free(var);
-      }
+      generate_stack_expression(exp, vartable);
+      printcm("POPS %s", asignee);
    }
-   
 }
