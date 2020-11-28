@@ -561,7 +561,9 @@ token_t* get_next_token() {
             prev = c;
             return token_ctor(TOKENID_NEWLINE, value);
          case STATE_EOF:
-            // prev = c;
+            if (ferror(stdin)) {
+               error("An error has occured while reading from stdin");
+            }
             return token_ctor(TOKENID_END_OF_FILE, value);
          case STATE_COMMENT:
             if (c == '\n' || c == EOF) {
