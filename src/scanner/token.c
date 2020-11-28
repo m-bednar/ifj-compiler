@@ -40,8 +40,10 @@ void token_dtor(token_t* token) {
 }
 
 token_t* token_copy(token_t* token) {
+   guard(token != NULL);
    token_value_u value;
    if (token->id == TOKENID_IDENTIFIER || token->id == TOKENID_STRING_LITERAL) {
+      guard(token->value.string_value != NULL);
       value.string_value = safe_alloc((strlen(token->value.string_value)+1)*sizeof(char));
       strcpy(value.string_value, token->value.string_value);
    } else if (token->id == TOKENID_NUM) {
