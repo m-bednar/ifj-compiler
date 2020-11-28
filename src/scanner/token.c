@@ -37,3 +37,19 @@ void token_dtor(token_t* token) {
    free(token);
 }
 
+token_t* token_copy(token_t* token) {
+   token_value_u value;
+   if (token->id == TOKENID_IDENTIFIER || token->id == TOKENID_STRING_LITERAL) {
+      value.string_value = safe_alloc((strlen(token->value.string_value)+1)*sizeof(char));
+      strcpy(value.string_value, token->value.string_value);
+   } else if (token->id == TOKENID_NUM) {
+      value.int_value = token->value.int_value;
+   } else if (token->id == TOKENID_NUM_DECIMAL) {
+      value.decimal_value = token->value.decimal_value;
+   } else if (token->id == TOKENID_BOOL_LITERAL) {
+      value.bool_value = token->value.bool_value;
+   }
+   token_t* copy = token_ctor(token->id, value);
+   return copy;
+}
+
