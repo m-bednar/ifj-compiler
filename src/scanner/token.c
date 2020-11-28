@@ -56,8 +56,11 @@ token_t* token_copy(token_t* token) {
 }
 
 void token_print(token_t* token) {
-   switch (token->id)
-   {
+   if (token == NULL) {
+      fprintf(stderr, "NULL\n");
+      return;
+   }
+   switch (token->id) {
       case TOKENID_IDENTIFIER:
          fprintf(stderr,"TOKEN ID: TOKENID_IDENTIFIER\n");
          fprintf(stderr,"STRING VALUE: %s\n", token->value.string_value);
