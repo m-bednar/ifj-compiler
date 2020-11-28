@@ -105,7 +105,7 @@ void token_print(token_t* token) {
          break;
       case TOKENID_NUM:
          fprintf(stderr,"TOKEN ID: TOKENID_NUM\n");
-         fprintf(stderr,"INT_VALUE: %" PRId64 "\n", token->value.int_value);
+         fprintf(stderr,"INT_VALUE: %lld\n", token->value.int_value);
          break;
       case TOKENID_NUM_DECIMAL:
          fprintf(stderr,"TOKEN ID: TOKENID_NUM_DECIMAL\n");
