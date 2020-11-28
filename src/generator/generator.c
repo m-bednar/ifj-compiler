@@ -137,14 +137,14 @@ void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable)
    if (node->defvar != NULL) {
       generate_defvar(node->defvar, vartable);
    }
-   vartable_descent(vartable);
    char* l1 = labelgen_new();
    char* l2 = labelgen_new();
    generate_condition(node->condition, vartable, l1, false);
-   vartable_ascent(vartable);
+   vartable_descent(vartable);
    defvar_all_vars(node->body, vartable);
    printlb("LABEL %s", l2);
    generate_codeblock(node->body, vartable, fntable);
+   vartable_ascent(vartable);
    generate_assign(node->assign, vartable, fntable);
    generate_condition(node->condition, vartable, l2, true);
    printlb("LABEL %s", l1);
