@@ -29,7 +29,7 @@ void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
          int depth = vartable_find(vartable, node->left_ids[i]->value.string_value)->depth;
          printcm("POPS %s", generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth));
       } else {
-         printcm("POPS GF@$tmp");
+         printcm("POPS GF@$tmp0");
       }
    }
    if (clears_from != node->ids_count) {
@@ -108,7 +108,7 @@ void generate_if(astnode_if_t* node, vartable_t* vartable, bintree_t* fntable) {
       printcm("PUSHS bool@false");
       printcm("JUMPIFEQS %s", l1);
    } else {
-      printcm("JUMPIFEQ %s GF@$tmp bool@false", l1);
+      printcm("JUMPIFEQ %s GF@$tmp0 bool@false", l1);
    }
    generate_codeblock(node->true_body, vartable, fntable);
    if (node->else_body != NULL) {
@@ -125,7 +125,7 @@ void generate_if(astnode_if_t* node, vartable_t* vartable, bintree_t* fntable) {
 void generate_ret(astnode_ret_t* node, vartable_t* vartable) {
    for (int i = 0; i < node->expressions_count; i++) {
       if (!generate_expression(node->expressions[i], vartable, true)) {
-         printcm("PUSHS GF@$tmp");
+         printcm("PUSHS GF@$tmp0");
       }
    }
 }
@@ -135,9 +135,7 @@ void generate_funcdecl(astnode_funcdecl_t* node, bintree_t* fntable) {
    guard(fntable != NULL);
    printlb("LABEL %s", node->name);
    vartable_t* vartable = vartable_ctor();
-   for (int i = 0; i < node->body->children_count; i++) {
-      generate_generic(node->body->children[i], vartable, fntable);
-   }
+   generate_codeblock(node->body, vartable, fntable);
    vartable_dtor(vartable);
    printcm("RETURN");
 }
@@ -187,8 +185,8 @@ void generate(astnode_global_t* global, bintree_t* fntable) {
    guard(fntable != NULL);
 
    printlb(".IFJcode20");
-   printcm("DEFVAR GF@$tmp");
-   printcm("DEFVAR GF@$tmp2");
+   printcm("DEFVAR GF@$tmp0");
+   printcm("DEFVAR GF@$tmp1");
    printcm("CREATEFRAME");
    printcm("CALL main");
    printcm("EXIT int@0");

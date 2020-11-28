@@ -11,10 +11,10 @@
 void builtin_input(char* type) {
    char* l1 = labelgen_new();
    char* l2 = labelgen_new();
-   printcm("READ GF@$tmp %s", type);
-   printcm("PUSHS GF@$tmp");
-   printcm("TYPE GF@$tmp2 GF@$tmp");
-   printcm("JUMPIFEQ %s GF@$tmp2 string@nil", l1);
+   printcm("READ GF@$tmp0 %s", type);
+   printcm("PUSHS GF@$tmp0");
+   printcm("TYPE GF@$tmp1 GF@$tmp0");
+   printcm("JUMPIFEQ %s GF@$tmp1 string@nil", l1);
    printcm("PUSHS int@0");
    printcm("JUMP %s", l2);
    printcm("LABEL %s", l1);
@@ -83,8 +83,8 @@ void builtin_len(vartable_t* vartable, token_t* param) {
    } else {
       char* identifier = param->value.string_value;
       char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
-      printcm("STRLEN GF@$tmp %s", var);
-      printcm("PUSHS GF@$tmp");
+      printcm("STRLEN GF@$tmp0 %s", var);
+      printcm("PUSHS GF@$tmp0");
       free(var);
    }
 }
@@ -149,11 +149,11 @@ void builtin_ord(vartable_t* vartable, token_t** params) {
          char* l2 = labelgen_new();
          char* identifier = params[0]->value.string_value;
          char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
-         printcm("STRLEN GF@$tmp %s", var);
-         printcm("LT GF@$tmp GF@$tmp int@%d");
-         printcm("JUMPIFEQ GF@$tmp GF@$false %s", l1);
-         printcm("STRI2INT GF@$tmp %s int@%d", var, params[1]->value.int_value);
-         printcm("PUSHS GF@$tmp");
+         printcm("STRLEN GF@$tmp0 %s", var);
+         printcm("LT GF@$tmp0 GF@$tmp0 int@%d");
+         printcm("JUMPIFEQ GF@$tmp0 GF@$false %s", l1);
+         printcm("STRI2INT GF@$tmp0 %s int@%d", var, params[1]->value.int_value);
+         printcm("PUSHS GF@$tmp0");
          printcm("PUSHS int@0");
          printcm("JUMP %s", l2);
          printcm("LABEL %s", l1);
@@ -171,19 +171,19 @@ void builtin_ord(vartable_t* vartable, token_t** params) {
       char* id2 = params[1]->value.string_value;
       char* var_i = generate_var_str(id1, FT_TF, vartable_depth(vartable, id1));
       char* var_s = generate_var_str(id2, FT_TF, vartable_depth(vartable, id2));
-      printcm("STRLEN GF@$tmp %s", var_s);
+      printcm("STRLEN GF@$tmp0 %s", var_s);
       printcm("PUSHS %s", var_i);
       printcm("PUSHS int@0", var_i);
       printcm("LTS");
       printcm("PUSHS %s", var_i);
-      printcm("PUSHS GF@$tmp");
+      printcm("PUSHS GF@$tmp0");
       printcm("LTS");
       printcm("NOTS");
       printcm("ORS");
       printcm("PUSHS bool@$true");
       printcm("JUMPIFEQS %s", l1);
-      printcm("STRI2INT GF@$tmp %s %s", var_s, var_i);
-      printcm("PUSHS GF@$tmp");
+      printcm("STRI2INT GF@$tmp0 %s %s", var_s, var_i);
+      printcm("PUSHS GF@$tmp0");
       printcm("PUSHS int@0");
       printcm("JUMP %s", l2);
       printcm("LABEL %s", l1);

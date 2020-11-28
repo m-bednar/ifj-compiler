@@ -233,7 +233,7 @@ bool generate_const_expression(astnode_exp_t* exp, vartable_t* vartable, bool pr
    if (prefer_stack) {
       printcm("PUSH %s", var);
    } else {
-      printcm("MOVE GF@$tmp %s", var);
+      printcm("MOVE GF@$tmp0 %s", var);
    }
    free(var);
    return prefer_stack;
@@ -244,7 +244,7 @@ bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_s
    if (exp->tokens_count == 1) { 
       return generate_const_expression(exp, vartable, prefer_stack);
    } else if (exp->tokens_count <= 3 && !prefer_stack) {
-      generate_local_expression("GF@$tmp", exp, vartable);
+      generate_local_expression("GF@$tmp0", exp, vartable);
       return false;
    } else {
       generate_stack_expression(exp, vartable);
