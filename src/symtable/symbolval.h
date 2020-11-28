@@ -18,6 +18,7 @@ typedef enum vartype_e {
 typedef struct symbolvalfn_t {
    int arg_count;          // Count of arguments
    int ret_count;          // Count of return values
+   char** arg_names;       // Names of arguments (NULL if no arguments)
    vartype_e* arg_types;   // Types of arguments (NULL if no arguments)
    vartype_e* ret_types;   // Types of return values (NULL if void)
    bool defined;           // Whatever function was already defined
@@ -38,7 +39,7 @@ typedef union symbolval_u {
 /**
  * Allocates and creates new symbol value for function.
  */
-symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, vartype_e* arg_types, vartype_e* ret_types, bool defined);
+symbolval_u symbolval_fn_ctor(int arg_count, int ret_count, char** arg_names, vartype_e* arg_types, vartype_e* ret_types, bool defined);
 
 /**
  * Allocates and creates new symbol value for variable.
