@@ -180,8 +180,8 @@ void token_print(token_t* token) {
       case TOKENID_END_OF_FILE:
          fprintf(stderr,"TOKEN ID: TOKENID_END_OF_FILE\n");
          break;
-   default:
-      printf("NULL\n");
-      break;
+      default:
+         error("Invalid token ID");
+         break;
    }
 }
