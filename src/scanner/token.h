@@ -72,3 +72,13 @@ token_t* token_ctor(tokenid_e id, token_value_u value);
  * Deallocates memory used by token.
  */
 void token_dtor(token_t* token);
+
+/**
+ * Creates a copy of given token.
+ */
+token_t* token_copy (token_t* token);
+
+/**
+ * Prints token id and its value if it has one
+ */
+void token_print(token_t* token);
