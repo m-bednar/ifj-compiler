@@ -78,3 +78,7 @@ void token_dtor(token_t* token);
  */
 token_t* token_copy (token_t* token);
 
+/**
+ * Prints token id and its value if it has one
+ */
+void token_print(token_t* token);
