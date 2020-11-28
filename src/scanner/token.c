@@ -59,123 +59,123 @@ void token_print(token_t* token) {
    switch (token->id)
    {
       case TOKENID_IDENTIFIER:
-         printf("TOKEN ID: TOKENID_IDENTIFIER\n");
-         printf("STRING VALUE: %s\n", token->value.string_value);
+         fprintf(stderr,"TOKEN ID: TOKENID_IDENTIFIER\n");
+         fprintf(stderr,"STRING VALUE: %s\n", token->value.string_value);
          break;
       case TOKENID_KEYWORD_IF:
-         printf("TOKEN ID: TOKENID_KEYWORD_IF\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_IF\n");
          break;
       case TOKENID_KEYWORD_FOR:
-         printf("TOKEN ID: TOKENID_KEYWORD_FOR\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_FOR\n");
          break;
       case TOKENID_KEYWORD_ELSE:
-         printf("TOKEN ID: TOKENID_KEYWORD_ELSE\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_ELSE\n");
          break;
       case TOKENID_KEYWORD_RETURN:
-         printf("TOKEN ID: TOKENID_KEYWORD_RETURN\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_RETURN\n");
          break;
       case TOKENID_KEYWORD_PACKAGE:
-         printf("TOKEN ID: TOKENID_KEYWORD_PACKAGE\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_PACKAGE\n");
          break;
       case TOKENID_KEYWORD_FUNC:
-         printf("TOKEN ID: TOKENID_KEYWORD_FUNC\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_FUNC\n");
          break;
       case TOKENID_KEYWORD_FLOAT64:
-         printf("TOKEN ID: TOKENID_KEYWORD_FLOAT64\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_FLOAT64\n");
          break;
       case TOKENID_KEYWORD_INT:
-         printf("TOKEN ID: TOKENID_KEYWORD_INT\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_INT\n");
          break;
       case TOKENID_KEYWORD_STRING:
-         printf("TOKEN ID: TOKENID_KEYWORD_STRING\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_STRING\n");
          break;
       case TOKENID_KEYWORD_BOOL:
-         printf("TOKEN ID: TOKENID_KEYWORD_BOOL\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_KEYWORD_BOOL\n");
          break;
       case TOKENID_STRING_LITERAL:
-         printf("TOKEN ID: TOKENID_STRING_LITERAL\n");
-         printf("STRING VALUE: %s\n", token->value.string_value);
+         fprintf(stderr,"TOKEN ID: TOKENID_STRING_LITERAL\n");
+         fprintf(stderr,"STRING VALUE: %s\n", token->value.string_value);
          break;
       case TOKENID_BOOL_LITERAL:
-         printf("TOKEN ID: TOKENID_BOOL_LITERAL\n");
-         printf("BOOL VALUE: %d\n", token->value.bool_value);
+         fprintf(stderr,"TOKEN ID: TOKENID_BOOL_LITERAL\n");
+         fprintf(stderr,"%s", token->value.bool_value ? "true" : "false");
          break;
       case TOKENID_NUM:
-         printf("TOKEN ID: TOKENID_NUM\n");
-         printf("INT_VALUE: %" PRId64 "\n", token->value.int_value);
+         fprintf(stderr,"TOKEN ID: TOKENID_NUM\n");
+         fprintf(stderr,"INT_VALUE: %" PRId64 "\n", token->value.int_value);
          break;
       case TOKENID_NUM_DECIMAL:
-         printf("TOKEN ID: TOKENID_NUM_DECIMAL\n");
-         printf("DOUBLE VALUE: %lf\n", token->value.decimal_value);
+         fprintf(stderr,"TOKEN ID: TOKENID_NUM_DECIMAL\n");
+         fprintf(stderr,"DOUBLE VALUE: %lf\n", token->value.decimal_value);
          break;
       case TOKENID_OPERATOR_ADD:
-         printf("TOKEN ID: TOKENID_OPERATOR_ADD\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_ADD\n");
          break;
       case TOKENID_OPERATOR_SUB:
-         printf("TOKEN ID: TOKENID_OPERATOR_SUB\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_SUB\n");
          break;
       case TOKENID_OPERATOR_MUL:
-         printf("TOKEN ID: TOKENID_OPERATOR_MUL\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_MUL\n");
          break;
       case TOKENID_OPERATOR_DIV:
-         printf("TOKEN ID: TOKENID_OPERATOR_DIV\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_DIV\n");
          break;
       case TOKENID_OPERATOR_LESS:
-         printf("TOKEN ID: TOKENID_OPERATOR_LESS\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_LESS\n");
          break;
       case TOKENID_OPERATOR_LESS_OR_EQUAL:
-         printf("TOKEN ID: TOKENID_OPERATOR_LESS_OR_EQUAL\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_LESS_OR_EQUAL\n");
          break;
       case TOKENID_OPERATOR_GREATER:
-         printf("TOKEN ID: TOKENID_OPERATOR_GREATER\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_GREATER\n");
          break;
       case TOKENID_OPERATOR_GREATER_OR_EQUAL:
-         printf("TOKEN ID: TOKENID_OPERATOR_GREATER_OR_EQUAL\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_GREATER_OR_EQUAL\n");
          break;
       case TOKENID_OPERATOR_DECLARE:
-         printf("TOKEN ID: TOKENID_OPERATOR_DECLARE\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_DECLARE\n");
          break;
       case TOKENID_OPERATOR_ASSIGN:
-         printf("TOKEN ID: TOKENID_OPERATOR_ASSIGN\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_ASSIGN\n");
          break;
       case TOKENID_OPERATOR_EQUALS:
-         printf("TOKEN ID: TOKENID_OPERATOR_EQUALS\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_EQUALS\n");
          break;
       case TOKENID_OPERATOR_NOT:
-         printf("TOKEN ID: TOKENID_OPERATOR_NOT\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_NOT\n");
          break;
       case TOKENID_OPERATOR_NOT_EQUAL:
-         printf("TOKEN ID: TOKENID_OPERATOR_NOT_EQUAL\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_NOT_EQUAL\n");
          break;
       case TOKENID_OPERATOR_AND:
-         printf("TOKEN ID: TOKENID_OPERATOR_AND\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_AND\n");
          break;
       case TOKENID_OPERATOR_OR:
-         printf("TOKEN ID: TOKENID_OPERATOR_OR\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_OPERATOR_OR\n");
          break;
       case TOKENID_LEFT_PARENTHESES:
-         printf("TOKEN ID: TOKENID_LEFT_PARENTHESES\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_LEFT_PARENTHESES\n");
          break;
       case TOKENID_RIGHT_PARENTHESES:
-         printf("TOKEN ID: TOKENID_RIGHT_PARENTHESES\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_RIGHT_PARENTHESES\n");
          break;
       case TOKENID_LEFT_BRACKET:
-         printf("TOKEN ID: TOKENID_LEFT_BRACKET\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_LEFT_BRACKET\n");
          break;
       case TOKENID_RIGHT_BRACKET:
-         printf("TOKEN ID: TOKENID_RIGHT_BRACKET\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_RIGHT_BRACKET\n");
          break;
       case TOKENID_SEMICOLON:
-         printf("TOKEN ID: TOKENID_SEMICOLON\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_SEMICOLON\n");
          break;
       case TOKENID_COMMA:
-         printf("TOKEN ID: TOKENID_COMMA\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_COMMA\n");
          break;
       case TOKENID_NEWLINE:
-         printf("TOKEN ID: TOKENID_NEWLINE\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_NEWLINE\n");
          break;
       case TOKENID_END_OF_FILE:
-         printf("TOKEN ID: TOKENID_END_OF_FILE\n");
+         fprintf(stderr,"TOKEN ID: TOKENID_END_OF_FILE\n");
          break;
    default:
       printf("NULL\n");
