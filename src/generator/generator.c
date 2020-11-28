@@ -13,6 +13,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* fntable);
+
 void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
    int clears_from = node->ids_count;
    for (int i = node->ids_count - 1; i >= 0; i--) {
@@ -88,12 +90,36 @@ void generate_defvar(astnode_defvar_t* node, vartable_t* vartable) {
    free(var);
 }
 
+void generate_codeblock(astnode_codeblock_t* node, vartable_t* vartable, bintree_t* fntable) {
+   for (int i = 0; i < node->children_count; i++) {
+      generate_generic(node->children[i], vartable, fntable);
+   }
+}
+
 void generate_for(astnode_for_t* node) {
    node = node;
 }
 
-void generate_if(astnode_if_t* node) {
-   node = node;
+void generate_if(astnode_if_t* node, vartable_t* vartable, bintree_t* fntable) {
+   bool stack = generate_expression(node->condition, vartable, false);
+   char* l1 = labelgen_new();
+   char* l2;
+   if (stack) {
+      printcm("PUSHS bool@false");
+      printcm("JUMPIFEQS %s", l1);
+   } else {
+      printcm("JUMPIFEQ %s GF@$tmp bool@false", l1);
+   }
+   generate_codeblock(node->true_body, vartable, fntable);
+   if (node->else_body != NULL) {
+      l2 = labelgen_new();
+      printcm("JUMP %s", l2);
+   }
+   printlb("LABEL %s", l1);
+   if (node->else_body != NULL) {
+      generate_codeblock(node->else_body, vartable, fntable);
+      printlb("LABEL %s", l2);
+   }
 }
 
 void generate_ret(astnode_ret_t* node, vartable_t* vartable) {
@@ -102,6 +128,18 @@ void generate_ret(astnode_ret_t* node, vartable_t* vartable) {
          printcm("PUSHS GF@$tmp");
       }
    }
+}
+
+void generate_funcdecl(astnode_funcdecl_t* node, bintree_t* fntable) {
+   guard(node != NULL);
+   guard(fntable != NULL);
+   printlb("LABEL %s", node->name);
+   vartable_t* vartable = vartable_ctor();
+   for (int i = 0; i < node->body->children_count; i++) {
+      generate_generic(node->body->children[i], vartable, fntable);
+   }
+   vartable_dtor(vartable);
+   printcm("RETURN");
 }
 
 void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* fntable) {
@@ -126,7 +164,7 @@ void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* 
          break;
       case ANT_IF:
          pcomment("If start");
-         generate_if(node->value.ifval);
+         generate_if(node->value.ifval, vartable, fntable);
          pcomment("If end");
          break;
       case ANT_FUNCCALL:
@@ -142,18 +180,6 @@ void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* 
       default: 
          exit(ERRCODE_INTERNAL_ERROR);
    }
-}
-
-void generate_funcdecl(astnode_funcdecl_t* node, bintree_t* fntable) {
-   guard(node != NULL);
-   guard(fntable != NULL);
-   printlb("LABEL %s", node->name);
-   vartable_t* vartable = vartable_ctor();
-   for (int i = 0; i < node->body->children_count; i++) {
-      generate_generic(node->body->children[i], vartable, fntable);
-   }
-   vartable_dtor(vartable);
-   printcm("RETURN");
 }
 
 void generate(astnode_global_t* global, bintree_t* fntable) {
