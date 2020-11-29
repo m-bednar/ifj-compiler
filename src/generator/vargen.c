@@ -10,6 +10,7 @@
 #include "../memory.h"
 #include <string.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 static const int BOOL_CONST_PREFIX = 6;
 static const int STR_CONST_PREFIX = 8;
@@ -76,7 +77,7 @@ char* generate_const_str(token_t* token) {
          break;
       case TOKENID_NUM:
          var = safe_alloc(sizeof(char) * (INT_CONST_PREFIX + digits_count(token->value.int_value)));
-         sprintf(var, "int@%d", token->value.int_value);
+         sprintf(var, "int@%lld", token->value.int_value);
          break;
       case TOKENID_NUM_DECIMAL:
          var = safe_alloc(sizeof(char) * FLOAT_CONST_MAX_SIZE); // used space cannot be easily computed

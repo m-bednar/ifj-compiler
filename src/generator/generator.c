@@ -47,7 +47,6 @@ void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t
       for (int i = 0; i < node->params_count; i++) {
          char* param = generate_var_str(fn_declaration->value.fn->arg_names[i], FT_TF, 0);
          printcm("DEFVAR %s", param);
-
          if (is_const_tokenid(node->params[i]->id)) {
             printcm("MOVE %s %s", param, generate_const_str(node->params[i]));
          } else {
@@ -150,6 +149,7 @@ void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable)
    printlb("LABEL %s", l1);
    vartable_ascent(vartable);
    free(l1);
+   free(l2);
 }
 
 void generate_if(astnode_if_t* node, vartable_t* vartable, bintree_t* fntable) {
@@ -167,7 +167,9 @@ void generate_if(astnode_if_t* node, vartable_t* vartable, bintree_t* fntable) {
    if (node->else_body != NULL) {
       generate_codeblock(node->else_body, vartable, fntable);
       printlb("LABEL %s", l2);
+      free(l2);
    }
+   free(l1);
 }
 
 void generate_ret(astnode_ret_t* node, vartable_t* vartable) {
