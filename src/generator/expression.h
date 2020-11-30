@@ -15,6 +15,11 @@
 vartype_e determine_expression_type(astnode_exp_t* exp, vartable_t* vartable);
 
 /**
+ * Generates variable or constant according to op parameter.
+ */
+char* generate_op_str(token_t* op, vartable_t* vartable);
+
+/**
  * Evaluates and generates expression to stdout.
  * Returns true, if expression result ends up on stack, false when in $tmp0 variable.
  */
