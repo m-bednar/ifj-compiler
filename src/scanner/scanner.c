@@ -393,6 +393,7 @@ token_t* get_next_token() {
                if (strlen(buffer) == 0 || (strlen(buffer) == 1 && buffer[0] == '-')) { // No digits were read as an exponent
                   exit(ERRCODE_LEXICAL_ERROR);
                }
+               prev = c;
                value.decimal_value = strtod(buffer, &pEnd);
                free(buffer);
                return token_ctor(TOKENID_NUM_DECIMAL, value);
