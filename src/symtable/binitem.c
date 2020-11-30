@@ -85,7 +85,7 @@ void binitem_to_array(binitem_t* item, symbol_t** array, int* length) {
       binitem_to_array(item->left, array, length);
    }
    if (item->right != NULL) {
-      binitem_to_array(item->left, array, length);
+      binitem_to_array(item->right, array, length);
    }
 }
 
