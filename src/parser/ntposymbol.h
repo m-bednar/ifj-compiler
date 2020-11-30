@@ -12,6 +12,7 @@
 #include "../scanner/token.h"
 #include "ntsymbol.h"
 
+
 typedef enum symtype_e {
    NONTERMINAL,
    TERMINAL,

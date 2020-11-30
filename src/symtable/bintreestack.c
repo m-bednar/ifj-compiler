@@ -83,7 +83,7 @@ symbol_t* bintreestack_find(bintreestack_t* stack, char* identifier, int* level)
          return found;
       }
    }
-
+   *level = -1;
    return NULL;
 }
 
