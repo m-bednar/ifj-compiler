@@ -390,7 +390,7 @@ token_t* get_next_token() {
                }
                state = STATE_EXP_UNDERSCORE;
             } else {
-               if (strlen(buffer) == 0 || (strlen(buffer) == 1 && buffer[0] == '-')) { // No digits were read as an exponent
+               if (buffer[strlen(buffer)-1] == '+' || buffer[strlen(buffer)-1] == '-' || buffer[strlen(buffer)-1] == 'e' || buffer[strlen(buffer)-1] == 'E') { // no digits were read as an exponent
                   exit(ERRCODE_LEXICAL_ERROR);
                }
                prev = c;
