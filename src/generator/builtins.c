@@ -8,6 +8,7 @@
 #include "expression.h"
 #include "vargen.h"
 #include "utils.h"
+#include <inttypes.h>
 
 void builtin_input(char* type) {
    char* l1 = labelgen_new();
@@ -203,7 +204,7 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
    token_t* i = params[1];
    token_t* n = params[2];
    if (is_const_tokenid(s->id) && is_const_tokenid(i->id) && is_const_tokenid(n->id)) {
-      if (i->value.int_value < 0 || i->value.int_value >= strlen(s->value.string_value) || n->value.int_value < 0) {
+      if (i->value.int_value < 0 || i->value.int_value >= (int)strlen(s->value.string_value) || n->value.int_value < 0) {
          printcm("PUSHS string@");
          printcm("PUSHS int@1");
       } else {
@@ -229,15 +230,36 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
 
          printcm("STRLEN GF@$tmp0 %s", s_var);
 
-         printcm("PUSHS %s", i_var);
-         printcm("PUSHS int@1");
-         printcm("ADDS");
-         printcm("PUSHS GF@$tmp0");
-         printcm("GTS", i_var);
-         printcm("PUSHS bool@true");
-         printcm("JUMPIFEQS %s", l1);
+         int64_t val = i->value.int_value + 1;
+         printcm("GT GF@$tmp1 int@%"PRId64" GF@$tmp0", val);
+         printcm("JUMPIFEQ %s GF@$tmp1 bool@true", l1);
          
-         // TODO:
+         int64_t sum = i->value.int_value + n->value.int_value;
+         printcm("LT GF@$tmp1 GF@$tmp0 int@%"PRId64, sum);
+         printcm("JUMPIFEQ %s GF@$tmp1 bool@true", l3);
+         printcm("MOVE GF@$tmp2 int@%"PRId64, sum);
+         printcm("JUMP %s", l4);
+         printlb("LABEL %s", l3);
+         printcm("MOVE GF@$tmp2 GF@$tmp0");
+         printlb("LABEL %s", l4);
+         printcm("MOVE GF@$tmp1 string@");
+         printcm("MOVE GF@$tmp3 %s", i_var);
+         
+         printlb("LABEL %s", l5);
+         printcm("GETCHAR GF@$tmp0 %s GF@$tmp3", s_var);
+         printcm("CONCAT GF@$tmp1 GF@$tmp1 GF@$tmp0");
+
+         printcm("ADD GF@$tmp3 GF@$tmp3 int@1");
+         printcm("LT GF@$tmp0 GF@$tmp3 GF@$tmp2");
+         printcm("JUMPIFEQ %s GF@$tmp0 bool@true", l5);
+
+         printcm("PUSHS GF@$tmp1");
+         printcm("PUSHS int@0");
+         printcm("JUMP %s", l2);
+         printlb("LABEL %s", l1);
+         printcm("PUSHS string@");
+         printcm("PUSHS int@1");
+         printlb("LABEL %s", l2);
 
          free(l1);
          free(l2);
@@ -252,74 +274,6 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
       
    }
 }
-
-/*
-func substr(string <x>, int <i>, int <n>) (string, int)
-   # $tmp0 = len(x)
-   STRLEN GF@$tmp0 TF@x
-
-   # i < 0 || i > len(x) || i == len(x) || n < 0
-   PUSHS TF@i
-   PUSHS int@0
-   LTS
-   PUSHS TF@i
-   PUSHS GF@$tmp0
-   GTS
-   PUSHS TF@i
-   PUSHS GF@$tmp0
-   EQS
-   PUSHS TF@n
-   PUSHS int@0
-   LTS
-   ORS
-   ORS
-   ORS
-   PUSHS bool@true
-   JUMPIFEQS L1
-
-   DEFVAR TF@!substr_to
-   DEFVAR TF@!substr_i
-   
-   # substr_to = (substr_tmp < i + n)? substr_tmp : i + n
-   PUSHS GF@$tmp0
-   PUSHS TF@i
-   PUSHS TF@n
-   ADDS 
-   LTS
-   PUSHS bool@true
-   JUMPIFEQS L3
-   ADD TF@!substr_to TF@i TF@n
-   JUMP L4
-  LABEL L3
-   MOVE TF@!substr_to GF@$tmp0
-  LABEL L4
-   
-   # substr_out = "", substr_i = i
-   MOVE GF@$tmp1 string@
-   MOVE TF@!substr_i TF@i
-   
-  LABEL L5
-   
-   # add char to substr_out
-   GETCHAR GF@$tmp0 TF@x TF@!substr_i
-   CONCAT GF@$tmp1 GF@$tmp1 GF@$tmp0
-   
-   # substr_i++
-   ADD TF@!substr_i TF@!substr_i int@1
-   
-   # substr_i < substr_to
-   LT GF@$tmp0 TF@!substr_i TF@!substr_to
-   JUMPIFEQ L5 GF@$tmp0 bool@true
-   
-   PUSHS GF@$tmp1
-   PUSHS int@0
-   JUMP L2 
-  LABEL L1
-   PUSHS string@
-   PUSHS int@1
-  LABEL L2
-
-*/
 
 bool is_builtin(char* identifier) {
    char* names[] = {

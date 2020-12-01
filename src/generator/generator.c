@@ -237,6 +237,8 @@ void generate(astnode_global_t* global, bintree_t* fntable) {
    printlb(".IFJcode20");
    printcm("DEFVAR GF@$tmp0");
    printcm("DEFVAR GF@$tmp1");
+   printcm("DEFVAR GF@$tmp2");
+   printcm("DEFVAR GF@$tmp3");
    printcm("CREATEFRAME");
    printcm("CALL main");
    printcm("EXIT int@0");
