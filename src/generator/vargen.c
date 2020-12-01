@@ -77,7 +77,7 @@ char* generate_const_str(token_t* token) {
          break;
       case TOKENID_NUM:
          var = safe_alloc(sizeof(char) * (INT_CONST_PREFIX + digits_count(token->value.int_value)));
-         sprintf(var, "int@%lld", token->value.int_value);
+         sprintf(var, "int@%"PRId64, token->value.int_value);
          break;
       case TOKENID_NUM_DECIMAL:
          var = safe_alloc(sizeof(char) * FLOAT_CONST_MAX_SIZE); // used space cannot be easily computed
