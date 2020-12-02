@@ -291,6 +291,8 @@ bool optimize_by_arithmetics(astnode_exp_t* exp) {
                   if (is_zero_value(t1)) {
                      replace_three_tokens(exp, t1, i);
                      optimized = true;
+                  } else if (is_zero_value(t2)) {
+                     exit(ERRCODE_ZERO_DIVISION_ERROR);
                   } else if (is_unary_value(t2)) {
                      replace_three_tokens(exp, t1, i);
                      optimized = true;
