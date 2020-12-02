@@ -412,13 +412,9 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
 
       }
       if(token->id == TOKENID_IDENTIFIER){
-         if(arg_names == NULL){
-            arg_names = safe_alloc(sizeof(char*));
-         }
-         else{
-            arg_names = safe_realloc(arg_names, sizeof(char*) * (arg_names_count+1));
-         }
-         arg_names[arg_names_count] = token->value.string_value;
+         arg_names = safe_realloc(arg_names, sizeof(char*) * (arg_names_count+1));
+         arg_names[arg_names_count] = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
+         strcpy(arg_names[arg_names_count], token->value.string_value);
          arg_names_count++;
 
       }
