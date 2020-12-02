@@ -370,12 +370,14 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    token_t* token;
    token = tokenvector_get(token_vector, 1);
    symbol_t* symbol;
-
+   char** arg_names = NULL;
+   int arg_names_count = 0;
    int i;
    vartype_e* arg_types = NULL;
    vartype_e* ret_types = NULL;
    int arg_count = 0;
    int ret_count = 0;
+   int level;
    i = 3;
    //function args handling
    token = tokenvector_get(token_vector, i);
@@ -398,7 +400,7 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
             bintree_add(bintreestack_peek(symtable_stack), symbol);
          }
          else{
-            symbol = bintreestack_find(symtable_stack, token_before->value.string_value, NULL);
+            symbol = bintreestack_find(symtable_stack, token_before->value.string_value, &level);
             if(symbol != NULL){
                return ERRCODE_GENERAL_SEMANTIC_ERROR;
             }
@@ -407,6 +409,13 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
                bintree_add(bintreestack_peek(symtable_stack), symbol);
             }
          }
+
+      }
+      if(token->id == TOKENID_IDENTIFIER){
+         arg_names = safe_realloc(arg_names, sizeof(char*) * (arg_names_count+1));
+         arg_names[arg_names_count] = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
+         strcpy(arg_names[arg_names_count], token->value.string_value);
+         arg_names_count++;
 
       }
       i++;
@@ -441,7 +450,7 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    //add function declaration to symtable
    symbol = bintree_find(symtable_global, token->value.string_value);
    if(symbol == NULL){
-      bintree_add(symtable_global, symbol_ctor(token->value.string_value, ST_FUNCTION, symbolval_fn_ctor(arg_count, ret_count, arg_types, ret_types, true)));
+      bintree_add(symtable_global, symbol_ctor(token->value.string_value, ST_FUNCTION, symbolval_fn_ctor(arg_count, ret_count, arg_names, arg_types, ret_types, true)));
    }
 
    return 0;
@@ -811,4 +820,3 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
 
    return err;
 }
-
