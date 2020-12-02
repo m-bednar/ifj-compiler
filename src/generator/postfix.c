@@ -203,11 +203,7 @@ token_t* eval_operation(token_t* operand1, token_t* operand2, token_t* operator)
  * given token and shifts rest of the expression accordingly.
  */
 void replace_three_tokens(astnode_exp_t* exp, token_t* token, int i) {
-   token_t* new = token_ctor(token->id, token->value);
-   if (token->id == TOKENID_IDENTIFIER || token->id == TOKENID_STRING_LITERAL) {
-      new->value.string_value = safe_alloc(strlen(token->value.string_value) + 1);
-      strcpy(new->value.string_value, token->value.string_value);
-   }
+   token_t* new = token_copy(token);
 
    token_dtor(exp->tokens[i]);
    token_dtor(exp->tokens[i + 1]);
