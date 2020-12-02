@@ -9,4 +9,7 @@
 #include "../symtable/symtable.h"
 #include "../parser/ast.h"
 
+/**
+ * Generates code onto stdout from given ast global node.
+ */
 void generate(astnode_global_t* global, bintree_t* fnsymtable);

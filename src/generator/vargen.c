@@ -17,13 +17,20 @@ static const int STR_CONST_PREFIX = 8;
 static const int INT_CONST_PREFIX = 5;
 static const int FLOAT_CONST_MAX_SIZE = 35;
 
-int digits_count(int n) {
+/**
+ * Returns count of digits of given int.
+ */
+int digits_count(int64_t n) {
    int count = 0;
    do {
       count++;
       n /= 10;
    } while(n != 0);
    return count; 
+}
+
+bool is_const_tokenid(tokenid_e id) {
+   return id == TOKENID_NUM_DECIMAL || id == TOKENID_NUM || id == TOKENID_STRING_LITERAL || id == TOKENID_BOOL_LITERAL;
 }
 
 char* labelgen_new() {
@@ -56,10 +63,6 @@ char* convert_string(char* str) {
    }
    out[len] = '\0';
    return out;
-}
-
-bool is_const_tokenid(tokenid_e id) {
-   return id == TOKENID_NUM_DECIMAL || id == TOKENID_NUM || id == TOKENID_STRING_LITERAL || id == TOKENID_BOOL_LITERAL;
 }
 
 char* generate_const_str(token_t* token) {

@@ -59,6 +59,10 @@ bool is_operand(token_t* token) {
       token->id == TOKENID_NUM_DECIMAL || token->id == TOKENID_BOOL_LITERAL;
 }
 
+/**
+ * Returns operator priority as int.
+ * Higher value means higher operator priority.
+ */
 int op_precedence(token_t* token) { 
    switch (token->id) {
       case TOKENID_OPERATOR_EQUALS:
@@ -81,7 +85,7 @@ int op_precedence(token_t* token) {
       case TOKENID_OPERATOR_NOT: 
          return 6; 
       default:
-         return -1;
+         error("Invalid operator.");
    }
 }
 
@@ -104,6 +108,9 @@ bool are_operand_equal(token_t* operand1, token_t* operand2) {
    }
 }
 
+/**
+ * Evaluates operation on given operands.
+ */
 token_t* eval_operation(token_t* operand1, token_t* operand2, token_t* operator) {
    switch (operator->id) {
       case TOKENID_OPERATOR_AND:
@@ -158,6 +165,7 @@ token_t* eval_operation(token_t* operand1, token_t* operand2, token_t* operator)
          } else if (operand1->id == TOKENID_NUM_DECIMAL) {
             operand1->value.decimal_value = operand1->value.decimal_value + operand2->value.decimal_value;
          } else if (operand1->id == TOKENID_STRING_LITERAL) {
+            // String concatenation
             int len = strlen(operand1->value.string_value) + strlen(operand2->value.string_value) + 1;
             operand1->value.string_value = safe_realloc(operand1->value.string_value, sizeof(char) * len);
             strcat(operand1->value.string_value, operand2->value.string_value);
@@ -190,26 +198,34 @@ token_t* eval_operation(token_t* operand1, token_t* operand2, token_t* operator)
    return operand1;
 }
 
-void replace_three_tokens(astnode_exp_t* exp, token_t* token, int index) {
+/**
+ * Replaces three tokens from expression (at indexes: i, i+1, i+2) with
+ * given token and shifts rest of the expression accordingly.
+ */
+void replace_three_tokens(astnode_exp_t* exp, token_t* token, int i) {
    token_t* new = token_ctor(token->id, token->value);
    if (token->id == TOKENID_IDENTIFIER || token->id == TOKENID_STRING_LITERAL) {
       new->value.string_value = safe_alloc(strlen(token->value.string_value) + 1);
       strcpy(new->value.string_value, token->value.string_value);
    }
 
-   token_dtor(exp->tokens[index]);
-   token_dtor(exp->tokens[index + 1]);
-   token_dtor(exp->tokens[index + 2]);
+   token_dtor(exp->tokens[i]);
+   token_dtor(exp->tokens[i + 1]);
+   token_dtor(exp->tokens[i + 2]);
 
-   exp->tokens[index] = new;
+   exp->tokens[i] = new;
 
-   for (int i = index + 3; i < exp->tokens_count; i++) {
-      exp->tokens[i - 2] = exp->tokens[i];
+   for (int j = i + 3; j < exp->tokens_count; j++) {
+      exp->tokens[j - 2] = exp->tokens[j];
    }
    
    exp->tokens_count -= 2;
 }
 
+/**
+ * Optimizes expression by evaluating constant operands.
+ * Returns true, if optimization was performed.
+ */
 bool optimize_by_evaluation(astnode_exp_t* exp) {
    bool flag = false; 
    bool optimized;
@@ -241,6 +257,10 @@ bool is_unary_value(token_t* t) {
       (t->id == TOKENID_NUM_DECIMAL && t->value.decimal_value == 1.0);
 }
 
+/**
+ * Optimizes expression by set of arithmetic rules.
+ * Returns true, if optimization was performed. 
+ */
 bool optimize_by_arithmetics(astnode_exp_t* exp) {
    bool flag = false; 
    bool optimized;
@@ -271,8 +291,6 @@ bool optimize_by_arithmetics(astnode_exp_t* exp) {
                   if (is_zero_value(t1)) {
                      replace_three_tokens(exp, t1, i);
                      optimized = true;
-                  } else if (is_zero_value(t2)) {
-                     exit(ERRCODE_ZERO_DIVISION_ERROR);
                   } else if (is_unary_value(t2)) {
                      replace_three_tokens(exp, t1, i);
                      optimized = true;
@@ -311,7 +329,7 @@ void optimize_postfix(astnode_exp_t* exp) {
 
 void infix_to_postfix(astnode_exp_t* exp) {
    tstack_t* stack = tstack_ctor(exp->tokens_count);
-   int j = 0;  // postfix length
+   int j = 0;
 
    for (int i = 0; i < exp->tokens_count; i++) {
       if (is_operand(exp->tokens[i])) {
@@ -324,7 +342,7 @@ void infix_to_postfix(astnode_exp_t* exp) {
          }
          token_dtor(tstack_pop(stack)); 
       } else { 
-         // operator is encountered
+         // Operator is encountered
          while (!tstack_isempty(stack) && op_precedence(exp->tokens[i]) <= op_precedence(tstack_peek(stack))) {
             exp->tokens[j++] = tstack_pop(stack);
          }
@@ -332,12 +350,14 @@ void infix_to_postfix(astnode_exp_t* exp) {
       } 
    }
 
-   // pop rest of the operators on stack
+   // Pop rest of the operators on stack
    while (!tstack_isempty(stack)) {
       exp->tokens[j++] = tstack_pop(stack); 
    }
 
    exp->tokens_count = j;
+
+   // Realloc space for the expression, which will be smaller, if included brackets
    exp->tokens = safe_realloc(exp->tokens, j * sizeof(token_t*));
 
    tstack_dtor(stack);

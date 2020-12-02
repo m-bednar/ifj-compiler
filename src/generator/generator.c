@@ -15,6 +15,9 @@
 
 void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* fntable);
 
+/**
+ * Generates stack pops of return variables after function call.
+ */
 void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
    int clears_from = node->ids_count;
    for (int i = node->ids_count - 1; i >= 0; i--) {
@@ -37,6 +40,9 @@ void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
    }
 }
 
+/**
+ * Generates function call with relevant argmunets.
+ */
 void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t* fntable) {
    if (is_builtin(node->name)) {
       generate_builtin(node->name, node->params, node->params_count, vartable);
@@ -62,6 +68,9 @@ void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t
    }
 }
 
+/**
+ * Generates variable assign.
+ */
 void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fntable) {
    if (node->right_function != NULL) {
       generate_funccall(node->right_function, vartable, fntable);
@@ -76,6 +85,9 @@ void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fn
    }
 }
 
+/**
+ * Generates defvar statement and adds variable to the vartable if necessary.
+ */
 void generate_defvar(astnode_defvar_t* node, vartable_t* vartable) {
    guard(node != NULL);
    guard(vartable != NULL);
@@ -89,6 +101,9 @@ void generate_defvar(astnode_defvar_t* node, vartable_t* vartable) {
    free(var);
 }
 
+/**
+ * Utility method, that will pre-define all variables in given codeblock.
+ */
 void defvar_all_vars(astnode_codeblock_t* node, vartable_t* vartable) {
    for (int i = 0; i < node->children_count; i++) {
       if (node->children[i]->type == ANT_DEFVAR) {
@@ -115,12 +130,18 @@ void defvar_all_vars(astnode_codeblock_t* node, vartable_t* vartable) {
    }
 }
 
+/**
+ * Generates all nodes of given codeblock.
+ */
 void generate_codeblock(astnode_codeblock_t* node, vartable_t* vartable, bintree_t* fntable) {
    for (int i = 0; i < node->children_count; i++) {
       generate_generic(node->children[i], vartable, fntable);
    }
 }
 
+/**
+ * Generates conditional expression with relevant jump.
+ */
 void generate_condition(astnode_exp_t* cond, vartable_t* vartable, char* label, bool jump_on) {
    bool stack = generate_expression(cond, vartable, false);
    if (stack) {
@@ -131,6 +152,9 @@ void generate_condition(astnode_exp_t* cond, vartable_t* vartable, char* label, 
    }
 }
 
+/**
+ * Generates for loop.
+ */
 void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable) {
    vartable_descent(vartable);
    if (node->defvar != NULL) {
@@ -152,6 +176,9 @@ void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable)
    free(l2);
 }
 
+/**
+ * Generates if statement.
+ */
 void generate_if(astnode_if_t* node, vartable_t* vartable, bintree_t* fntable) {
    char* l1 = labelgen_new();
    char* l2;
@@ -172,6 +199,9 @@ void generate_if(astnode_if_t* node, vartable_t* vartable, bintree_t* fntable) {
    free(l1);
 }
 
+/**
+ * Generates function return statement.
+ */
 void generate_ret(astnode_ret_t* node, vartable_t* vartable) {
    for (int i = 0; i < node->expressions_count; i++) {
       if (!generate_expression(node->expressions[i], vartable, true)) {
@@ -180,6 +210,9 @@ void generate_ret(astnode_ret_t* node, vartable_t* vartable) {
    }
 }
 
+/**
+ * Generates function declaration from ast node.
+ */
 void generate_funcdecl(astnode_funcdecl_t* node, bintree_t* fntable) {
    guard(node != NULL);
    guard(fntable != NULL);
@@ -190,6 +223,9 @@ void generate_funcdecl(astnode_funcdecl_t* node, bintree_t* fntable) {
    printcm("RETURN");
 }
 
+/**
+ * Generates node depending on it's type.
+ */
 void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* fntable) {
    guard(node != NULL);
    guard(vartable != NULL);

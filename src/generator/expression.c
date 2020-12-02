@@ -9,12 +9,18 @@
 #include "vargen.h"
 #include "utils.h"
 
+/**
+ * Returns true, if given operator id is resulting in boolean.
+ */
 bool is_bool_operator(tokenid_e id) {
    return id == TOKENID_OPERATOR_NOT || id == TOKENID_OPERATOR_NOT_EQUAL || id == TOKENID_OPERATOR_EQUALS
       || id == TOKENID_OPERATOR_LESS || id == TOKENID_OPERATOR_LESS_OR_EQUAL || id == TOKENID_OPERATOR_GREATER
       || id == TOKENID_OPERATOR_GREATER_OR_EQUAL;
 }
 
+/**
+ * Whenever to use float operators insead of int operators.
+ */
 bool should_use_float_ops(astnode_exp_t* exp, vartable_t* vartable) {
    for (int i = 0; i < exp->tokens_count; i++) {
       if (exp->tokens[i]->id == TOKENID_NUM_DECIMAL) {
@@ -29,6 +35,9 @@ bool should_use_float_ops(astnode_exp_t* exp, vartable_t* vartable) {
    return false;
 }
 
+/**
+ * Determines value type of given token.
+ */
 vartype_e determine_token_type(token_t* token, vartable_t* vartable) {
    switch (token->id) {
       case TOKENID_IDENTIFIER:
@@ -61,15 +70,21 @@ vartype_e determine_expression_type(astnode_exp_t* exp, vartable_t* vartable) {
    error("Given expression cannot be determined.");
 }
 
-char* generate_op_str(token_t* op, vartable_t* vartable) {
-   if (is_const_tokenid(op->id)) {
-      return generate_const_str(op);
+/**
+ * Creates relevant var/const string depending on given token.
+ */
+char* generate_op_str(token_t* token, vartable_t* vartable) {
+   if (is_const_tokenid(token->id)) {
+      return generate_const_str(token);
    } else {
-      guard(op->id == TOKENID_IDENTIFIER);
-      return generate_var_str(op->value.string_value, FT_TF, vartable_depth(vartable, op->value.string_value)); 
+      guard(token->id == TOKENID_IDENTIFIER);
+      return generate_var_str(token->value.string_value, FT_TF, vartable_depth(vartable, token->value.string_value)); 
    }
 }
 
+/**
+ * Determines whenever is given token string value.
+ */
 bool is_string_value(token_t* token, vartable_t* vartable) {
    if (token->id == TOKENID_STRING_LITERAL) {
       return true;
@@ -80,6 +95,9 @@ bool is_string_value(token_t* token, vartable_t* vartable) {
    return false;
 }
 
+/**
+ * Generates PUSHS instruction with given operand.
+ */
 void pushs_operand(token_t* token, vartable_t* vartable) {
    if (!is_string_value(token, vartable)) {
       char* var = generate_op_str(token, vartable);
@@ -88,6 +106,9 @@ void pushs_operand(token_t* token, vartable_t* vartable) {
    }
 }
 
+/**
+ * Generates expression with stack-only operations. 
+ */
 void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
    for (int i = 0; i < exp->tokens_count; i++) {
       switch (exp->tokens[i]->id) {
@@ -162,6 +183,10 @@ void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
    }
 }
 
+/**
+ * For simple expressions, containing 2-3 tokens, this will generate operation(s) with
+ * ouput to given asignee.
+ */
 void generate_local_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
    if (exp->tokens_count == 2) {
       guard(exp->tokens[0]->id == TOKENID_IDENTIFIER && exp->tokens[1]->id == TOKENID_OPERATOR_NOT);
@@ -222,12 +247,20 @@ void generate_local_expression(char* asignee, astnode_exp_t* exp, vartable_t* va
    }
 }
 
+/**
+ * For expression that is single variable/const, this will generate assign
+ * to appropriate variable.
+ */
 void generate_const_assign_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
    char* val = generate_op_str(exp->tokens[0], vartable);
    printcm("MOVE %s %s", asignee, val);
    free(val);
 }
 
+/**
+ * For expression that is single variable/const, this will generate assign
+ * that will move this value in main global variable or on stack.
+ */
 bool generate_const_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_stack) {
    char* var = generate_op_str(exp->tokens[0], vartable);
    if (prefer_stack) {
