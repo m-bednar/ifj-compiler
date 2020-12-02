@@ -157,6 +157,8 @@ int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintre
                   return ERRCODE_GENERAL_SEMANTIC_ERROR;
                }
                break;
+            default:
+               break;
          }
       }
    }
