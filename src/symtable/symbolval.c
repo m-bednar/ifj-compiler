@@ -49,8 +49,12 @@ void symbolval_fn_dtor(symbolval_u symbolval) {
       symbolval.fn->arg_names = NULL;
    }
    if (symbolval.fn->ret_count > 0 && symbolval.fn->ret_types != NULL) {
-      free(symbolval.fn->ret_types);
-      symbolval.fn->ret_types = NULL;
+      free(symbolval.fn->arg_types);
+      for (int i = 0; i < symbolval.fn->arg_count; i++) {
+         free(symbolval.fn->arg_names[i]);
+      }
+      symbolval.fn->arg_types = NULL;
+      symbolval.fn->arg_names = NULL;
    }
    
    free(symbolval.fn);

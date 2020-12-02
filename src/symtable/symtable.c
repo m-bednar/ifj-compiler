@@ -60,11 +60,19 @@ symbol_t* bintree_find(bintree_t* tree, const char* identifier) {
    return NULL;
 }
 
+symbol_t** bintree_to_array(bintree_t* tree, int* length) {
+   guard(tree != NULL);
+
+   symbol_t** array = NULL;
+   *length = 0;
+   if (tree->root != NULL) {
+      binitem_to_array(tree->root, array, length);
+   }
+   
+   return array;
+}
+
 void bintree_print(bintree_t* tree) {
    guard(tree != NULL);
-   if (tree->root != NULL) {
-      binitem_print(tree->root);
-   } else {
-      fprintf(stderr, "(empty bintree)\n");
-   }
+   binitem_print(tree->root);
 }

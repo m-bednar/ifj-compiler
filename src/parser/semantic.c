@@ -585,7 +585,6 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    static nonterminalid_e current_flag;
    static bool was_right_bracket = false;
    int err = 0;
-
    if(symtable_stack == NULL){
       symtable_stack = bintreestack_ctor();
    }
