@@ -35,6 +35,11 @@ bool bintree_add(bintree_t* tree, symbol_t* value);
 symbol_t* bintree_find(bintree_t* tree, const char* identifier);
 
 /**
+ * Transforms bintree into array, returning length of the array via parameter.
+ */
+symbol_t** bintree_to_array(bintree_t* tree, int* length);
+
+/**
  * Print whole bintree to stderr.
  */
 void bintree_print(bintree_t* tree);
