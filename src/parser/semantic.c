@@ -458,36 +458,56 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    return 0;
 }
 
-int semantic_ret(tokenvector_t* token_vector, astnode_generic_t** node_ret){
+int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bintreestack_t* symtable_stack, bintree_t* symtable_global, astnode_generic_t** node_ret){
    int i;
    tokenvector_t* expression;
    token_t** expressionArray;
    token_t* token;
    int size;
+   int expressions_count = 0;
+   symbol_t* function_symbol;
+   int err = 0;
+   vartype_e expression_type  = VT_BOOL;
    (*node_ret) = astnode_ret_ctor();
    i = 1;
 
-   while(tokenvector_get_lenght(token_vector) != i){
+   function_symbol = bintree_find(symtable_global, function->name);
+   while(tokenvector_get_lenght(token_vector) > i){
       expression = tokenvector_ctor();
-      token = tokenvector_get(token_vector, i);
-
-      while(token->id != TOKENID_COMMA && tokenvector_get_lenght(token_vector) > i){
-         
-         tokenvector_push(expression, token);
+      do{
+         token = tokenvector_get(token_vector, i);
+         if(token->id != TOKENID_COMMA){
+            tokenvector_push(expression, token_copy(token));
+         }
 
          i++;
-         if(tokenvector_get_lenght(token_vector) == i){
-            break;
-         }
-         token = tokenvector_get(token_vector, i);
+      }while(token->id != TOKENID_COMMA && tokenvector_get_lenght(token_vector) > i);
+
+      tokenvector_print(expression);
+      err = semantic_expression(expression, &expression_type, symtable_stack);
+
+      if(err){
+         tokenvector_dtor(expression);
+         return err;
+      }
+      expressions_count++;
+      expressions_count=expressions_count;
+      symbol_print(function_symbol);
+      if(function_symbol->value.fn->ret_count < expressions_count || function_symbol->value.fn->arg_types[expressions_count - 1] != expression_type){
+         tokenvector_dtor(expression);
+         return ERRCODE_ARGS_OR_RETURN_ERROR;
       }
 
       expressionArray = tokenvector_get_array(expression, &size);
       astnode_ret_add_exp((*node_ret), astnode_exp_ctor(expressionArray, size));
-
       tokenvector_dtor(expression);
-
    }
+   
+   if(function_symbol->value.fn->ret_count != expressions_count){
+      printf("%d %d",function_symbol->value.fn->ret_count,  expressions_count);
+      return ERRCODE_ARGS_OR_RETURN_ERROR; // too few return values
+   }
+
 
    return 0;
 }
@@ -501,7 +521,7 @@ int semantic_if(tokenvector_t* token_vector, astnode_generic_t** ast_node){
    i = 1; // skip token with if 
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_LEFT_BRACKET && tokenvector_get_lenght(token_vector) > i){
-      tokenvector_push(condition, token);
+      tokenvector_push(condition, token_copy(token));
 
       i++;
       token = tokenvector_get(token_vector, i);
@@ -624,6 +644,7 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    astnode_assign_t* ast_assign = NULL;
    astnode_funccall_t* ast_funccall = NULL;
    astnode_generic_t* ast_node_generic = NULL;
+   char* temp_str = NULL;
    //ast insert
 
    if(was_right_bracket && (current_flag == NONTERMINAL_ELSE || current_flag == NONTERMINAL_ELSE_IF)){
@@ -638,13 +659,14 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    switch(current_flag){
       // FUNCTION DECLARATION
       case NONTERMINAL_FUNCTION:
-         token = tokenvector_get(token_vector, 0);
-         function = astnode_funcdecl_ctor(token->value.string_value);
+         token = tokenvector_get(token_vector, 1);
+         temp_str = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
+         strcpy(temp_str, token->value.string_value);
+         function = astnode_funcdecl_ctor(temp_str);
          ast_global_add_func(ast, function);
          err = semantic_function_decl(token_vector, symtable_stack, symtable_global);
          bintreestack_push(symtable_stack, bintree_ctor());
          
-
          break;
       case NONTERMINAL_DEFINITION:
          err = semantic_definition(token_vector, symtable_stack, &ast_def);
@@ -696,7 +718,7 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          
          break;
       case NONTERMINAL_RETURN:
-         err = semantic_ret(token_vector, &ast_node_generic);
+         err = semantic_ret(token_vector, function, symtable_stack, symtable_global, &ast_node_generic);
 
          if(astnodestack_lenght(ast_parents) != 0){
             if(astnodestack_peek(ast_parents)->type == ANT_IF){
