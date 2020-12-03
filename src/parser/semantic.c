@@ -183,7 +183,7 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
    
    token = tokenvector_get(token_vector, i);
    while(tokenvector_get_lenght(token_vector) > i){
-      tokenvector_push(expresion, token);
+      tokenvector_push(expresion, token_copy(token));
 
       i++;
       if(tokenvector_get_lenght(token_vector) == i){
@@ -208,7 +208,6 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
 
    new_symbol = symbol_ctor(token->value.string_value, ST_VARIABLE, symbolval_var_ctor(type));
    bintree_add(bintreestack_peek(symtable_stack), new_symbol);
-   token_dtor(token);
 
    // create ast node
    expresion_array = tokenvector_get_array(expresion, &size);
@@ -221,6 +220,7 @@ int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node)
    tokenvector_t* args = tokenvector_ctor();
    token_t** args_array;
    token_t* token;
+   char* funccall_name = NULL;
    int i;
    int size;
 
@@ -228,7 +228,7 @@ int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node)
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_RIGHT_PARENTHESES){
       if(token -> id == TOKENID_IDENTIFIER){
-         tokenvector_push(args, token);
+         tokenvector_push(args, token_copy(token));
       }
       i++;
       token = tokenvector_get(token_vector, i);
@@ -236,7 +236,9 @@ int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node)
 
    args_array = tokenvector_get_array(args, &size);
    token = tokenvector_get(token_vector, 0);
-   (*ast_node) = astnode_funccall_ctor(token->value.string_value, args_array, size);
+   funccall_name = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
+   strcpy(funccall_name, token->value.string_value);
+   (*ast_node) = astnode_funccall_ctor(funccall_name, args_array, size);
 
    return 0;
 }
@@ -258,7 +260,7 @@ int semantic_assign_funccall(tokenvector_t* token_vector, astnode_assign_t** ass
    //reading variables
    while(token->id != TOKENID_OPERATOR_ASSIGN){
       if(token -> id == TOKENID_IDENTIFIER){
-         tokenvector_push(variables, token);
+         tokenvector_push(variables, token_copy(token));
       }
       i++;
       token = tokenvector_get(token_vector, i);
@@ -305,7 +307,7 @@ int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack,
    //reading variables
    while(token->id != TOKENID_OPERATOR_ASSIGN){
       if(token -> id == TOKENID_IDENTIFIER){
-         tokenvector_push(variables, token);
+         tokenvector_push(variables, token_copy(token));
       }
       i++;
       token = tokenvector_get(token_vector, i);
@@ -337,12 +339,7 @@ int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack,
          return err;
       }
 
-      if(expression_types == NULL){
-         expression_types = safe_alloc(sizeof(vartype_e));
-      }
-      else{
-         expression_types = safe_realloc(expression_types, sizeof(vartype_e) * (expression_types_size + 1));
-      }
+      expression_types = safe_realloc(expression_types, sizeof(vartype_e) * (expression_types_size + 1));
       expression_types[expression_types_size] = type;
       expression_types_size++;
 
@@ -351,6 +348,7 @@ int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack,
    }
 
    if(tokenvector_get_lenght(variables) != expression_types_size){
+      tokenvector_print(variables);
       return ERRCODE_GENERAL_SEMANTIC_ERROR;
    }
 
@@ -386,12 +384,7 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    while(token->id != TOKENID_RIGHT_PARENTHESES){
       
       if(token->id == TOKENID_KEYWORD_FLOAT64 || token->id == TOKENID_KEYWORD_INT || token->id == TOKENID_KEYWORD_STRING || token->id == TOKENID_KEYWORD_BOOL){
-         if(arg_types == NULL){
-            arg_types = safe_alloc(sizeof(vartype_e));
-         }
-         else{
-            arg_types = safe_realloc(arg_types, sizeof(vartype_e)* (arg_count + 1));
-         }
+         arg_types = safe_realloc(arg_types, sizeof(vartype_e)* (arg_count + 1));
          arg_types[arg_count] = tokenid_to_vartype(token->id);
          arg_count++;
          //add arguments to local symtable
@@ -483,7 +476,6 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
          i++;
       }while(token->id != TOKENID_COMMA && tokenvector_get_lenght(token_vector) > i);
 
-      tokenvector_print(expression);
       err = semantic_expression(expression, &expression_type, symtable_stack);
 
       if(err){
@@ -492,7 +484,6 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
       }
       expressions_count++;
       expressions_count=expressions_count;
-      symbol_print(function_symbol);
       if(function_symbol->value.fn->ret_count < expressions_count || function_symbol->value.fn->arg_types[expressions_count - 1] != expression_type){
          tokenvector_dtor(expression);
          return ERRCODE_ARGS_OR_RETURN_ERROR;
@@ -504,7 +495,6 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
    }
    
    if(function_symbol->value.fn->ret_count != expressions_count){
-      printf("%d %d",function_symbol->value.fn->ret_count,  expressions_count);
       return ERRCODE_ARGS_OR_RETURN_ERROR; // too few return values
    }
 
@@ -547,51 +537,58 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    int err;
    int i;
    int size;
-
+   printf("for: ");
+   tokenvector_print(token_vector);
    i = 1; // skip token with for
    // read def
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_SEMICOLON && tokenvector_get_lenght(token_vector) > i){
-      tokenvector_push(def, token);
-
+      tokenvector_push(def, token_copy(token));
       i++;
       token = tokenvector_get(token_vector, i);
    }
+   i++;
    // read condition
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_SEMICOLON && tokenvector_get_lenght(token_vector) > i){
-      tokenvector_push(condition, token);
+      tokenvector_push(condition, token_copy(token));
 
       i++;
       token = tokenvector_get(token_vector, i);
    }
-
+   i++;
    // read assign
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_LEFT_BRACKET && tokenvector_get_lenght(token_vector) > i){
-      tokenvector_push(assign, token);
+      tokenvector_push(assign, token_copy(token));
 
       i++;
       token = tokenvector_get(token_vector, i);
    }
-   
+
+   if(tokenvector_get_lenght(def) != 0){
+      bintreestack_push(symtable_stack, bintree_ctor());
+      err = semantic_definition(def, symtable_stack, &def_node);
+   }
+
    if(tokenvector_get_lenght(condition) != 0){
       condition_array = tokenvector_get_array(condition, &size);
       condition_node = astnode_exp_ctor(condition_array, size);
    }
 
-   bintreestack_push(symtable_stack, bintree_ctor());
-
-   if(tokenvector_get_lenght(def) != 0){
-      err = semantic_definition(def, symtable_stack, &def_node);
+   if(tokenvector_get_lenght(assign) != 0){
+      err = semantic_assign(assign, symtable_stack, &assign_node);
    }
 
    (*ast_node) = astnode_for_ctor(condition_node, def_node, assign_node);
 
-
+   tokenvector_dtor(assign);
+   tokenvector_dtor(def);
+   tokenvector_dtor(condition);
    if(err){
       return err;
    }
+
    return 0;
 }
 
