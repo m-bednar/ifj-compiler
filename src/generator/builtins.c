@@ -275,7 +275,94 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
          free(n_var);
       }
    } else {
+      char* l1 = labelgen_new();
+      char* l2 = labelgen_new();
+      char* l3 = labelgen_new();
+      char* l4 = labelgen_new();
+      char* l5 = labelgen_new();
+      char* s_var = generate_op_str(s, vartable);
+      char* i_var = generate_op_str(i, vartable);
+      char* n_var = generate_op_str(n, vartable);
+
+      printcm("STRLEN GF@$tmp0 %s", s_var);
       
+      if (is_const_tokenid(i->id)) {
+         if (i->value.int_value < 0) {
+            printcm("PUSHS string@");
+            printcm("PUSHS int@1");
+         }
+      } else {
+         printcm("PUSHS %s", i_var);
+         printcm("PUSHS int@0");
+         printcm("LTS");
+      }
+
+      if (is_const_tokenid(n->id)) {
+         if (n->value.int_value < 0) {
+            printcm("PUSHS string@");
+            printcm("PUSHS int@1");
+         }
+      } else {
+         printcm("PUSHS %s", n_var);
+         printcm("PUSHS int@0");
+         printcm("LTS");
+      }
+
+      printcm("PUSHS %s", i_var);
+      printcm("PUSHS GF@$tmp0");
+      printcm("LTS");
+      printcm("NOTS");
+
+      if (!is_const_tokenid(i->id)) {
+         printcm("ORS");
+      }
+      if (!is_const_tokenid(n->id)) {
+         printcm("ORS");
+      }
+
+      printcm("PUSHS bool@true");
+      printcm("JUMPIFEQS %s", l1);
+
+      printcm("PUSHS GF@$tmp0");
+      printcm("PUSHS %s", i_var);
+      printcm("PUSHS %s", n_var);
+      printcm("ADDS");
+      printcm("LTS");
+      printcm("PUSHS bool@true");
+      printcm("JUMPIFEQS %s", l3);
+      printcm("ADD GF@$tmp2 %s %s", i_var, n_var);
+      printcm("JUMP %s", l4);
+      printlb("LABEL %s", l3);
+      printcm("MOVE GF@$tmp2 GF@$tmp0");
+      printlb("LABEL %s", l4);
+
+      printcm("MOVE GF@$tmp1 string@");
+      printcm("MOVE GF@$tmp3 %s", i_var);
+
+      printlb("LABEL %s", l5);
+      printcm("GETCHAR GF@$tmp0 %s GF@$tmp3", s_var);
+      printcm("CONCAT GF@$tmp1 GF@$tmp1 GF@$tmp0");
+
+      printcm("ADD GF@$tmp3 GF@$tmp3 int@1");
+      printcm("LT GF@$tmp0 GF@$tmp3 GF@$tmp2");
+      printcm("JUMPIFEQ %s GF@$tmp0 bool@true", l5);
+
+      printcm("PUSHS GF@$tmp1");
+      printcm("PUSHS int@0");
+      printcm("JUMP %s", l2);
+      printlb("LABEL %s", l1);
+      printcm("PUSHS string@");
+      printcm("PUSHS int@1");
+      printlb("LABEL %s", l2);
+
+      free(l1);
+      free(l2);
+      free(l3);
+      free(l4);
+      free(l5);
+      free(s_var);
+      free(i_var);
+      free(n_var);
    }
 }
 
