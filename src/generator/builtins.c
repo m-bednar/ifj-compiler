@@ -38,6 +38,10 @@ void builtin_inputf() {
    builtin_input("float");
 }
 
+void builtin_inputb() {
+   builtin_input("bool");
+}
+
 void builtin_print(vartable_t* vartable, token_t** params, int param_count) {
    for (int i = 0; i < param_count; i++) {
       if (is_const_tokenid(params[i]->id)) {
@@ -277,7 +281,7 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
 
 bool is_builtin(char* identifier) {
    char* names[] = {
-      "inputs", "inputi", "inputf", "print", "int2float", 
+      "inputs", "inputi", "inputf", "inputb", "print", "int2float", 
       "float2int", "len", "chr", "ord", "substr"
    };
    for (int i = 0; i < (int)(sizeof(names) / sizeof(char*)); i++) {
@@ -295,6 +299,8 @@ void generate_builtin(char* identifier, token_t** params, int param_count, varta
       builtin_inputi();
    } else if (streq(identifier, "inputf")) {
       builtin_inputf();
+   } else if (streq(identifier, "inputb")) {
+      builtin_inputb();
    } else if (streq(identifier, "print")) {
       builtin_print(vartable, params, param_count);
    } else if (streq(identifier, "int2float")) {
