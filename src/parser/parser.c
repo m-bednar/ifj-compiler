@@ -227,7 +227,7 @@ int nonterminal_commands_derivation(ntsymstack_t* stack, int token_id) {
 }
 
 int nonterminal_id_next_derivation(ntsymstack_t* stack, int token_id) {
-   if (token_id == TOKENID_OPERATOR_ASSIGN || token_id == TOKENID_RIGHT_PARENTHESES) {
+   if (token_id == TOKENID_OPERATOR_ASSIGN) {
       ntsymbol_dtor(ntsymstack_pop(stack));
       return 0;
    } else if (token_id == TOKENID_COMMA) {
@@ -259,7 +259,7 @@ int nonterminal_for_assignment_right_derivation(ntsymstack_t* stack, int token_i
       } else {
          return ERRCODE_SYNTAX_ERROR;
       }
-   } else if (token_id == TOKENID_LEFT_PARENTHESES || token_id == TOKENID_OPERATOR_NOT || token_id == TOKENID_NUM ||
+   } else if (token_id == TOKENID_LEFT_PARENTHESES || token_id == TOKENID_OPERATOR_NOT || token_id == TOKENID_NUM || 
                   token_id == TOKENID_NUM_DECIMAL || token_id == TOKENID_STRING_LITERAL || token_id == TOKENID_BOOL_LITERAL) {
       ntsymbol_dtor(ntsymstack_pop(stack));
       ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
@@ -875,7 +875,6 @@ void parse(astnode_generic_t* ast_root, bintree_t* symtable) {
       token_dtor(token_next);
       exit(error);
    } else if (error) {
-      printf("err %d", error);
       exit(error);
    }
 
