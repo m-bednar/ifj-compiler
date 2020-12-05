@@ -681,16 +681,16 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
 
          if(astnodestack_lenght(ast_parents) != 0 && ast_def != NULL){
             ast_node_generic = astnode_generic_defvar_ctor(ast_def);
-            if(astnodestack_peek(ast_parents)->type == ANT_IF){
+            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
                if(ast_if_body){
-                  astnode_if_add_truebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
                else{
-                  astnode_if_add_elsebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents), ast_node_generic);
+            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
+               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
             }
          }
          else{
@@ -710,16 +710,16 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
 
          if(astnodestack_lenght(ast_parents) != 0 && ast_assign != NULL){
             ast_node_generic = astnode_generic_assign_ctor(ast_assign);
-            if(astnodestack_peek(ast_parents)->type == ANT_IF){
+            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
                if(ast_if_body){
-                  astnode_if_add_truebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
                else{
-                  astnode_if_add_elsebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents), ast_node_generic);
+            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
+               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
             }
          }
          else{
@@ -732,16 +732,16 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          err = semantic_ret(token_vector, function, symtable_stack, symtable_global, &ast_node_generic);
 
          if(astnodestack_lenght(ast_parents) != 0 && ast_node_generic != NULL){
-            if(astnodestack_peek(ast_parents)->type == ANT_IF){
+            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
                if(ast_if_body){
-                  astnode_if_add_truebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
                else{
-                  astnode_if_add_elsebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents), ast_node_generic);
+            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
+               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
             }
          }
          else{
@@ -754,16 +754,16 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          bintreestack_push(symtable_stack, bintree_ctor());
 
          if(astnodestack_lenght(ast_parents) != 0 && ast_node_generic != NULL){
-            if(astnodestack_peek(ast_parents)->type == ANT_IF){
+            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
                if(ast_if_body){
-                  astnode_if_add_truebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
                else{
-                  astnode_if_add_elsebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents), ast_node_generic);
+            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
+               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
             }
          }
          else{
@@ -780,16 +780,16 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          bintreestack_push(symtable_stack, bintree_ctor());
 
          if(astnodestack_lenght(ast_parents) != 0 && ast_node_generic != NULL){
-            if(astnodestack_peek(ast_parents)->type == ANT_IF){
+            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
                if(ast_if_body){
-                  astnode_if_add_truebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
                else{
-                  astnode_if_add_elsebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents), ast_node_generic);
+            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
+               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
             }
          }
          else{
@@ -804,16 +804,16 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          bintreestack_push(symtable_stack, bintree_ctor());
 
          if(astnodestack_lenght(ast_parents) != 0 && ast_node_generic != NULL){
-            if(astnodestack_peek(ast_parents)->type == ANT_IF){
+            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
                if(ast_if_body){
-                  astnode_if_add_truebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
                else{
-                  astnode_if_add_elsebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents), ast_node_generic);
+            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
+               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
             }
          }
          else{
@@ -826,16 +826,16 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
 
          if(astnodestack_lenght(ast_parents) != 0 && ast_funccall != NULL){
             ast_node_generic = astnode_generic_funccall_ctor(ast_funccall);
-            if(astnodestack_peek(ast_parents)->type == ANT_IF){
+            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
                if(ast_if_body){
-                  astnode_if_add_truebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
                else{
-                  astnode_if_add_elsebody(astnodestack_peek(ast_parents), ast_node_generic);
+                  astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents), ast_node_generic);
+            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
+               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
             }
          }
          else{
