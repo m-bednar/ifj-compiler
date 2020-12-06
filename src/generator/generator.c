@@ -57,7 +57,7 @@ void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t
             printcm("MOVE %s %s", param, generate_const_str(node->params[i]));
          } else {
             int depth = vartable_find(vartable, node->params[i]->value.string_value)->depth;
-            char* var = generate_var_str(node->params[i]->value.string_value, FT_TF, depth);
+            char* var = generate_var_str(node->params[i]->value.string_value, FT_LF, depth);
             printcm("MOVE %s %s", param, var);
             free(var);
          }
