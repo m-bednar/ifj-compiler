@@ -29,7 +29,7 @@ void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
    }
    for (int i = 0; i < clears_from; i++) {
       if (!streq(node->left_ids[i]->value.string_value, "_")) {
-         int depth = vartable_find(vartable, node->left_ids[i]->value.string_value)->depth;
+         int depth = vartable_depth(vartable, node->left_ids[i]->value.string_value);
          printcm("POPS %s", generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth));
       } else {
          printcm("POPS GF@$tmp0");
@@ -56,7 +56,7 @@ void generate_funccall(astnode_funccall_t* node, vartable_t* vartable, bintree_t
          if (is_const_tokenid(node->params[i]->id)) {
             printcm("MOVE %s %s", param, generate_const_str(node->params[i]));
          } else {
-            int depth = vartable_find(vartable, node->params[i]->value.string_value)->depth;
+            int depth = vartable_depth(vartable, node->params[i]->value.string_value);
             char* var = generate_var_str(node->params[i]->value.string_value, FT_LF, depth);
             printcm("MOVE %s %s", param, var);
             free(var);
