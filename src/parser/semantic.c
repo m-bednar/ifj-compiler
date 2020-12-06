@@ -72,7 +72,7 @@ int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintre
    vartype_e type;
    tokenvector_t* operators;
    int level;
-
+   
    token = tokenvector_get(token_vector, 0);
    if(token->id == TOKENID_OPERATOR_NOT){
       token = tokenvector_get(token_vector, 1);
@@ -220,14 +220,13 @@ int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node)
    tokenvector_t* args = tokenvector_ctor();
    token_t** args_array;
    token_t* token;
-   char* funccall_name = NULL;
    int i;
    int size;
 
    i = 2;
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_RIGHT_PARENTHESES){
-      if(token -> id == TOKENID_IDENTIFIER){
+      if(token -> id != TOKENID_COMMA){
          tokenvector_push(args, token_copy(token));
       }
       i++;
@@ -236,9 +235,8 @@ int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node)
 
    args_array = tokenvector_get_array(args, &size);
    token = tokenvector_get(token_vector, 0);
-   funccall_name = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
-   strcpy(funccall_name, token->value.string_value);
-   (*ast_node) = astnode_funccall_ctor(funccall_name, args_array, size);   
+   (*ast_node) = astnode_funccall_ctor(token->value.string_value, args_array, size);   
+   //printf("size: %s %d \n",token->value.string_value, size);
    return 0;
 }
 
@@ -456,13 +454,9 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    if(token->id != TOKENID_LEFT_BRACKET){
       while(token->id != TOKENID_RIGHT_PARENTHESES){
          if(token->id == TOKENID_KEYWORD_FLOAT64 || token->id == TOKENID_KEYWORD_INT || token->id == TOKENID_KEYWORD_STRING || token->id == TOKENID_KEYWORD_BOOL){
-            if(ret_types == NULL){
-               ret_types = safe_alloc(sizeof(vartype_e));
-            }
-            else{
-               ret_types = safe_realloc(ret_types, sizeof(vartype_e)* (arg_count + 1));
-            }
-            ret_types[arg_count] = tokenid_to_vartype(token->id);
+            
+            ret_types = safe_realloc(ret_types, sizeof(vartype_e)* (ret_count + 1));
+            ret_types[ret_count] = tokenid_to_vartype(token->id);
             ret_count++;
          }
          i++;
@@ -517,7 +511,7 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
       }
       expressions_count++;
       expressions_count=expressions_count;
-      if(function_symbol->value.fn->ret_count < expressions_count || function_symbol->value.fn->arg_types[expressions_count - 1] != expression_type){
+      if(function_symbol->value.fn->ret_count < expressions_count || function_symbol->value.fn->ret_types[expressions_count - 1] != expression_type){
          tokenvector_dtor(expression);
          return ERRCODE_ARGS_OR_RETURN_ERROR;
       }
@@ -526,7 +520,6 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
       astnode_ret_add_exp((*node_ret), astnode_exp_ctor(expressionArray, size));
       tokenvector_dtor(expression);
    }
-   
    if(function_symbol->value.fn->ret_count != expressions_count){
       return ERRCODE_ARGS_OR_RETURN_ERROR; // too few return values
    }
@@ -726,8 +719,6 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    //tokenvector_print(token_vector);
    switch(current_flag){
       case NONTERMINAL_PACKAGE:
-         //printf("PACKAGE: \n");
-         //tokenvector_print(token_vector);
          err = semantic_package(token_vector, was_main);
          if(!err){
             was_main = true;
