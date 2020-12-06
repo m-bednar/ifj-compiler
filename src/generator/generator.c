@@ -77,10 +77,12 @@ void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fn
       generate_returns_pops(node, vartable);
    } else {
       for (int i = 0; i < node->ids_count; i++) {
-         int depth = vartable_depth(vartable, node->left_ids[i]->value.string_value);
-         char* var = generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth);
-         generate_assign_expression(var, node->right_expressions[i], vartable);
-         free(var);
+         if (!streq(node->left_ids[i]->value.string_value, "_")) {
+            int depth = vartable_depth(vartable, node->left_ids[i]->value.string_value);
+            char* var = generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth);
+            generate_assign_expression(var, node->right_expressions[i], vartable);
+            free(var);
+         }
       }
    }
 }
