@@ -4,6 +4,7 @@
  * @authors Michal Trlica (xtrlic02)
  */
 
+#include <string.h>
 #include "ast.h"
 #include "../memory.h"
 #include "../error.h"
@@ -100,7 +101,8 @@ void astnode_ret_add_exp(astnode_generic_t* ret, astnode_exp_t* exp){
 
 astnode_funcdecl_t* astnode_funcdecl_ctor(char* name) {
    astnode_funcdecl_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
-   ast_node->name = name;
+   ast_node->name = safe_alloc(sizeof(char) * (strlen(name) + 1));
+   strcpy(ast_node->name, name);
    ast_node->body = astnode_codeblock_ctor();
    return ast_node;
 }
@@ -173,7 +175,8 @@ void astnode_assign_add_funccall(astnode_assign_t* ast_node, astnode_funccall_t*
 
 astnode_funccall_t* astnode_funccall_ctor(char* name, token_t** params, int params_count){
    astnode_funccall_t* ast_node = safe_alloc(sizeof(astnode_funccall_t));
-   ast_node->name = name;
+   ast_node->name = safe_alloc(sizeof(char) * (strlen(name) + 1));
+   strcpy(ast_node->name, name);
    ast_node->params = params;
    ast_node->params_count = params_count;
    return ast_node;

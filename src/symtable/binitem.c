@@ -77,9 +77,9 @@ bool binitem_insert_child(binitem_t* item, symbol_t* value) {
    return true;
 }
 
-void binitem_to_array(binitem_t* item, symbol_t** array, int* length) {
-   array = safe_realloc(array, sizeof(symbol_t*) * (*length + 1));
-   array[*length] = item->value;
+void binitem_to_array(binitem_t* item, symbol_t*** array, int* length) {
+   (*array) = safe_realloc(*array, sizeof(symbol_t*) * (*length + 1));
+   (*array)[*length] = item->value;
    (*length)++;
    if (item->left != NULL) {
       binitem_to_array(item->left, array, length);
