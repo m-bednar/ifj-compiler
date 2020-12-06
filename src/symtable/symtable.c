@@ -66,7 +66,7 @@ symbol_t** bintree_to_array(bintree_t* tree, int* length) {
    symbol_t** array = NULL;
    *length = 0;
    if (tree->root != NULL) {
-      binitem_to_array(tree->root, array, length);
+      binitem_to_array(tree->root, &array, length);
    }
    
    return array;
