@@ -150,7 +150,7 @@ void generate_condition(astnode_exp_t* cond, vartable_t* vartable, char* label, 
       printcm("PUSHS bool@%s", jump_on ? "true" : "false");
       printcm("JUMPIFEQS %s", label);
    } else {
-      printcm("JUMPIFEQ %s GF@$tmp0 bool@f%s", label, jump_on ? "true" : "false");
+      printcm("JUMPIFEQ %s GF@$tmp0 bool@%s", label, jump_on ? "true" : "false");
    }
 }
 
