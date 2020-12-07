@@ -18,6 +18,7 @@ vartable_t* vartable_ctor() {
 }
 
 void vartable_dtor(vartable_t* vartable) {
+   guard(vartable != NULL);
    for (int i = 0; i < vartable->lenght; i++) {
       free(vartable->data[i]->identifier);
       free(vartable->data[i]);
@@ -26,14 +27,19 @@ void vartable_dtor(vartable_t* vartable) {
 }
 
 void vartable_ascent(vartable_t* vartable) {
+   guard(vartable != NULL);
    vartable->depth--;
 }
 
 void vartable_descent(vartable_t* vartable) {
+   guard(vartable != NULL);
    vartable->depth++;
 }
 
 void vartable_add(vartable_t* vartable, char* identifier, vartype_e type) {
+   guard(vartable != NULL);
+   guard(identifier != NULL);
+
    vardata_t* data = safe_alloc(sizeof(vardata_t));
    data->identifier = safe_alloc(strlen(identifier) * sizeof(char));
    strcpy(data->identifier, identifier);
@@ -46,6 +52,9 @@ void vartable_add(vartable_t* vartable, char* identifier, vartype_e type) {
 }
 
 bool vartable_should_define(vartable_t* vartable, char* identifier, vartype_e type) {
+   guard(vartable != NULL);
+   guard(identifier != NULL);
+
    vardata_t* data = vartable_find(vartable, identifier);
    if (data == NULL) {
       return true;
@@ -58,12 +67,18 @@ bool vartable_should_define(vartable_t* vartable, char* identifier, vartype_e ty
 }
 
 int vartable_depth(vartable_t* vartable, char* identifier) {
+   guard(vartable != NULL);
+   guard(identifier != NULL);
+
    vardata_t* data = vartable_find(vartable, identifier);
    guard(data != NULL);
    return data->depth;
 }
 
 vardata_t* vartable_find(vartable_t* vartable, char* identifier) {
+   guard(vartable != NULL);
+   guard(identifier != NULL);
+   
    int max = -1;
    vardata_t* item = NULL;
    for (int i = 0; i < vartable->lenght; i++) {
