@@ -26,11 +26,11 @@ void vartable_dtor(vartable_t* vartable) {
 }
 
 void vartable_ascent(vartable_t* vartable) {
-   vartable->depth++;
+   vartable->depth--;
 }
 
 void vartable_descent(vartable_t* vartable) {
-   vartable->depth--;
+   vartable->depth++;
 }
 
 void vartable_add(vartable_t* vartable, char* identifier, vartype_e type) {

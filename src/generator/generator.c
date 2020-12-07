@@ -170,7 +170,9 @@ void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable)
    printlb("LABEL %s", l2);
    generate_codeblock(node->body, vartable, fntable);
    vartable_ascent(vartable);
-   generate_assign(node->assign, vartable, fntable);
+   if (node->assign != NULL) {
+      generate_assign(node->assign, vartable, fntable);
+   }
    generate_condition(node->condition, vartable, l2, true);
    printlb("LABEL %s", l1);
    vartable_ascent(vartable);
