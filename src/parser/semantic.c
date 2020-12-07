@@ -300,7 +300,6 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
          for(int i = 0 ; i < tokenvector_get_lenght(variables); i++){
             token = tokenvector_get(variables, i);
             return_types[i] = bintreestack_find(symtable_stack, token->value.string_value, NULL)->value.var->type;
-            printf("%d",return_types[i]);
          }
       }
       token = tokenvector_get(funccall, 0);
@@ -472,7 +471,6 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
          }
       }
       //pre declaration match
-      //symbol_print(symbol);
       symbol->value.fn->arg_names = arg_names;
       symbol->value.fn->defined = true;
    }
@@ -506,7 +504,6 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
       }while(token->id != TOKENID_COMMA && tokenvector_get_lenght(token_vector) > i);
       
       err = semantic_expression(expression, &expression_type, symtable_stack);
-      printf(" ret type: %d", expression_type);
       if(err){
          tokenvector_dtor(expression);
          return err;
@@ -538,7 +535,12 @@ int semantic_if(tokenvector_t* token_vector, astnode_generic_t** ast_node, bintr
    symtable_stack=symtable_stack;
    //int err;
    //vartype_e type;
-   i = 1; // skip token with if 
+   if(tokenvector_get(token_vector,0)->id == TOKENID_KEYWORD_ELSE){
+      i=2; // skip token with else and if
+   }
+   else{
+      i = 1; // skip token with if 
+   }
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_LEFT_BRACKET && tokenvector_get_lenght(token_vector) > i){
       tokenvector_push(condition, token_copy(token));
@@ -732,7 +734,7 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    if(current_flag != NONTERMINAL_PACKAGE && !was_main){
       return ERRCODE_SYNTAX_ERROR;
    }
-   tokenvector_print(token_vector);
+   //tokenvector_print(token_vector);
    switch(current_flag){
       case NONTERMINAL_PACKAGE:
          err = semantic_package(token_vector, was_main);
