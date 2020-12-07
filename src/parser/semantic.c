@@ -236,7 +236,6 @@ int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node)
    args_array = tokenvector_get_array(args, &size);
    token = tokenvector_get(token_vector, 0);
    (*ast_node) = astnode_funccall_ctor(token->value.string_value, args_array, size);   
-   //printf("size: %s %d \n",token->value.string_value, size);
    return 0;
 }
 
@@ -247,12 +246,11 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
    token_t* token;
    astnode_funccall_t* funccall_node;
    symbol_t* symbol;
-   //astnode_funccall_t* ast_funccall;
    int i;
    int size;
    int err = 0;
    (*assign_node) = astnode_assign_ctor();
-
+   symtable_stack = symtable_stack;
    i = 0;
    token = tokenvector_get(token_vector, i);
    //reading variables
@@ -276,15 +274,11 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
    }while(tokenvector_get_lenght(token_vector) > i);
 
    err = semantic_funcall(funccall, &funccall_node);
-
    astnode_assign_add_funccall((*assign_node), funccall_node);
    
    token = tokenvector_get(funccall, 0);
    symbol = bintree_find(symtable_global ,token->value.string_value);
-
    if(symbol == NULL){
-      char* name = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
-      strcpy(name, token->value.string_value);
       //expected arguments for yet undefined function
       vartype_e* arg_types = NULL;
       if(funccall_node->params_count != 0){
@@ -302,14 +296,15 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
       //expected return types for yet undefined function
       vartype_e* return_types = NULL;
       if(tokenvector_get_lenght(variables) != 0){
-         arg_types = safe_alloc(sizeof(vartype_e) * tokenvector_get_lenght(variables));
+         return_types = safe_alloc(sizeof(vartype_e) * tokenvector_get_lenght(variables));
          for(int i = 0 ; i < funccall_node->params_count; i++){
             token = tokenvector_get(variables, i);
             return_types[i] = bintreestack_find(symtable_stack, token->value.string_value, NULL)->value.var->type;
          }
       }
-      //symbolval_u new_symbolval = symbolval_fn_ctor(funccall_node->params_count, tokenvector_get_lenght(variables), NULL, arg_types, return_types, false);
-      //bintree_add(symtable_global, symbol_ctor(name, ST_FUNCTION, new_symbolval));
+      token = tokenvector_get(funccall, 0);
+      symbolval_u new_symbolval = symbolval_fn_ctor(funccall_node->params_count, tokenvector_get_lenght(variables), NULL, arg_types, return_types, false);
+      bintree_add(symtable_global, symbol_ctor(token->value.string_value, ST_FUNCTION, new_symbolval));
    }
 
    tokenvector_dtor(funccall);
@@ -406,7 +401,6 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    vartype_e* ret_types = NULL;
    int arg_count = 0;
    int ret_count = 0;
-   int level;
    i = 3;
    //function args handling
    token = tokenvector_get(token_vector, i);
@@ -418,21 +412,8 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
          arg_count++;
          //add arguments to local symtable
          token_t* token_before = tokenvector_get(token_vector, i - 1);
-         if(bintreestack_get_length(symtable_stack) == 0){
-            bintreestack_push(symtable_stack, bintree_ctor());
-            symbol = symbol_ctor(token_before->value.string_value, ST_VARIABLE, symbolval_var_ctor(tokenid_to_vartype(token->id)));
-            bintree_add(bintreestack_peek(symtable_stack), symbol);
-         }
-         else{
-            symbol = bintreestack_find(symtable_stack, token_before->value.string_value, &level);
-            if(symbol != NULL){
-               return ERRCODE_GENERAL_SEMANTIC_ERROR;
-            }
-            else{
-               symbol = symbol_ctor(token_before->value.string_value, ST_VARIABLE, symbolval_var_ctor(tokenid_to_vartype(token->id)));
-               bintree_add(bintreestack_peek(symtable_stack), symbol);
-            }
-         }
+         symbol = symbol_ctor(token_before->value.string_value, ST_VARIABLE, symbolval_var_ctor(tokenid_to_vartype(token->id)));
+         bintree_add(bintreestack_peek(symtable_stack), symbol);
 
       }
       if(token->id == TOKENID_IDENTIFIER){
@@ -471,6 +452,30 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    symbol = bintree_find(symtable_global, token->value.string_value);
    if(symbol == NULL){
       bintree_add(symtable_global, symbol_ctor(token->value.string_value, ST_FUNCTION, symbolval_fn_ctor(arg_count, ret_count, arg_names, arg_types, ret_types, true)));
+   }
+   else{
+      if(symbol->value.fn->defined){
+         //function was already declared
+         return ERRCODE_VAR_UNDEFINED_ERROR;
+      }
+      if(symbol->value.fn->arg_count != arg_count || symbol->value.fn->ret_count != ret_count){
+         //pre declaration doesnt match
+         return ERRCODE_ARGS_OR_RETURN_ERROR;
+      }
+
+      for(int i = 0; i < symbol->value.fn->arg_count; i++){
+         if(symbol->value.fn->arg_types[i] != arg_types[i]){
+            return ERRCODE_ARGS_OR_RETURN_ERROR;
+         }
+      }
+      for(int i = 0; i < symbol->value.fn->ret_count; i++){
+         if(symbol->value.fn->ret_types[i] != ret_types[i]){
+            return ERRCODE_ARGS_OR_RETURN_ERROR;
+         }
+      }
+      //pre declaration match
+      symbol->value.fn->arg_names=arg_names;
+      symbol->value.fn->defined = true;
    }
 
    return 0;
@@ -644,6 +649,7 @@ int semantic_check_undeclared_func(bintree_t* symtable_global){
    symbol_t** functions = bintree_to_array(symtable_global, &functions_count);
    for(int i = 0; i < functions_count; i++){
       if(!functions[i]->value.fn->defined){
+         printf(" konec nebyla definovana %s",functions[i]->identifier);
          return ERRCODE_VAR_UNDEFINED_ERROR;
       }
    }
@@ -697,13 +703,15 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
 
    if(was_right_bracket && (current_flag != NONTERMINAL_ELSE && current_flag != NONTERMINAL_ELSE_IF)){
       was_right_bracket = false;
-      astnodestack_pop(ast_parents);
+      if(astnodestack_lenght(ast_parents) != 0)
+         astnodestack_pop(ast_parents);
    }
 
    astnode_defvar_t* ast_def = NULL;
    astnode_assign_t* ast_assign = NULL;
    astnode_funccall_t* ast_funccall = NULL;
    astnode_generic_t* ast_node_generic = NULL;
+   token_t* token_tmp = NULL;
    //ast insert
 
    if(current_flag != NONTERMINAL_PACKAGE && !was_main){
@@ -722,8 +730,8 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          token = tokenvector_get(token_vector, 1);
          function = astnode_funcdecl_ctor(token->value.string_value);
          ast_global_add_func(ast, function);
-         err = semantic_function_decl(token_vector, symtable_stack, symtable_global);
          bintreestack_push(symtable_stack, bintree_ctor());
+         err = semantic_function_decl(token_vector, symtable_stack, symtable_global);
          
          break;
       case NONTERMINAL_DEFINITION:
@@ -876,6 +884,29 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
+         }
+
+         //add to symtable if its not yet declared
+         token_tmp = tokenvector_get(token_vector,0);
+         if(bintree_find(symtable_global ,token_tmp->value.string_value) == NULL){
+            //expected arguments for yet undefined function
+            vartype_e* arg_types = NULL;
+            if(ast_funccall->params_count != 0){
+               arg_types = safe_alloc(sizeof(vartype_e) * ast_funccall->params_count);
+               for(int i = 0 ; i < ast_funccall->params_count; i++){
+                  token_tmp = ast_funccall->params[i];
+                  if(token_tmp->id == TOKENID_IDENTIFIER){
+                     arg_types[i] = bintreestack_find(symtable_stack, token_tmp->value.string_value, NULL)->value.var->type;
+                  }
+                  else{
+                     arg_types[i] =  get_const_type(token_tmp);
+                  }
+               }
+            }
+
+            token_tmp = tokenvector_get(token_vector, 0);
+            symbolval_u new_symbolval = symbolval_fn_ctor(ast_funccall->params_count, 0, NULL, arg_types, NULL, false);
+            bintree_add(symtable_global, symbol_ctor(token_tmp->value.string_value, ST_FUNCTION, new_symbolval));
          }
 
          break;
