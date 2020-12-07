@@ -519,7 +519,7 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
 
       expressionArray = tokenvector_get_array(expression, &size);
       astnode_ret_add_exp((*node_ret), astnode_exp_ctor(expressionArray, size));
-      tokenvector_dtor(expression);
+      //tokenvector_dtor(expression);
    }
    if(function_symbol->value.fn->ret_count != expressions_count){
       return ERRCODE_ARGS_OR_RETURN_ERROR; // too few return values
@@ -576,8 +576,6 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    int err;
    int i;
    int size;
-   printf("for: ");
-   //tokenvector_print(token_vector);
    i = 1; // skip token with for
    // read def
    token = tokenvector_get(token_vector, i);
@@ -588,8 +586,6 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    }
    i++;
    // read condition
-   printf("def: ");
-   tokenvector_print(def);
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_SEMICOLON && tokenvector_get_lenght(token_vector) > i){
       tokenvector_push(condition, token_copy(token));
@@ -599,8 +595,6 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    }
    i++;
    // read assign
-   printf("condition: ");
-   tokenvector_print(condition);
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_LEFT_BRACKET && tokenvector_get_lenght(token_vector) > i){
       tokenvector_push(assign, token_copy(token));
@@ -609,8 +603,6 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
       token = tokenvector_get(token_vector, i);
    }
 
-   printf("assign: ");
-   tokenvector_print(assign);
    if(tokenvector_get_lenght(def) != 0){
       bintreestack_push(symtable_stack, bintree_ctor());
       err = semantic_definition(def, symtable_stack, &def_node);
@@ -653,7 +645,6 @@ int semantic_check_undeclared_func(bintree_t* symtable_global){
    symbol_t** functions = bintree_to_array(symtable_global, &functions_count);
    for(int i = 0; i < functions_count; i++){
       if(!functions[i]->value.fn->defined){
-         printf(" konec nebyla definovana %s",functions[i]->identifier);
          return ERRCODE_VAR_UNDEFINED_ERROR;
       }
    }
@@ -741,7 +732,7 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    if(current_flag != NONTERMINAL_PACKAGE && !was_main){
       return ERRCODE_SYNTAX_ERROR;
    }
-   tokenvector_print(token_vector);
+   //tokenvector_print(token_vector);
    switch(current_flag){
       case NONTERMINAL_PACKAGE:
          err = semantic_package(token_vector, was_main);
@@ -854,7 +845,6 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
       case NONTERMINAL_ELSE:
          bintreestack_push(symtable_stack, bintree_ctor());
          was_right_bracket = false;
-         printf("paren body : %d \n",astnodestack_peek(ast_parents)->parentbody);
          astnodestack_peek(ast_parents)->parentbody = AP_IF_FALSE;
          break;
       case NONTERMINAL_ELSE_IF:

@@ -52,7 +52,7 @@ astnode_generic_t* astnode_if_ctor(astnode_exp_t* condition) {
    ast_node->type = ANT_IF;
    ast_node->value.ifval = safe_alloc(sizeof(astnode_if_t));
    ast_node->value.ifval->condition = condition;
-   ast_node->value.ifval->else_body = astnode_codeblock_ctor();
+   ast_node->value.ifval->else_body = NULL;
    ast_node->value.ifval->true_body = astnode_codeblock_ctor();
    return ast_node;
 }
@@ -131,6 +131,9 @@ void astnode_if_add_truebody(astnode_generic_t* ast_node, astnode_generic_t* new
 }
 
 void astnode_if_add_elsebody(astnode_generic_t* ast_node, astnode_generic_t* new_node){
+   if(ast_node->value.ifval->else_body == NULL){
+      ast_node->value.ifval->else_body = astnode_codeblock_ctor();
+   }
    astnode_codeblock_insert(ast_node->value.ifval->else_body, new_node);
 }
 
@@ -148,6 +151,8 @@ astnode_generic_t* astnode_generic_assign_ctor(astnode_assign_t* assign){
    astnode_generic_t* ast_node = safe_alloc(sizeof(astnode_generic_t));
    ast_node->type = ANT_ASSIGN;
    ast_node->value.assignval = assign;
+   ast_node->value.assignval->ids_count = 0;
+   ast_node->value.assignval->expressions_count = 0;
    return ast_node;
 }
 
