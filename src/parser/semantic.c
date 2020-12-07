@@ -368,8 +368,6 @@ int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack,
       expression_types[expression_types_size] = type;
       expression_types_size++;
 
-      tokenvector_dtor(expression);
-
    }
 
    if(tokenvector_get_lenght(variables) != expression_types_size){
