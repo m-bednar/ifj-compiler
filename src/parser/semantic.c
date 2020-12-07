@@ -10,6 +10,7 @@
 #include "semantic.h"
 #include "tokenvector.h"
 #include "astnodestack.h"
+#include "../generator/postfix.h"
 #include "../error.h"
 
 // converts tokenid type keyword to vartype
@@ -63,6 +64,77 @@ bool is_relational_operator(token_t* token){
       return true;
    }
 }
+
+bool is_operator(token_t* token){
+   if(token->id == TOKENID_OPERATOR_ADD || token->id == TOKENID_OPERATOR_SUB || token->id == TOKENID_OPERATOR_MUL || token->id == TOKENID_OPERATOR_DIV || token->id == TOKENID_OPERATOR_LESS || token->id == TOKENID_OPERATOR_LESS_OR_EQUAL || token->id == TOKENID_OPERATOR_GREATER || token->id == TOKENID_OPERATOR_GREATER_OR_EQUAL || token->id == TOKENID_OPERATOR_EQUALS || token->id == TOKENID_OPERATOR_EQUALS || token->id == TOKENID_OPERATOR_NOT || token->id == TOKENID_OPERATOR_NOT_EQUAL || token->id == TOKENID_OPERATOR_AND || token->id == TOKENID_OPERATOR_OR){
+      return true;
+   }
+   else{
+      return false;
+   }
+}
+
+bool is_binary_operator(token_t* token){
+   if(token->id == TOKENID_OPERATOR_NOT){
+      return true;
+   }
+   else{
+      return false;
+   }
+}
+
+void expression_replace_tree_tokens(astnode_exp_t* exp, token_t* token, int i){
+   token_t* new = token_copy(token);
+
+   token_dtor(exp->tokens[i]);
+   token_dtor(exp->tokens[i + 1]);
+   token_dtor(exp->tokens[i + 2]);
+
+   exp->tokens[i] = new;
+
+   for (int j = i + 3; j < exp->tokens_count; j++) {
+      exp->tokens[j - 2] = exp->tokens[j];
+   }
+   
+   exp->tokens_count -= 2;
+}
+
+void expression_replace_two_tokens(astnode_exp_t* exp, token_t* token, int i){
+   token_t* new = token_copy(token);
+
+   token_dtor(exp->tokens[i]);
+   token_dtor(exp->tokens[i + 1]);
+
+   exp->tokens[i] = new;
+
+   for (int j = i + 2; j < exp->tokens_count; j++) {
+      exp->tokens[j - 1] = exp->tokens[j];
+   }
+   
+   exp->tokens_count -= 1;
+}
+
+
+/*int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintreestack_t* symtable_stack){
+   (*ret_type)=VT_INT;
+   symtable_stack=symtable_stack;
+   int expression_size = 0;
+   bool reduced = false;
+   tokenvector_print(token_vector);
+   token_t** expression_array = tokenvector_get_array(token_vector, &expression_size);
+   astnode_exp_t* node_exp = astnode_exp_ctor(expression_array, expression_size);
+   infix_to_postfix(node_exp);
+   
+   do{
+      for(int i = 0; i < node_exp->tokens_count && !reduced; i++){
+         if(is_operator(node_exp->tokens[i])){
+
+         }
+      }
+   }while(reduced);
+   
+   return 0;
+}*/
 
 int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintreestack_t* symtable_stack){
    token_t* token;
@@ -694,6 +766,11 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    }
 
    if(token->id == TOKENID_RIGHT_BRACKET){
+      if(was_right_bracket){
+         if(astnodestack_lenght(ast_parents) != 0){
+            astnodestack_pop(ast_parents);
+         }
+      }
       was_right_bracket = true;
       if(bintreestack_get_length(symtable_stack) != 0)
          bintree_dtor(bintreestack_pop(symtable_stack));
@@ -720,8 +797,9 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
 
    if(was_right_bracket && (current_flag != NONTERMINAL_ELSE && current_flag != NONTERMINAL_ELSE_IF)){
       was_right_bracket = false;
-      if(astnodestack_lenght(ast_parents) != 0)
+      if(astnodestack_lenght(ast_parents) != 0){
          astnodestack_pop(ast_parents);
+      }
    }
 
    astnode_defvar_t* ast_def = NULL;
@@ -929,7 +1007,6 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
       default:
          break;
    }
-
    tokenvector_dtor(token_vector);
    token_vector = NULL;
    
