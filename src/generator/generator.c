@@ -163,6 +163,7 @@ void generate_condition(astnode_exp_t* cond, vartable_t* vartable, char* label, 
  */
 void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable) {
    vartable_descent(vartable);
+   // dprint("%d", node->body->children_count);
    if (node->defvar != NULL) {
       generate_defvar(node->defvar, vartable, true);
    }
