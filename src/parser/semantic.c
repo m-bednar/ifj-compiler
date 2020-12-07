@@ -656,6 +656,22 @@ int semantic_check_undeclared_func(bintree_t* symtable_global){
    return 0;
 }
 
+vartype_e* vartype_arr_static_to_dyn(vartype_e static_arr[], int count){
+   vartype_e* dynamic = safe_alloc(sizeof(vartype_e) * count);
+   for(int i = 0; i < count; i++){
+      dynamic[i] = static_arr[i];
+   }
+   return static_arr;
+}
+
+void add_buildin_funcs(bintree_t* symtable_global){
+   symbol_t* symbol;
+   //inputs() (string, int)
+   vartype_e inputs_arg_types[] = {VT_STRING, VT_INT};
+   symbol = symbol_ctor("inputs", ST_FUNCTION, symbolval_fn_ctor(0, 2, NULL, NULL, vartype_arr_static_to_dyn(inputs_arg_types, 2), true));
+   bintree_add(symtable_global, symbol);
+}
+
 int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic_t* ast, bintree_t* symtable_global){
    static astnode_funcdecl_t* function;
    static bintreestack_t* symtable_stack = NULL;
@@ -676,6 +692,10 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
       ast_parents = astnodestack_ctor();
    }
    
+   if(symtable_global->root == NULL){
+      add_buildin_funcs(symtable_global);
+   }
+
    if(token->id == TOKENID_RIGHT_BRACKET){
       was_right_bracket = true;
       if(bintreestack_get_length(symtable_stack) != 0)
@@ -727,6 +747,7 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          break;
       // FUNCTION DECLARATION
       case NONTERMINAL_FUNCTION:
+         //TODO: if function has return
          token = tokenvector_get(token_vector, 1);
          function = astnode_funcdecl_ctor(token->value.string_value);
          ast_global_add_func(ast, function);
