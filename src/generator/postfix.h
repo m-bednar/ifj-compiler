@@ -13,3 +13,8 @@
  * Converts expression in infix notation to postfix notation.
  */
 void infix_to_postfix(astnode_exp_t* exp);
+
+/**
+ * Optimizes postfix notation.
+ */
+void optimize_postfix(astnode_exp_t* exp);

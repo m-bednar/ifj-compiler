@@ -359,5 +359,4 @@ void infix_to_postfix(astnode_exp_t* exp) {
    exp->tokens = safe_realloc(exp->tokens, j * sizeof(token_t*));
 
    tstack_dtor(stack);
-   optimize_postfix(exp);
 }

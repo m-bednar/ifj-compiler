@@ -274,6 +274,7 @@ bool generate_const_expression(astnode_exp_t* exp, vartable_t* vartable, bool pr
 
 bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_stack) {
    infix_to_postfix(exp);
+   optimize_postfix(exp);
    if (exp->tokens_count == 1) { 
       return generate_const_expression(exp, vartable, prefer_stack);
    } else if (exp->tokens_count <= 3 && !prefer_stack) {
@@ -287,6 +288,7 @@ bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_s
 
 void generate_assign_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
    infix_to_postfix(exp);
+   optimize_postfix(exp);
    if (exp->tokens_count == 1) {
       generate_const_assign_expression(asignee, exp, vartable);
    } else if (exp->tokens_count <= 3) {
