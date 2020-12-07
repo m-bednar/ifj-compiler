@@ -65,6 +65,8 @@ bool is_operand(token_t* token) {
  */
 int op_precedence(token_t* token) { 
    switch (token->id) {
+      case TOKENID_LEFT_PARENTHESES:
+         return 0;
       case TOKENID_OPERATOR_EQUALS:
       case TOKENID_OPERATOR_NOT_EQUAL:
       case TOKENID_OPERATOR_LESS:
@@ -328,7 +330,6 @@ void optimize_postfix(astnode_exp_t* exp) {
 void infix_to_postfix(astnode_exp_t* exp) {
    tstack_t* stack = tstack_ctor(exp->tokens_count);
    int j = 0;
-
    for (int i = 0; i < exp->tokens_count; i++) {
       if (is_operand(exp->tokens[i])) {
          exp->tokens[j++] = exp->tokens[i];

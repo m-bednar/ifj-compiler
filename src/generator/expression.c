@@ -276,7 +276,6 @@ bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_s
    infix_to_postfix(exp);
    optimize_postfix(exp);
    if (exp->tokens_count == 1) { 
-      dprint("%d", exp->tokens_count);
       return generate_const_expression(exp, vartable, prefer_stack);
    } else if (exp->tokens_count <= 3 && !prefer_stack) {
       generate_local_expression("GF@$tmp0", exp, vartable);
