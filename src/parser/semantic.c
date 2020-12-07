@@ -112,7 +112,7 @@ int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintre
          next_type = get_const_type(token);
       }
       else{
-         tokenvector_push(operators, token);
+         tokenvector_push(operators, token_copy(token));
       }
 
       if(type == VT_FLOAT || type == VT_INT){
@@ -269,7 +269,7 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
    
    do{
       token = tokenvector_get(token_vector, i);
-      tokenvector_push(funccall, token);
+      tokenvector_push(funccall, token_copy(token));
       i++;
    }while(tokenvector_get_lenght(token_vector) > i);
 
@@ -578,7 +578,7 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    int err;
    int i;
    int size;
-   //printf("for: ");
+   printf("for: ");
    //tokenvector_print(token_vector);
    i = 1; // skip token with for
    // read def
@@ -590,6 +590,8 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    }
    i++;
    // read condition
+   printf("def: ");
+   tokenvector_print(def);
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_SEMICOLON && tokenvector_get_lenght(token_vector) > i){
       tokenvector_push(condition, token_copy(token));
@@ -599,6 +601,8 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    }
    i++;
    // read assign
+   printf("condition: ");
+   tokenvector_print(condition);
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_LEFT_BRACKET && tokenvector_get_lenght(token_vector) > i){
       tokenvector_push(assign, token_copy(token));
@@ -607,6 +611,8 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
       token = tokenvector_get(token_vector, i);
    }
 
+   printf("assign: ");
+   tokenvector_print(assign);
    if(tokenvector_get_lenght(def) != 0){
       bintreestack_push(symtable_stack, bintree_ctor());
       err = semantic_definition(def, symtable_stack, &def_node);
@@ -625,7 +631,7 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
 
    tokenvector_dtor(assign);
    tokenvector_dtor(def);
-   tokenvector_dtor(condition);
+   //tokenvector_dtor(condition);
    if(err){
       return err;
    }
