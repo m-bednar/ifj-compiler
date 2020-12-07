@@ -47,11 +47,14 @@ void vartable_add(vartable_t* vartable, char* identifier, vartype_e type) {
 
 bool vartable_should_define(vartable_t* vartable, char* identifier, vartype_e type) {
    vardata_t* data = vartable_find(vartable, identifier);
-   if (data != NULL) {
+   if (data == NULL) {
+      return true;
+   } else if (data->depth != vartable->depth) {
+      return true;
+   } else {
       data->type = type;
       return false;
    }
-   return true;
 }
 
 int vartable_depth(vartable_t* vartable, char* identifier) {
