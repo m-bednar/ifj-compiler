@@ -72,7 +72,7 @@ int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintre
    vartype_e type;
    tokenvector_t* operators;
    int level;
-
+   
    token = tokenvector_get(token_vector, 0);
    if(token->id == TOKENID_OPERATOR_NOT){
       token = tokenvector_get(token_vector, 1);
@@ -220,14 +220,13 @@ int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node)
    tokenvector_t* args = tokenvector_ctor();
    token_t** args_array;
    token_t* token;
-   char* funccall_name = NULL;
    int i;
    int size;
 
    i = 2;
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_RIGHT_PARENTHESES){
-      if(token -> id == TOKENID_IDENTIFIER){
+      if(token -> id != TOKENID_COMMA){
          tokenvector_push(args, token_copy(token));
       }
       i++;
@@ -236,9 +235,7 @@ int semantic_funcall(tokenvector_t* token_vector, astnode_funccall_t** ast_node)
 
    args_array = tokenvector_get_array(args, &size);
    token = tokenvector_get(token_vector, 0);
-   funccall_name = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
-   strcpy(funccall_name, token->value.string_value);
-   (*ast_node) = astnode_funccall_ctor(funccall_name, args_array, size);   
+   (*ast_node) = astnode_funccall_ctor(token->value.string_value, args_array, size);   
    return 0;
 }
 
@@ -249,12 +246,11 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
    token_t* token;
    astnode_funccall_t* funccall_node;
    symbol_t* symbol;
-   //astnode_funccall_t* ast_funccall;
    int i;
    int size;
    int err = 0;
    (*assign_node) = astnode_assign_ctor();
-
+   symtable_stack = symtable_stack;
    i = 0;
    token = tokenvector_get(token_vector, i);
    //reading variables
@@ -278,15 +274,11 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
    }while(tokenvector_get_lenght(token_vector) > i);
 
    err = semantic_funcall(funccall, &funccall_node);
-
    astnode_assign_add_funccall((*assign_node), funccall_node);
    
    token = tokenvector_get(funccall, 0);
    symbol = bintree_find(symtable_global ,token->value.string_value);
-
    if(symbol == NULL){
-      char* name = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
-      strcpy(name, token->value.string_value);
       //expected arguments for yet undefined function
       vartype_e* arg_types = NULL;
       if(funccall_node->params_count != 0){
@@ -304,14 +296,15 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
       //expected return types for yet undefined function
       vartype_e* return_types = NULL;
       if(tokenvector_get_lenght(variables) != 0){
-         arg_types = safe_alloc(sizeof(vartype_e) * tokenvector_get_lenght(variables));
+         return_types = safe_alloc(sizeof(vartype_e) * tokenvector_get_lenght(variables));
          for(int i = 0 ; i < funccall_node->params_count; i++){
             token = tokenvector_get(variables, i);
             return_types[i] = bintreestack_find(symtable_stack, token->value.string_value, NULL)->value.var->type;
          }
       }
-      //symbolval_u new_symbolval = symbolval_fn_ctor(funccall_node->params_count, tokenvector_get_lenght(variables), NULL, arg_types, return_types, false);
-      //bintree_add(symtable_global, symbol_ctor(name, ST_FUNCTION, new_symbolval));
+      token = tokenvector_get(funccall, 0);
+      symbolval_u new_symbolval = symbolval_fn_ctor(funccall_node->params_count, tokenvector_get_lenght(variables), NULL, arg_types, return_types, false);
+      bintree_add(symtable_global, symbol_ctor(token->value.string_value, ST_FUNCTION, new_symbolval));
    }
 
    tokenvector_dtor(funccall);
@@ -355,8 +348,7 @@ int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack,
       expression = tokenvector_ctor();
       token = tokenvector_get(token_vector, i);
       while(token->id != TOKENID_COMMA && tokenvector_get_lenght(token_vector) > i){
-
-         tokenvector_push(expression, token);
+         tokenvector_push(expression, token_copy(token));
 
          i++;
          if(tokenvector_get_lenght(token_vector) == i){
@@ -384,7 +376,6 @@ int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack,
       //tokenvector_print(variables);
       return ERRCODE_GENERAL_SEMANTIC_ERROR;
    }
-
    for(i = 0; i < tokenvector_get_lenght(variables); i++){
       token = tokenvector_get(variables, i);
       symbol = bintreestack_find(symtable_stack, token->value.string_value, &level);
@@ -410,7 +401,6 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    vartype_e* ret_types = NULL;
    int arg_count = 0;
    int ret_count = 0;
-   int level;
    i = 3;
    //function args handling
    token = tokenvector_get(token_vector, i);
@@ -422,21 +412,8 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
          arg_count++;
          //add arguments to local symtable
          token_t* token_before = tokenvector_get(token_vector, i - 1);
-         if(bintreestack_get_length(symtable_stack) == 0){
-            bintreestack_push(symtable_stack, bintree_ctor());
-            symbol = symbol_ctor(token_before->value.string_value, ST_VARIABLE, symbolval_var_ctor(tokenid_to_vartype(token->id)));
-            bintree_add(bintreestack_peek(symtable_stack), symbol);
-         }
-         else{
-            symbol = bintreestack_find(symtable_stack, token_before->value.string_value, &level);
-            if(symbol != NULL){
-               return ERRCODE_GENERAL_SEMANTIC_ERROR;
-            }
-            else{
-               symbol = symbol_ctor(token_before->value.string_value, ST_VARIABLE, symbolval_var_ctor(tokenid_to_vartype(token->id)));
-               bintree_add(bintreestack_peek(symtable_stack), symbol);
-            }
-         }
+         symbol = symbol_ctor(token_before->value.string_value, ST_VARIABLE, symbolval_var_ctor(tokenid_to_vartype(token->id)));
+         bintree_add(bintreestack_peek(symtable_stack), symbol);
 
       }
       if(token->id == TOKENID_IDENTIFIER){
@@ -456,13 +433,9 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    if(token->id != TOKENID_LEFT_BRACKET){
       while(token->id != TOKENID_RIGHT_PARENTHESES){
          if(token->id == TOKENID_KEYWORD_FLOAT64 || token->id == TOKENID_KEYWORD_INT || token->id == TOKENID_KEYWORD_STRING || token->id == TOKENID_KEYWORD_BOOL){
-            if(ret_types == NULL){
-               ret_types = safe_alloc(sizeof(vartype_e));
-            }
-            else{
-               ret_types = safe_realloc(ret_types, sizeof(vartype_e)* (arg_count + 1));
-            }
-            ret_types[arg_count] = tokenid_to_vartype(token->id);
+            
+            ret_types = safe_realloc(ret_types, sizeof(vartype_e)* (ret_count + 1));
+            ret_types[ret_count] = tokenid_to_vartype(token->id);
             ret_count++;
          }
          i++;
@@ -479,6 +452,30 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    symbol = bintree_find(symtable_global, token->value.string_value);
    if(symbol == NULL){
       bintree_add(symtable_global, symbol_ctor(token->value.string_value, ST_FUNCTION, symbolval_fn_ctor(arg_count, ret_count, arg_names, arg_types, ret_types, true)));
+   }
+   else{
+      if(symbol->value.fn->defined){
+         //function was already declared
+         return ERRCODE_VAR_UNDEFINED_ERROR;
+      }
+      if(symbol->value.fn->arg_count != arg_count || symbol->value.fn->ret_count != ret_count){
+         //pre declaration doesnt match
+         return ERRCODE_ARGS_OR_RETURN_ERROR;
+      }
+
+      for(int i = 0; i < symbol->value.fn->arg_count; i++){
+         if(symbol->value.fn->arg_types[i] != arg_types[i]){
+            return ERRCODE_ARGS_OR_RETURN_ERROR;
+         }
+      }
+      for(int i = 0; i < symbol->value.fn->ret_count; i++){
+         if(symbol->value.fn->ret_types[i] != ret_types[i]){
+            return ERRCODE_ARGS_OR_RETURN_ERROR;
+         }
+      }
+      //pre declaration match
+      symbol->value.fn->arg_names=arg_names;
+      symbol->value.fn->defined = true;
    }
 
    return 0;
@@ -517,7 +514,7 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
       }
       expressions_count++;
       expressions_count=expressions_count;
-      if(function_symbol->value.fn->ret_count < expressions_count || function_symbol->value.fn->arg_types[expressions_count - 1] != expression_type){
+      if(function_symbol->value.fn->ret_count < expressions_count || function_symbol->value.fn->ret_types[expressions_count - 1] != expression_type){
          tokenvector_dtor(expression);
          return ERRCODE_ARGS_OR_RETURN_ERROR;
       }
@@ -526,7 +523,6 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
       astnode_ret_add_exp((*node_ret), astnode_exp_ctor(expressionArray, size));
       tokenvector_dtor(expression);
    }
-   
    if(function_symbol->value.fn->ret_count != expressions_count){
       return ERRCODE_ARGS_OR_RETURN_ERROR; // too few return values
    }
@@ -653,10 +649,27 @@ int semantic_check_undeclared_func(bintree_t* symtable_global){
    symbol_t** functions = bintree_to_array(symtable_global, &functions_count);
    for(int i = 0; i < functions_count; i++){
       if(!functions[i]->value.fn->defined){
+         printf(" konec nebyla definovana %s",functions[i]->identifier);
          return ERRCODE_VAR_UNDEFINED_ERROR;
       }
    }
    return 0;
+}
+
+vartype_e* vartype_arr_static_to_dyn(vartype_e static_arr[], int count){
+   vartype_e* dynamic = safe_alloc(sizeof(vartype_e) * count);
+   for(int i = 0; i < count; i++){
+      dynamic[i] = static_arr[i];
+   }
+   return static_arr;
+}
+
+void add_buildin_funcs(bintree_t* symtable_global){
+   symbol_t* symbol;
+   //inputs() (string, int)
+   vartype_e inputs_arg_types[] = {VT_STRING, VT_INT};
+   symbol = symbol_ctor("inputs", ST_FUNCTION, symbolval_fn_ctor(0, 2, NULL, NULL, vartype_arr_static_to_dyn(inputs_arg_types, 2), true));
+   bintree_add(symtable_global, symbol);
 }
 
 int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic_t* ast, bintree_t* symtable_global){
@@ -665,7 +678,6 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    static tokenvector_t* token_vector = NULL;
    static astnodestack_t* ast_parents = NULL;
    static bool function_call = false;
-   static bool ast_if_body = false;
    static nonterminalid_e current_flag;
    static bool was_right_bracket = false;
    static bool was_main = false;
@@ -680,10 +692,15 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
       ast_parents = astnodestack_ctor();
    }
    
+   if(symtable_global->root == NULL){
+      add_buildin_funcs(symtable_global);
+   }
+
    if(token->id == TOKENID_RIGHT_BRACKET){
       was_right_bracket = true;
       if(bintreestack_get_length(symtable_stack) != 0)
          bintree_dtor(bintreestack_pop(symtable_stack));
+      token_dtor(token);
       return 0;
    }
 
@@ -704,30 +721,25 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
       return 0;
    }
 
+   if(was_right_bracket && (current_flag != NONTERMINAL_ELSE && current_flag != NONTERMINAL_ELSE_IF)){
+      was_right_bracket = false;
+      if(astnodestack_lenght(ast_parents) != 0)
+         astnodestack_pop(ast_parents);
+   }
+
    astnode_defvar_t* ast_def = NULL;
    astnode_assign_t* ast_assign = NULL;
    astnode_funccall_t* ast_funccall = NULL;
    astnode_generic_t* ast_node_generic = NULL;
-   char* temp_str = NULL;
+   token_t* token_tmp = NULL;
    //ast insert
-
-   if(was_right_bracket && (current_flag == NONTERMINAL_ELSE || current_flag == NONTERMINAL_ELSE_IF)){
-      ast_if_body = false;
-   }
-   else{
-      if(astnodestack_lenght(ast_parents) != 0){
-         astnodestack_pop(ast_parents);
-      }
-   }
 
    if(current_flag != NONTERMINAL_PACKAGE && !was_main){
       return ERRCODE_SYNTAX_ERROR;
    }
-   //tokenvector_print(token_vector);
+   tokenvector_print(token_vector);
    switch(current_flag){
       case NONTERMINAL_PACKAGE:
-         //printf("PACKAGE: \n");
-         //tokenvector_print(token_vector);
          err = semantic_package(token_vector, was_main);
          if(!err){
             was_main = true;
@@ -735,37 +747,34 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          break;
       // FUNCTION DECLARATION
       case NONTERMINAL_FUNCTION:
+         //TODO: if function has return
          token = tokenvector_get(token_vector, 1);
-         temp_str = safe_alloc(sizeof(char) * (strlen(token->value.string_value) + 1));
-         strcpy(temp_str, token->value.string_value);
-         function = astnode_funcdecl_ctor(temp_str);
+         function = astnode_funcdecl_ctor(token->value.string_value);
          ast_global_add_func(ast, function);
-         err = semantic_function_decl(token_vector, symtable_stack, symtable_global);
          bintreestack_push(symtable_stack, bintree_ctor());
+         err = semantic_function_decl(token_vector, symtable_stack, symtable_global);
          
          break;
       case NONTERMINAL_DEFINITION:
          err = semantic_definition(token_vector, symtable_stack, &ast_def);
 
-         if(astnodestack_lenght(ast_parents) != 0 && ast_def != NULL){
+         if(ast_def != NULL){
             ast_node_generic = astnode_generic_defvar_ctor(ast_def);
-            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
-               if(ast_if_body){
+            if(astnodestack_lenght(ast_parents) == 0){
+               astnode_funcdecl_add(function, ast_node_generic);
+            }
+            else{
+               if(astnodestack_peek(ast_parents)->parentbody == AP_FOR){
+                  astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
+               }
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_TRUE){
                   astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
-               else{
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_FALSE){
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-            }
          }
-         else{
-            ast_node_generic = astnode_generic_defvar_ctor(ast_def);
-            astnode_funcdecl_add(function, ast_node_generic);
-         }
-
          break;
       case NONTERMINAL_ASSIGNMENT:
          if(!function_call){
@@ -776,139 +785,149 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
             function_call = false;
          }
 
-         if(astnodestack_lenght(ast_parents) != 0 && ast_assign != NULL){
+         if(ast_assign != NULL){
             ast_node_generic = astnode_generic_assign_ctor(ast_assign);
-            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
-               if(ast_if_body){
+            if(astnodestack_lenght(ast_parents) == 0){
+               astnode_funcdecl_add(function, ast_node_generic);
+            }
+            else{
+               if(astnodestack_peek(ast_parents)->parentbody == AP_FOR){
+                  astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
+               }
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_TRUE){
                   astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
-               else{
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_FALSE){
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-            }
-         }
-         else{
-            ast_node_generic = astnode_generic_defvar_ctor(ast_def);
-            astnode_funcdecl_add(function, ast_node_generic);
          }
          
          break;
       case NONTERMINAL_RETURN:
          err = semantic_ret(token_vector, function, symtable_stack, symtable_global, &ast_node_generic);
 
-         if(astnodestack_lenght(ast_parents) != 0 && ast_node_generic != NULL){
-            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
-               if(ast_if_body){
+         if(ast_node_generic != NULL){
+            if(astnodestack_lenght(ast_parents) == 0){
+               astnode_funcdecl_add(function, ast_node_generic);
+            }
+            else{
+               if(astnodestack_peek(ast_parents)->parentbody == AP_FOR){
+                  astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
+               }
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_TRUE){
                   astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
-               else{
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_FALSE){
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-            }
-         }
-         else{
-            astnode_funcdecl_add(function, ast_node_generic);
          }
 
          break;
       case NONTERMINAL_IF:
          err = semantic_if(token_vector, &ast_node_generic, symtable_stack);
          bintreestack_push(symtable_stack, bintree_ctor());
-
-         if(astnodestack_lenght(ast_parents) != 0 && ast_node_generic != NULL){
-            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
-               if(ast_if_body){
+         if(ast_node_generic != NULL){
+            if(astnodestack_lenght(ast_parents) == 0){
+               astnode_funcdecl_add(function, ast_node_generic);
+            }
+            else{
+               if(astnodestack_peek(ast_parents)->parentbody == AP_FOR){
+                  astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
+               }
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_TRUE){
                   astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
-               else{
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_FALSE){
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-            }
-         }
-         else{
-            astnode_funcdecl_add(function, ast_node_generic);
          }
 
-         ast_if_body = true;
+         astnodestack_push(ast_parents, ast_node_generic, AP_IF_TRUE);
          break;
       case NONTERMINAL_ELSE:
          bintreestack_push(symtable_stack, bintree_ctor());
+         was_right_bracket = false;
+         printf("paren body : %d \n",astnodestack_peek(ast_parents)->parentbody);
+         astnodestack_peek(ast_parents)->parentbody = AP_IF_FALSE;
          break;
       case NONTERMINAL_ELSE_IF:
          err = semantic_if(token_vector, &ast_node_generic, symtable_stack);
          bintreestack_push(symtable_stack, bintree_ctor());
-
-         if(astnodestack_lenght(ast_parents) != 0 && ast_node_generic != NULL){
-            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
-               if(ast_if_body){
-                  astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-               }
-               else{
-                  astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-               }
-            }
-            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-            }
+         was_right_bracket = false;
+         astnodestack_peek(ast_parents)->parentbody = AP_IF_FALSE;
+         
+         if(ast_node_generic != NULL){
+            astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
          }
-         else{
-            astnode_funcdecl_add(function, ast_node_generic);
-         }
-
-         ast_if_body = true;
-
+         astnodestack_push(ast_parents, ast_node_generic, AP_IF_TRUE);
          break;
       case NONTERMINAL_FOR:
          err = semantic_for(token_vector, symtable_stack, &ast_node_generic);
          bintreestack_push(symtable_stack, bintree_ctor());
 
-         if(astnodestack_lenght(ast_parents) != 0 && ast_node_generic != NULL){
-            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
-               if(ast_if_body){
+         if(ast_node_generic != NULL){
+            if(astnodestack_lenght(ast_parents) == 0){
+               astnode_funcdecl_add(function, ast_node_generic);
+            }
+            else{
+               if(astnodestack_peek(ast_parents)->parentbody == AP_FOR){
+                  astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
+               }
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_TRUE){
                   astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
-               else{
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_FALSE){
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-            }
          }
-         else{
-            astnode_funcdecl_add(function, ast_node_generic);
-         }
-
+         astnodestack_push(ast_parents, ast_node_generic, AP_FOR);
          break;
       case NONTERMINAL_CALL:
+         function_call = false;
          err = semantic_funcall(token_vector, &ast_funccall);
-
-         if(astnodestack_lenght(ast_parents) != 0 && ast_funccall != NULL){
+         if(ast_funccall != NULL){
             ast_node_generic = astnode_generic_funccall_ctor(ast_funccall);
-            if(astnodestack_peek(ast_parents)->astnode->type == ANT_IF){
-               if(ast_if_body){
+            if(astnodestack_lenght(ast_parents) == 0){
+               astnode_funcdecl_add(function, ast_node_generic);
+            }
+            else{
+               if(astnodestack_peek(ast_parents)->parentbody == AP_FOR){
+                  astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
+               }
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_TRUE){
                   astnode_if_add_truebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
-               else{
+               else if(astnodestack_peek(ast_parents)->parentbody == AP_IF_FALSE){
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
-            else if(astnodestack_peek(ast_parents)->astnode->type == ANT_FOR){
-               astnode_for_add_body(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
-            }
          }
-         else{
-            ast_node_generic = astnode_generic_funccall_ctor(ast_funccall);
-            astnode_funcdecl_add(function, ast_node_generic);
+
+         //add to symtable if its not yet declared
+         token_tmp = tokenvector_get(token_vector,0);
+         if(bintree_find(symtable_global ,token_tmp->value.string_value) == NULL){
+            //expected arguments for yet undefined function
+            vartype_e* arg_types = NULL;
+            if(ast_funccall->params_count != 0){
+               arg_types = safe_alloc(sizeof(vartype_e) * ast_funccall->params_count);
+               for(int i = 0 ; i < ast_funccall->params_count; i++){
+                  token_tmp = ast_funccall->params[i];
+                  if(token_tmp->id == TOKENID_IDENTIFIER){
+                     arg_types[i] = bintreestack_find(symtable_stack, token_tmp->value.string_value, NULL)->value.var->type;
+                  }
+                  else{
+                     arg_types[i] =  get_const_type(token_tmp);
+                  }
+               }
+            }
+
+            token_tmp = tokenvector_get(token_vector, 0);
+            symbolval_u new_symbolval = symbolval_fn_ctor(ast_funccall->params_count, 0, NULL, arg_types, NULL, false);
+            bintree_add(symtable_global, symbol_ctor(token_tmp->value.string_value, ST_FUNCTION, new_symbolval));
          }
 
          break;

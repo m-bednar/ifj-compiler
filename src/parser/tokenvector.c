@@ -103,6 +103,9 @@ void tokenvector_print(tokenvector_t* vector){
          case TOKENID_KEYWORD_FOR:
             printf("for ");
             break;
+         case TOKENID_KEYWORD_ELSE:
+            printf("else ");
+            break;
          case TOKENID_KEYWORD_PACKAGE:
             printf("package ");
             break;
