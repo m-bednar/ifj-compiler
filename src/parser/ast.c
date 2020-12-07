@@ -69,6 +69,9 @@ astnode_generic_t* astnode_for_ctor(astnode_exp_t* condition,  astnode_defvar_t*
 }
 
 void astnode_for_add_body(astnode_generic_t* ast_node, astnode_generic_t* new_node){
+   if(ast_node->value.forval->body == NULL){
+      ast_node->value.forval->body = astnode_codeblock_ctor();
+   }
    astnode_codeblock_insert(ast_node->value.forval->body, new_node);
 }
 
@@ -127,10 +130,16 @@ astnode_generic_t* astnode_generic_defvar_ctor(astnode_defvar_t* def){
 }
 
 void astnode_if_add_truebody(astnode_generic_t* ast_node, astnode_generic_t* new_node){
+   if(ast_node->value.ifval->true_body == NULL){
+      ast_node->value.ifval->true_body = astnode_codeblock_ctor();
+   }
    astnode_codeblock_insert(ast_node->value.ifval->true_body, new_node);
 }
 
 void astnode_if_add_elsebody(astnode_generic_t* ast_node, astnode_generic_t* new_node){
+   if(ast_node->value.ifval->else_body == NULL){
+      ast_node->value.ifval->else_body = astnode_codeblock_ctor();
+   }
    astnode_codeblock_insert(ast_node->value.ifval->else_body, new_node);
 }
 
