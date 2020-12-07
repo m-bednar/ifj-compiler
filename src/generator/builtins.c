@@ -243,13 +243,13 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
          printcm("JUMPIFEQ %s GF@$tmp1 bool@true", l3);
          printcm("MOVE GF@$tmp2 int@%"PRId64, sum);
          printcm("JUMP %s", l4);
-         printlb("LABEL %s", l3);
+         printjl("LABEL %s", l3);
          printcm("MOVE GF@$tmp2 GF@$tmp0");
-         printlb("LABEL %s", l4);
+         printjl("LABEL %s", l4);
          printcm("MOVE GF@$tmp1 string@");
          printcm("MOVE GF@$tmp3 %s", i_var);
          
-         printlb("LABEL %s", l5);
+         printjl("LABEL %s", l5);
          printcm("GETCHAR GF@$tmp0 %s GF@$tmp3", s_var);
          printcm("CONCAT GF@$tmp1 GF@$tmp1 GF@$tmp0");
 
@@ -260,10 +260,10 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
          printcm("PUSHS GF@$tmp1");
          printcm("PUSHS int@0");
          printcm("JUMP %s", l2);
-         printlb("LABEL %s", l1);
+         printjl("LABEL %s", l1);
          printcm("PUSHS string@");
          printcm("PUSHS int@1");
-         printlb("LABEL %s", l2);
+         printjl("LABEL %s", l2);
 
          free(l1);
          free(l2);
@@ -332,14 +332,14 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
       printcm("JUMPIFEQS %s", l3);
       printcm("ADD GF@$tmp2 %s %s", i_var, n_var);
       printcm("JUMP %s", l4);
-      printlb("LABEL %s", l3);
+      printjl("LABEL %s", l3);
       printcm("MOVE GF@$tmp2 GF@$tmp0");
-      printlb("LABEL %s", l4);
+      printjl("LABEL %s", l4);
 
       printcm("MOVE GF@$tmp1 string@");
       printcm("MOVE GF@$tmp3 %s", i_var);
 
-      printlb("LABEL %s", l5);
+      printjl("LABEL %s", l5);
       printcm("GETCHAR GF@$tmp0 %s GF@$tmp3", s_var);
       printcm("CONCAT GF@$tmp1 GF@$tmp1 GF@$tmp0");
 
@@ -350,10 +350,10 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
       printcm("PUSHS GF@$tmp1");
       printcm("PUSHS int@0");
       printcm("JUMP %s", l2);
-      printlb("LABEL %s", l1);
+      printjl("LABEL %s", l1);
       printcm("PUSHS string@");
       printcm("PUSHS int@1");
-      printlb("LABEL %s", l2);
+      printjl("LABEL %s", l2);
 
       free(l1);
       free(l2);

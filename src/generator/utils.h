@@ -27,7 +27,12 @@
 /** 
  * Print label macro.
  */
-#define printlb(f, ...) printf(f"\n",##__VA_ARGS__)   
+#define printlb(f, ...) printf(f"\n",##__VA_ARGS__)  
+
+/** 
+ * Print "jump to" label macro.
+ */
+#define printjl(f, ...) printf(" "f"\n",##__VA_ARGS__)  
 
 /** 
  * Returns true if strings are equal.
