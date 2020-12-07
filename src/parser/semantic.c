@@ -297,9 +297,10 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
       vartype_e* return_types = NULL;
       if(tokenvector_get_lenght(variables) != 0){
          return_types = safe_alloc(sizeof(vartype_e) * tokenvector_get_lenght(variables));
-         for(int i = 0 ; i < funccall_node->params_count; i++){
+         for(int i = 0 ; i < tokenvector_get_lenght(variables); i++){
             token = tokenvector_get(variables, i);
             return_types[i] = bintreestack_find(symtable_stack, token->value.string_value, NULL)->value.var->type;
+            printf("%d",return_types[i]);
          }
       }
       token = tokenvector_get(funccall, 0);
@@ -371,8 +372,7 @@ int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack,
    }
 
    if(tokenvector_get_lenght(variables) != expression_types_size){
-      //tokenvector_print(variables);
-      return ERRCODE_GENERAL_SEMANTIC_ERROR;
+      return ERRCODE_SYNTAX_ERROR;
    }
    for(i = 0; i < tokenvector_get_lenght(variables); i++){
       token = tokenvector_get(variables, i);
@@ -472,7 +472,8 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
          }
       }
       //pre declaration match
-      symbol->value.fn->arg_names=arg_names;
+      //symbol_print(symbol);
+      symbol->value.fn->arg_names = arg_names;
       symbol->value.fn->defined = true;
    }
 
@@ -503,15 +504,14 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
 
          i++;
       }while(token->id != TOKENID_COMMA && tokenvector_get_lenght(token_vector) > i);
-
+      
       err = semantic_expression(expression, &expression_type, symtable_stack);
-
+      printf(" ret type: %d", expression_type);
       if(err){
          tokenvector_dtor(expression);
          return err;
       }
       expressions_count++;
-      expressions_count=expressions_count;
       if(function_symbol->value.fn->ret_count < expressions_count || function_symbol->value.fn->ret_types[expressions_count - 1] != expression_type){
          tokenvector_dtor(expression);
          return ERRCODE_ARGS_OR_RETURN_ERROR;
@@ -732,7 +732,7 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    if(current_flag != NONTERMINAL_PACKAGE && !was_main){
       return ERRCODE_SYNTAX_ERROR;
    }
-   //tokenvector_print(token_vector);
+   tokenvector_print(token_vector);
    switch(current_flag){
       case NONTERMINAL_PACKAGE:
          err = semantic_package(token_vector, was_main);
@@ -779,7 +779,6 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
             err = semantic_assign_funccall(token_vector, symtable_stack, symtable_global, &ast_assign);
             function_call = false;
          }
-
          if(ast_assign != NULL){
             ast_node_generic = astnode_generic_assign_ctor(ast_assign);
             if(astnodestack_lenght(ast_parents) == 0){
