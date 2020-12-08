@@ -227,6 +227,8 @@ token_t* get_next_token() {
             state = determine_next_state(c);
             if (state == STATE_IDENTIFIER_KEYWORD || state == STATE_NUM) {
                prev = c;
+            }else if (state == STATE_QUOTATION_MARKS) {
+               buffer = append((char) '\0', buffer);
             }
             break;
          case STATE_IDENTIFIER_KEYWORD:
