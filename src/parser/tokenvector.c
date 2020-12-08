@@ -53,7 +53,7 @@ void tokenvector_push(tokenvector_t* vector, token_t* token){
    vector->length++;
 }
 
-int tokenvector_get_lenght(tokenvector_t* vector){
+int tokenvector_get_length(tokenvector_t* vector){
    return vector->length;
 }
 
@@ -121,10 +121,16 @@ void tokenvector_print(tokenvector_t* vector){
 }
 
 token_t** tokenvector_get_array(tokenvector_t* vector, int* size){
-   token_t** array = safe_alloc(sizeof(token_t*) * (vector->length));
-   for(int i = 0; i < vector->length; i++){
-      array[i] = token_copy(vector->memory[i]);
+   if(vector->length != 0){
+      token_t** array = safe_alloc(sizeof(token_t*) * (vector->length));
+      for(int i = 0; i < vector->length; i++){
+         array[i] = token_copy(vector->memory[i]);
+      }
+      (*size) = vector->length;
+      return array;
    }
-   (*size) = vector->length;
-   return array;
+   else{
+      (*size) = vector->length;
+      return NULL;
+   }
 }

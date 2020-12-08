@@ -34,5 +34,5 @@ astparentnode_t* astnodestack_pop(astnodestack_t* stack);
 
 void astnodestack_push(astnodestack_t* stack, astnode_generic_t* astnode, astparentbody_t parentbody);
 
-int astnodestack_lenght(astnodestack_t* stack);
+int astnodestack_length(astnodestack_t* stack);
 
