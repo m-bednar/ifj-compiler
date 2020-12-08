@@ -247,6 +247,11 @@ void generate_local_expression(char* assignee, astnode_exp_t* exp, vartable_t* v
    }
 }
 
+bool can_generate_local_exp(astnode_exp_t* exp) {
+   return exp->tokens_count <= 3 && (is_const_tokenid(exp->tokens[0]->id) || exp->tokens[0]->id == TOKENID_IDENTIFIER)
+      && (is_const_tokenid(exp->tokens[1]->id) || exp->tokens[0]->id == TOKENID_IDENTIFIER);
+}
+
 /**
  * For expression that is single variable/const, this will generate assign
  * to appropriate variable.
@@ -277,7 +282,7 @@ bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_s
    optimize_postfix(exp);
    if (exp->tokens_count == 1) { 
       return generate_const_expression(exp, vartable, prefer_stack);
-   } else if (exp->tokens_count <= 3 && !prefer_stack) {
+   } else if (can_generate_local_exp(exp) && !prefer_stack) {
       generate_local_expression("GF@$tmp0", exp, vartable);
       return false;
    } else {
@@ -291,7 +296,7 @@ void generate_assign_expression(char* assignee, astnode_exp_t* exp, vartable_t* 
    optimize_postfix(exp);
    if (exp->tokens_count == 1) {
       generate_const_assign_expression(assignee, exp, vartable);
-   } else if (exp->tokens_count <= 3) {
+   } else if (can_generate_local_exp(exp)) {
       generate_local_expression(assignee, exp, vartable);
    } else {
       generate_stack_expression(exp, vartable);
