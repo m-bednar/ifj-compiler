@@ -47,7 +47,7 @@ void binitem_print(binitem_t* item);
 /**
  * Adds binitem content and it's children content to array, increasing length.
  */
-void binitem_to_array(binitem_t* item, symbol_t** array, int* length);
+void binitem_to_array(binitem_t* item, symbol_t*** array, int* length);
 
 /**
  * Compare identifier with item's identifier, returns ID_EQUAL when equal, ID_LEFT value when left item's
