@@ -674,13 +674,13 @@ int semantic_if(tokenvector_t* token_vector, astnode_generic_t** ast_node, bintr
    int i;
    int size;
    symtable_stack=symtable_stack;
-   //int err;
-   //vartype_e type;
+   int err;
+   vartype_e type;
    if(tokenvector_get(token_vector,0)->id == TOKENID_KEYWORD_ELSE){
-      i=2; // skip token with else and if
+      i=2; // skip token "else" and "if"
    }
    else{
-      i = 1; // skip token with if 
+      i = 1; // skip token "if" 
    }
    token = tokenvector_get(token_vector, i);
    while(token->id != TOKENID_LEFT_BRACKET && tokenvector_get_lenght(token_vector) > i){
@@ -690,14 +690,14 @@ int semantic_if(tokenvector_t* token_vector, astnode_generic_t** ast_node, bintr
       token = tokenvector_get(token_vector, i);
    }
 
-   /*err = semantic_expression(condition, &type, symtable_stack);
+   err = semantic_expression(condition, &type, symtable_stack);
 
    if(err){
       return err;
    }
    if(type != VT_BOOL){
       return ERRCODE_GENERAL_SEMANTIC_ERROR;
-   }*/
+   }
    condition_array = tokenvector_get_array(condition, &size);
 
    (*ast_node) = astnode_if_ctor(astnode_exp_ctor(condition_array, size));
@@ -986,9 +986,8 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
+            astnodestack_push(ast_parents, ast_node_generic, AP_IF_TRUE);
          }
-
-         astnodestack_push(ast_parents, ast_node_generic, AP_IF_TRUE);
          break;
       case NONTERMINAL_ELSE:
          bintreestack_push(symtable_stack, bintree_ctor());
