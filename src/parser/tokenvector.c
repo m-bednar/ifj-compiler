@@ -68,7 +68,7 @@ void tokenvector_print(tokenvector_t* vector){
             printf("if ");
             break;
          case TOKENID_NUM:
-            printf("%" PRId64 "", vector->memory[i]->value.int_value);
+            printf("%" PRId64 " ", vector->memory[i]->value.int_value);
             break;
          case TOKENID_NUM_DECIMAL:
             printf("%f ", vector->memory[i]->value.decimal_value);
