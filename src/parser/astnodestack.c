@@ -29,6 +29,7 @@ astparentnode_t* astparentnode_ctor(astnode_generic_t* astnode, astparentbody_t 
 void astnodestack_dtor(astnodestack_t* stack){
    guard(stack != NULL);
    if (stack->memory == NULL) {
+      free(stack);
       return;
    }
    free(stack->memory);
