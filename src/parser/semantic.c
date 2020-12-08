@@ -425,7 +425,6 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
    }
 
    variables_array = tokenvector_get_array(variables, &size);
-   printf("%p %d",variables_array, size);
    astnode_assign_add_ids((*assign_node), variables_array, size);
 
    i++;
@@ -889,8 +888,82 @@ vartype_e* vartype_arr_static_to_dyn(vartype_e static_arr[], int count){
 void add_buildin_funcs(bintree_t* symtable_global){
    symbol_t* symbol;
    //inputs() (string, int)
-   vartype_e inputs_arg_types[] = {VT_STRING, VT_INT};
-   symbol = symbol_ctor("inputs", ST_FUNCTION, symbolval_fn_ctor(0, 2, NULL, NULL, vartype_arr_static_to_dyn(inputs_arg_types, 2), true));
+   vartype_e inputs_rets_types[] = {VT_STRING, VT_INT};
+   symbol = symbol_ctor("inputs", ST_FUNCTION, symbolval_fn_ctor(0, 2, NULL, NULL, vartype_arr_static_to_dyn(inputs_rets_types, 2), true));
+   bintree_add(symtable_global, symbol);
+
+   //func inputi() (int,int)
+   vartype_e inputi_rets_types[] = {VT_INT, VT_INT};
+   symbol = symbol_ctor("inputi", ST_FUNCTION, symbolval_fn_ctor(0, 2, NULL, NULL, vartype_arr_static_to_dyn(inputi_rets_types, 2), true));
+   bintree_add(symtable_global, symbol);
+
+   //func inputf() (float64,int)
+   vartype_e inputf_rets_types[] = {VT_FLOAT, VT_INT};
+   symbol = symbol_ctor("inputf", ST_FUNCTION, symbolval_fn_ctor(0, 2, NULL, NULL, vartype_arr_static_to_dyn(inputf_rets_types, 2), true));
+   bintree_add(symtable_global, symbol);
+
+   //func print (term1,term2,...,term𝑛)
+   symbol = symbol_ctor("print", ST_FUNCTION, symbolval_fn_ctor(0, 0, NULL, NULL, NULL, true));
+   bintree_add(symtable_global, symbol);
+
+   //func int2float(i int) (float64)
+   vartype_e int2float_rets_types[] = {VT_FLOAT};
+   vartype_e int2float_arg_types[] = {VT_INT};
+   char** int2float_arg_names =  safe_alloc(sizeof(char*));
+   int2float_arg_names[0] = safe_alloc(sizeof(char)*2);
+   strcpy(int2float_arg_names[0], "i");
+   symbol = symbol_ctor("int2float", ST_FUNCTION, symbolval_fn_ctor(1, 1, int2float_arg_names, vartype_arr_static_to_dyn(int2float_arg_types, 1), vartype_arr_static_to_dyn(int2float_rets_types, 1), true));
+   bintree_add(symtable_global, symbol);
+
+   //func float2int(f float64) (int)
+   vartype_e float2int_rets_types[] = {VT_INT};
+   vartype_e float2int_arg_types[] = {VT_FLOAT};
+   char** float2int_arg_names =  safe_alloc(sizeof(char*));
+   float2int_arg_names[0] = safe_alloc(sizeof(char)*2);
+   strcpy(float2int_arg_names[0], "f");
+   symbol = symbol_ctor("float2int", ST_FUNCTION, symbolval_fn_ctor(1, 1, float2int_arg_names, vartype_arr_static_to_dyn(float2int_arg_types, 1), vartype_arr_static_to_dyn(float2int_rets_types, 1), true));
+   bintree_add(symtable_global, symbol);
+
+   //func len(𝑠 string) (int)
+   vartype_e len_rets_types[] = {VT_INT};
+   vartype_e len_arg_types[] = {VT_STRING};
+   char** len_arg_names =  safe_alloc(sizeof(char*));
+   len_arg_names[0] = safe_alloc(sizeof(char)*2);
+   strcpy(len_arg_names[0], "s");
+   symbol = symbol_ctor("len", ST_FUNCTION, symbolval_fn_ctor(1, 1, len_arg_names, vartype_arr_static_to_dyn(len_arg_types, 1), vartype_arr_static_to_dyn(len_rets_types, 1), true));
+   bintree_add(symtable_global, symbol);
+
+   //func substr(s string, i int, n int) (string, int)
+   vartype_e substr_rets_types[] = {VT_STRING, VT_INT};
+   vartype_e substr_arg_types[] = {VT_STRING, VT_INT, VT_INT};
+   char** substr_arg_names =  safe_alloc(sizeof(char*)*3);
+   substr_arg_names[0] = safe_alloc(sizeof(char)*2);
+   substr_arg_names[1] = safe_alloc(sizeof(char)*2);
+   substr_arg_names[2] = safe_alloc(sizeof(char)*2);
+   strcpy(substr_arg_names[0], "s");
+   strcpy(substr_arg_names[1], "i");
+   strcpy(substr_arg_names[2], "n");
+   symbol = symbol_ctor("substr", ST_FUNCTION, symbolval_fn_ctor(3, 2, substr_arg_names, vartype_arr_static_to_dyn(substr_arg_types, 3), vartype_arr_static_to_dyn(substr_rets_types, 2), true));
+   bintree_add(symtable_global, symbol);
+
+   //func ord(s string, i int) (int, int)
+   vartype_e ord_rets_types[] = {VT_INT, VT_INT};
+   vartype_e ord_arg_types[] = {VT_STRING, VT_INT};
+   char** ord_arg_names =  safe_alloc(sizeof(char*)*2);
+   ord_arg_names[0] = safe_alloc(sizeof(char)*2);
+   ord_arg_names[1] = safe_alloc(sizeof(char)*2);
+   strcpy(ord_arg_names[0], "s");
+   strcpy(ord_arg_names[1], "i");
+   symbol = symbol_ctor("ord", ST_FUNCTION, symbolval_fn_ctor(2, 2, ord_arg_names, vartype_arr_static_to_dyn(ord_arg_types, 2), vartype_arr_static_to_dyn(ord_rets_types, 2), true));
+   bintree_add(symtable_global, symbol);
+
+   //func chr(i int) (string, int)
+   vartype_e chr_rets_types[] = {VT_STRING, VT_INT};
+   vartype_e chr_arg_types[] = {VT_INT};
+   char** chr_arg_names =  safe_alloc(sizeof(char*));
+   chr_arg_names[0] = safe_alloc(sizeof(char)*2);
+   strcpy(chr_arg_names[0], "i");
+   symbol = symbol_ctor("chr", ST_FUNCTION, symbolval_fn_ctor(1, 2, chr_arg_names, vartype_arr_static_to_dyn(chr_arg_types, 1), vartype_arr_static_to_dyn(chr_rets_types, 2), true));
    bintree_add(symtable_global, symbol);
 }
 
@@ -1131,7 +1204,7 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
                }
             }
          }
-
+         //TODO: check returns, update pre declare
          //add to symtable if its not yet declared
          token_tmp = tokenvector_get(token_vector,0);
          if(bintree_find(symtable_global ,token_tmp->value.string_value) == NULL){
