@@ -162,7 +162,6 @@ void generate_condition(astnode_exp_t* cond, vartable_t* vartable, char* label, 
  * Generates for loop.
  */
 void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable) {
-   dprint("For start");
    vartable_descent(vartable);
    if (node->defvar != NULL) {
       generate_defvar(node->defvar, vartable, true);
@@ -183,7 +182,6 @@ void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable)
    vartable_ascent(vartable);
    free(l1);
    free(l2);
-   dprint("For end");
 }
 
 /**
