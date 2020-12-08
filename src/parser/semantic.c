@@ -80,15 +80,9 @@ vartype_e get_const_type(token_t* token){
    }
 }
 
-bool is_relational_operator(token_t* token){
-   if(token->id == TOKENID_OPERATOR_ADD || token->id == TOKENID_OPERATOR_SUB || token->id == TOKENID_OPERATOR_MUL || token->id == TOKENID_OPERATOR_DIV){
-      return false;
-   }
-   else{
-      return true;
-   }
-}
-
+/**
+ * returns true if token is operator
+ */
 bool is_operator(token_t* token){
    if(token->id == TOKENID_OPERATOR_ADD || token->id == TOKENID_OPERATOR_SUB || token->id == TOKENID_OPERATOR_MUL || token->id == TOKENID_OPERATOR_DIV || token->id == TOKENID_OPERATOR_LESS || token->id == TOKENID_OPERATOR_LESS_OR_EQUAL || token->id == TOKENID_OPERATOR_GREATER || token->id == TOKENID_OPERATOR_GREATER_OR_EQUAL || token->id == TOKENID_OPERATOR_EQUALS || token->id == TOKENID_OPERATOR_EQUALS || token->id == TOKENID_OPERATOR_NOT || token->id == TOKENID_OPERATOR_NOT_EQUAL || token->id == TOKENID_OPERATOR_AND || token->id == TOKENID_OPERATOR_OR){
       return true;
@@ -98,6 +92,9 @@ bool is_operator(token_t* token){
    }
 }
 
+/**
+ * returns true if token is binary operator
+ */
 bool is_binary_operator(token_t* token){
    if(token->id == TOKENID_OPERATOR_NOT){
       return true;
@@ -107,6 +104,9 @@ bool is_binary_operator(token_t* token){
    }
 }
 
+/**
+ * replace 3 tokens with 1 and shift
+ */
 void expression_replace_tree_tokens(astnode_exp_t* exp, token_t* token, int i){
    token_dtor(exp->tokens[i]);
    token_dtor(exp->tokens[i + 1]);
@@ -121,6 +121,9 @@ void expression_replace_tree_tokens(astnode_exp_t* exp, token_t* token, int i){
    exp->tokens_count -= 2;
 }
 
+/**
+ * replace 2 tokens with 1 and shift
+ */
 void expression_replace_two_tokens(astnode_exp_t* exp, token_t* token, int i){
 
    token_dtor(exp->tokens[i]);
@@ -234,6 +237,10 @@ token_t* expression_eval_operation(token_t* t1, token_t* t2, token_t* t3, bintre
    return NULL;
 }
 
+/**
+ * return 0 if expression is valid, else return err code
+ * if expression is valid then returns type in ret_type parameter
+ */
 int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintreestack_t* symtable_stack){
    int expression_size = 0;
    bool reduced = false;
@@ -307,6 +314,10 @@ int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintre
    return 0;
 }
 
+/**
+ * return 0 if definition is valid, else return err code
+ * if definition is valid then returns ast node in def_node parameter
+ */
 int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_stack, astnode_defvar_t** def_node){
    tokenvector_t* expression = tokenvector_ctor();
    token_t** expression_array;
@@ -358,6 +369,10 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
    return 0;
 }
 
+/**
+ * return 0 if funcall is valid, else return err code
+ * if funcall is valid then returns ast node in ast_node parameter
+ */
 int semantic_funcall(tokenvector_t* token_vector, bintreestack_t* symtable_stack, astnode_funccall_t** ast_node){
    tokenvector_t* args = tokenvector_ctor();
    token_t** args_array;
@@ -396,6 +411,10 @@ int semantic_funcall(tokenvector_t* token_vector, bintreestack_t* symtable_stack
    return 0;
 }
 
+/**
+ * return 0 if funcall assign is valid, else return err code
+ * if funcall is valid then returns ast node in assign_node parameter
+ */
 int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtable_stack, bintree_t* symtable_global, astnode_assign_t** assign_node){
    tokenvector_t* funccall = tokenvector_ctor();
    tokenvector_t* variables = tokenvector_ctor();
@@ -541,6 +560,10 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
    return err;
 }
 
+/**
+ * return 0 if assign is valid, else return err code
+ * if funcall is valid then returns ast node in assign_node parameter
+ */
 int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack, astnode_assign_t** assign_node){
    tokenvector_t* expression = NULL;
    token_t** expression_array;
@@ -630,6 +653,9 @@ int semantic_assign(tokenvector_t* token_vector, bintreestack_t* symtable_stack,
    return 0;
 }
 
+/**
+ * return 0 if function declaration is valid, else return err code
+ */
 int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable_stack, bintree_t* symtable_global){
    token_t* token;
    token = tokenvector_get(token_vector, 1);
@@ -730,6 +756,10 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    return 0;
 }
 
+/**
+ * return 0 if return command is valid, else return err code
+ * returns ast node in node_ret parameter
+ */
 int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bintreestack_t* symtable_stack, bintree_t* symtable_global, astnode_generic_t** node_ret){
    int i;
    tokenvector_t* expression;
@@ -778,6 +808,9 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
    return 0;
 }
 
+/**
+ * return 0 if "if" command is valid, else return err code
+ */
 int semantic_if(tokenvector_t* token_vector, astnode_generic_t** ast_node, bintreestack_t* symtable_stack){
    tokenvector_t* condition = tokenvector_ctor();
    token_t** condition_array;
@@ -816,13 +849,15 @@ int semantic_if(tokenvector_t* token_vector, astnode_generic_t** ast_node, bintr
    return 0;
 }
 
+/**
+ * return 0 if "for" command is valid, else return err code
+ * returns ast node in ast_node parameter
+ */
 int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, astnode_generic_t** ast_node){
    tokenvector_t* def = tokenvector_ctor();
    tokenvector_t* condition = tokenvector_ctor();
    tokenvector_t* assign = tokenvector_ctor();
    token_t** condition_array;
-   //token_t** def_array;
-   //token_t** assign_array;
    token_t* token;
    astnode_exp_t* condition_node = NULL;
    astnode_defvar_t* def_node = NULL;
@@ -912,7 +947,7 @@ int semantic_package(tokenvector_t* token_vector, bool was_main){
 }
 
 /**
- * 
+ * searching for return ast node in subtree
  */
 bool semantic_find_return(astnode_codeblock_t* func){
    for(int i = 0; i < func->children_count; i++){
@@ -939,7 +974,7 @@ bool semantic_find_return(astnode_codeblock_t* func){
 }
 
 /**
- * returns error if function missing return
+ * returns error code if function missing return
  */
 int semantic_return_in_func(astnode_generic_t* ast, bintree_t* symtable_global){
    symbol_t* function;
@@ -952,6 +987,9 @@ int semantic_return_in_func(astnode_generic_t* ast, bintree_t* symtable_global){
    return 0;
 }
 
+/**
+ * returns error code if function wasnt declared
+ */
 int semantic_check_undeclared_func(bintree_t* symtable_global){
    int functions_count = 0;
    symbol_t** functions = bintree_to_array(symtable_global, &functions_count);
@@ -981,6 +1019,9 @@ vartype_e* vartype_arr_static_to_dyn(vartype_e static_arr[], int count){
    return dynamic;
 }
 
+/**
+ * add buildin functions into global symbol table
+ */
 void add_buildin_funcs(bintree_t* symtable_global){
    symbol_t* symbol;
    //inputs() (string, int)
