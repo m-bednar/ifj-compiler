@@ -26,22 +26,6 @@ void builtin_input(char* type) {
    free(l2);
 }
 
-void builtin_inputs() {
-   builtin_input("string");
-}
-
-void builtin_inputi() {
-   builtin_input("int");
-}
-
-void builtin_inputf() {
-   builtin_input("float");
-}
-
-void builtin_inputb() {
-   builtin_input("bool");
-}
-
 void builtin_print(vartable_t* vartable, token_t** params, int param_count) {
    for (int i = 0; i < param_count; i++) {
       if (is_const_tokenid(params[i]->id)) {
@@ -115,8 +99,8 @@ void builtin_chr(vartable_t* vartable, token_t* param) {
       char* l2 = labelgen_new();
       char* identifier = param->value.string_value;
       char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
-      printcm("PUSHS string@");
       printcm("PUSHS %s", var);
+      printcm("PUSHS int@0");
       printcm("LTS");
       printcm("PUSHS %s", var);
       printcm("PUSHS int@255");
@@ -161,7 +145,7 @@ void builtin_ord(vartable_t* vartable, token_t** params) {
          char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
          printcm("STRLEN GF@$tmp0 %s", var);
          printcm("LT GF@$tmp0 GF@$tmp0 int@%d");
-         printcm("JUMPIFEQ GF@$tmp0 GF@$false %s", l1);
+         printcm("JUMPIFEQ %s GF@$tmp0 bool@false", l1);
          printcm("STRI2INT GF@$tmp0 %s int@%d", var, params[1]->value.int_value);
          printcm("PUSHS GF@$tmp0");
          printcm("PUSHS int@0");
@@ -190,7 +174,7 @@ void builtin_ord(vartable_t* vartable, token_t** params) {
       printcm("LTS");
       printcm("NOTS");
       printcm("ORS");
-      printcm("PUSHS bool@$true");
+      printcm("PUSHS bool@true");
       printcm("JUMPIFEQS %s", l1);
       printcm("STRI2INT GF@$tmp0 %s %s", var_s, var_i);
       printcm("PUSHS GF@$tmp0");
@@ -388,13 +372,13 @@ bool is_builtin(char* identifier) {
 
 void generate_builtin(char* identifier, token_t** params, int param_count, vartable_t* vartable) {
    if (streq(identifier, "inputs")) {
-      builtin_inputs();
+      builtin_input("string");
    } else if (streq(identifier, "inputi")) {
-      builtin_inputi();
+      builtin_input("int");
    } else if (streq(identifier, "inputf")) {
-      builtin_inputf();
+      builtin_input("float");
    } else if (streq(identifier, "inputb")) {
-      builtin_inputb();
+      builtin_input("bool");
    } else if (streq(identifier, "print")) {
       builtin_print(vartable, params, param_count);
    } else if (streq(identifier, "int2float")) {
