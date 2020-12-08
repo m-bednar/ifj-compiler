@@ -17,5 +17,7 @@ int main() {
    bintree_t* symtable_global = bintree_ctor();
    parse(ast, symtable_global);
    generate(ast->value.globalval, symtable_global);
+   ast_dtor(ast);
+   bintree_dtor(symtable_global);
    return EXIT_SUCCESS;
 }
