@@ -678,19 +678,20 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
          //pre declaration doesnt match
          return ERRCODE_ARGS_OR_RETURN_ERROR;
       }
-      //check return types
+      //check arg types
       for(int i = 0; i < symbol->value.fn->arg_count; i++){
-         if(symbol->value.fn->arg_types[i] == VT_UNDEFINED){
-            //update unknown type
-            symbol->value.fn->arg_types[i] = arg_types[i];
-         }
-         else if(symbol->value.fn->arg_types[i] != arg_types[i]){
+         if(symbol->value.fn->arg_types[i] != arg_types[i]){
             return ERRCODE_ARGS_OR_RETURN_ERROR;
          }
       }
-      //check arg types
+      //check return types
       for(int i = 0; i < symbol->value.fn->ret_count; i++){
-         if(symbol->value.fn->ret_types[i] != ret_types[i]){
+         if(symbol->value.fn->ret_types[i] == VT_UNDEFINED){
+            //update unknown type
+            symbol->value.fn->ret_types[i] = ret_types[i];
+         }
+         else if(symbol->value.fn->ret_types[i] != ret_types[i]){
+            printf("fasdf");
             return ERRCODE_ARGS_OR_RETURN_ERROR;
          }
       }
@@ -740,7 +741,7 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
 
       expressionArray = tokenvector_get_array(expression, &size);
       astnode_ret_add_exp((*node_ret), astnode_exp_ctor(expressionArray, size));
-      //tokenvector_dtor(expression);
+      tokenvector_dtor(expression);
    }
    if(function_symbol->value.fn->ret_count != expressions_count){
       return ERRCODE_ARGS_OR_RETURN_ERROR; // too few return values
