@@ -10,6 +10,7 @@
 #include "../memory.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 
 static const int BOOL_CONST_PREFIX = 6;
@@ -42,7 +43,7 @@ char* labelgen_new() {
 }
 
 char* convert_string(char* str) {
-   const int csize = 5; // Size of escaped ascii code
+   const int csize = 3; // Size of escaped ascii code minus one char
    char* out;
    int len = strlen(str);
    for (int i = 0; i < (int)strlen(str); i++) {
@@ -51,34 +52,35 @@ char* convert_string(char* str) {
       }
    }
    out = safe_alloc(sizeof(char) * (len + 1));
-   len = 0;
+   out[0] = '\0';
    for (int i = 0; i < (int)strlen(str); i++) {
       if ((str[i] >= 0 && str[i] <= 32) || str[i] == 35 || str[i] == 92) {
+         char buffer[3];
+         sprintf(buffer, "%d", str[i]);
          if (digits_count((int)str[i]) == 2) {
-            sprintf(out + len * sizeof(char), "\\0%d", (int)str[i]);
-         } else {
-            sprintf(out + len * sizeof(char), "\\00%d", (int)str[i]);
+            strcat(out, "\\0");
+         } else { 
+            strcat(out, "\\00");
          }
-         len += (csize - 1);
+         strcat(out, buffer);
       } else {
-         out[len] = str[i];
-         len++;
+         strncat(out, &str[i], 1);
       }
    }
-   out[len] = '\0';
    return out;
 }
 
 char* generate_const_str(token_t* token) {
    char* var;
+   char* str;
    switch (token->id) {
       case TOKENID_BOOL_LITERAL:
          var = safe_alloc(sizeof(char) * (BOOL_CONST_PREFIX + token->value.bool_value ? 4 : 5));
          sprintf(var, "bool@%s", token->value.bool_value ? "true" : "false");
          break;
       case TOKENID_STRING_LITERAL:
-         var = safe_alloc(sizeof(char) * (STR_CONST_PREFIX + strlen(token->value.string_value)));
-         char* str = convert_string(token->value.string_value);
+         str = convert_string(token->value.string_value);
+         var = safe_alloc(sizeof(char) * (STR_CONST_PREFIX + strlen(str)));
          sprintf(var, "string@%s", str);
          free(str);
          break;
