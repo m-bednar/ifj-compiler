@@ -199,5 +199,115 @@ void astnode_exp_dtor(astnode_exp_t* ast_node){
    ast_node->tokens_count = 0;
    free(ast_node->tokens);
    free(ast_node);
-   ast_node = NULL;
+}
+
+void astnode_defvar_dtor(astnode_defvar_t* ast_node){
+   guard(ast_node != NULL);
+   token_dtor(ast_node->variable);
+   astnode_exp_dtor(ast_node->expression);
+   free(ast_node);
+}
+
+void astnode_assign_dtor(astnode_assign_t* ast_node){
+   guard(ast_node != NULL);
+   for(int i = 0; i < ast_node->ids_count; i++){
+      token_dtor(ast_node->left_ids[i]);
+   }
+   free(ast_node->left_ids);
+   if(ast_node->right_expressions != NULL){
+      for(int i = 0; i < ast_node->expressions_count; i++){
+        astnode_exp_dtor(ast_node->right_expressions[i]);
+      }
+   }
+   else{
+      astnode_funccall_dtor(ast_node->right_function);
+   }
+   free(ast_node);
+}
+
+void astnode_funccall_dtor(astnode_funccall_t* ast_node){
+   guard(ast_node != NULL);
+   for(int i = 0; i < ast_node->params_count; i++){
+      token_dtor(ast_node->params[i]);
+   }
+   free(ast_node->params);
+   free(ast_node->name);
+   free(ast_node);
+}
+
+void astnode_ret_dtor(astnode_ret_t* ast_node){
+   guard(ast_node != NULL);
+   for(int i = 0; i < ast_node->expressions_count; i++){
+      astnode_exp_dtor(ast_node->expressions[i]);
+   }
+   free(ast_node->expressions);
+   free(ast_node);
+}
+
+void astnode_for_dtor(astnode_for_t* ast_node){
+   guard(ast_node != NULL);
+   astnode_exp_dtor(ast_node->condition);
+   if(ast_node->assign != NULL){
+      astnode_assign_dtor(ast_node->assign);
+   }
+   if(ast_node->defvar != NULL){
+      astnode_defvar_dtor(ast_node->defvar);
+   }
+   astnode_codeblock_dtor(ast_node->body);
+   free(ast_node);
+}
+
+void astnode_if_dtor(astnode_if_t* ast_node){
+   guard(ast_node != NULL);
+   astnode_exp_dtor(ast_node->condition);
+   if(ast_node->else_body != NULL){
+      astnode_codeblock_dtor(ast_node->else_body);
+   }
+   astnode_codeblock_dtor(ast_node->true_body);
+   free(ast_node);
+}
+
+void astnode_codeblock_dtor(astnode_codeblock_t* ast_node){
+   guard(ast_node != NULL);
+   for(int i = 0; i < ast_node->children_count; i++){
+      switch(ast_node->children[i]->type){
+         case ANT_IF:
+            astnode_if_dtor(ast_node->children[i]->value.ifval);
+            break;
+         case ANT_FOR:
+            astnode_for_dtor(ast_node->children[i]->value.forval);
+            break;
+         case ANT_RET:
+            astnode_ret_dtor(ast_node->children[i]->value.returnval);
+            break;
+         case ANT_FUNCCALL:
+            astnode_funccall_dtor(ast_node->children[i]->value.funccallval);
+            break;
+         case ANT_ASSIGN:
+            astnode_assign_dtor(ast_node->children[i]->value.assignval);
+            break;
+         case ANT_DEFVAR:
+            astnode_defvar_dtor(ast_node->children[i]->value.defvarval);
+            break;
+      }
+   }
+   free(ast_node);
+}
+
+void astnode_funcdecl_dtor(astnode_funcdecl_t* ast_node){
+   guard(ast_node != NULL);
+   astnode_codeblock_dtor(ast_node->body);
+   free(ast_node->name);
+   free(ast_node);
+}
+
+void ast_dtor(astnode_generic_t* root_global){
+   guard(root_global != NULL);
+   for(int i = 0; i < root_global->value.globalval->functions_count; i++){
+      astnode_funcdecl_dtor(root_global->value.globalval->functions[i]);
+   }
+   free(root_global->value.globalval->functions);
+   root_global->value.globalval->functions_count = 0;
+   free(root_global);
+   root_global = NULL;
 }

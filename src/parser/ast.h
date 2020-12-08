@@ -139,4 +139,22 @@ astnode_funccall_t* astnode_funccall_ctor(char* name, token_t** params, int para
 
 astnode_generic_t* astnode_generic_funccall_ctor(astnode_funccall_t* funccall);
 
+void ast_dtor(astnode_generic_t* root_global);
+
 void astnode_exp_dtor(astnode_exp_t* ast_node);
+
+void astnode_defvar_dtor(astnode_defvar_t* ast_node);
+
+void astnode_assign_dtor(astnode_assign_t* ast_node);
+
+void astnode_funccall_dtor(astnode_funccall_t* ast_node);
+
+void astnode_ret_dtor(astnode_ret_t* ast_node);
+
+void astnode_for_dtor(astnode_for_t* ast_node);
+
+void astnode_if_dtor(astnode_if_t* ast_node);
+
+void astnode_codeblock_dtor(astnode_codeblock_t* ast_node);
+
+void astnode_funcdecl_dtor(astnode_funcdecl_t* ast_node);
