@@ -67,25 +67,26 @@ int op_precedence(token_t* token) {
    switch (token->id) {
       case TOKENID_LEFT_PARENTHESES:
          return 0;
+      case TOKENID_OPERATOR_OR:
+         return 1;
+      case TOKENID_OPERATOR_AND:
+         return 2;
       case TOKENID_OPERATOR_EQUALS:
       case TOKENID_OPERATOR_NOT_EQUAL:
+         return 3;
       case TOKENID_OPERATOR_LESS:
       case TOKENID_OPERATOR_LESS_OR_EQUAL:
       case TOKENID_OPERATOR_GREATER:
       case TOKENID_OPERATOR_GREATER_OR_EQUAL:
-         return 1;
-      case TOKENID_OPERATOR_OR:
-         return 2;
-      case TOKENID_OPERATOR_AND:
-         return 3;
+         return 4;
       case TOKENID_OPERATOR_ADD: 
       case TOKENID_OPERATOR_SUB: 
-         return 4; 
+         return 5; 
       case TOKENID_OPERATOR_MUL: 
       case TOKENID_OPERATOR_DIV: 
-         return 5; 
-      case TOKENID_OPERATOR_NOT: 
          return 6; 
+      case TOKENID_OPERATOR_NOT: 
+         return 7; 
       default:
          error("Invalid operator.");
    }
