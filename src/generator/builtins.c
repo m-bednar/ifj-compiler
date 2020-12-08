@@ -45,7 +45,9 @@ void builtin_inputb() {
 void builtin_print(vartable_t* vartable, token_t** params, int param_count) {
    for (int i = 0; i < param_count; i++) {
       if (is_const_tokenid(params[i]->id)) {
-         printcm("WRITE %s", generate_const_str(params[i]));
+         char* str = generate_const_str(params[i]);
+         printcm("WRITE %s", str);
+         free(str);
       } else {
          char* identifier = params[i]->value.string_value;
          char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
@@ -109,10 +111,10 @@ void builtin_chr(vartable_t* vartable, token_t* param) {
          free(converted);
       }
    } else {
-      char* identifier = param->value.string_value;
-      char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
       char* l1 = labelgen_new();
       char* l2 = labelgen_new();
+      char* identifier = param->value.string_value;
+      char* var = generate_var_str(identifier, FT_TF, vartable_depth(vartable, identifier));
       printcm("PUSHS string@");
       printcm("PUSHS %s", var);
       printcm("LTS");
@@ -130,6 +132,9 @@ void builtin_chr(vartable_t* vartable, token_t* param) {
       printcm("PUSHS string@");
       printcm("PUSHS int@1");
       printcm("LABEL %s", l2);
+      free(l1);
+      free(l2);
+      free(var);
    }
    pcomment("Built-in len end");
 }
@@ -149,7 +154,6 @@ void builtin_ord(vartable_t* vartable, token_t** params) {
       if (params[1]->value.int_value < 0) {
          printcm("PUSHS int@0");
          printcm("PUSHS int@1");
-         return;
       } else {
          char* l1 = labelgen_new();
          char* l2 = labelgen_new();
@@ -217,6 +221,7 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
          sub[n->value.int_value] = '\0';
          printcm("PUSHS string@%s", sub);
          printcm("PUSHS int@0");
+         free(sub);
       }
    } else if (is_const_tokenid(i->id) && is_const_tokenid(n->id)) {
       if (i->value.int_value < 0 || n->value.int_value < 0) {

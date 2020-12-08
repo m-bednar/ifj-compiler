@@ -42,7 +42,7 @@ char* labelgen_new() {
 }
 
 char* convert_string(char* str) {
-   const int csize = 4; // Size of escaped ascii code
+   const int csize = 5; // Size of escaped ascii code
    char* out;
    int len = strlen(str);
    for (int i = 0; i < (int)strlen(str); i++) {
@@ -54,8 +54,12 @@ char* convert_string(char* str) {
    len = 0;
    for (int i = 0; i < (int)strlen(str); i++) {
       if ((str[i] >= 0 && str[i] <= 32) || str[i] == 35 || str[i] == 92) {
-         sprintf(out + len * sizeof(char), "\\%03d", (int)str[i]);
-         len += csize;
+         if (digits_count((int)str[i]) == 2) {
+            sprintf(out + len * sizeof(char), "\\0%d", (int)str[i]);
+         } else {
+            sprintf(out + len * sizeof(char), "\\00%d", (int)str[i]);
+         }
+         len += (csize - 1);
       } else {
          out[len] = str[i];
          len++;

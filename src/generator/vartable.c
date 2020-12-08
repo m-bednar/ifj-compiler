@@ -41,7 +41,7 @@ void vartable_add(vartable_t* vartable, char* identifier, vartype_e type) {
    guard(identifier != NULL);
 
    vardata_t* data = safe_alloc(sizeof(vardata_t));
-   data->identifier = safe_alloc(strlen(identifier) * sizeof(char));
+   data->identifier = safe_alloc(strlen(identifier) * (sizeof(char) + 1));
    strcpy(data->identifier, identifier);
    data->depth = vartable->depth;
    data->type = type;
