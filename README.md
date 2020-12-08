@@ -18,7 +18,7 @@
 ### TODO list
 - [x] Tabulka symbolů
 - [x] Lexikální analyzátor (scanner)
-- [ ] Syntaktický analyzátor (parser)
+- [x] Syntaktický analyzátor (parser)
 - [ ] Sémantický analyzátor (Generátor vnitřního kódu)
 - [ ] Generátor konečného kódu
 

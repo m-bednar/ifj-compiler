@@ -227,7 +227,7 @@ int nonterminal_commands_derivation(ntsymstack_t* stack, int token_id) {
 }
 
 int nonterminal_id_next_derivation(ntsymstack_t* stack, int token_id) {
-   if (token_id == TOKENID_OPERATOR_ASSIGN || token_id == TOKENID_RIGHT_PARENTHESES) {
+   if (token_id == TOKENID_OPERATOR_ASSIGN) {
       ntsymbol_dtor(ntsymstack_pop(stack));
       return 0;
    } else if (token_id == TOKENID_COMMA) {
@@ -259,7 +259,7 @@ int nonterminal_for_assignment_right_derivation(ntsymstack_t* stack, int token_i
       } else {
          return ERRCODE_SYNTAX_ERROR;
       }
-   } else if (token_id == TOKENID_LEFT_PARENTHESES || token_id == TOKENID_OPERATOR_NOT || token_id == TOKENID_NUM ||
+   } else if (token_id == TOKENID_LEFT_PARENTHESES || token_id == TOKENID_OPERATOR_NOT || token_id == TOKENID_NUM || 
                   token_id == TOKENID_NUM_DECIMAL || token_id == TOKENID_STRING_LITERAL || token_id == TOKENID_BOOL_LITERAL) {
       ntsymbol_dtor(ntsymstack_pop(stack));
       ntsymstack_push(stack, ntsymbol_ctor(NONTERMINAL_EXPRESSION_NEXT, false));
@@ -700,11 +700,11 @@ int precedence_parser(token_t** token, token_t** token_next, nonterminalid_e non
 
       switch (precedence_table[stack_top_terminal_id][input_terminal_id]) {
          case PT_E:
-            error = semantic((*token), nonterminal_flag, false, ast, symtable_global);
+            error = semantic((*token), nonterminal_flag, false, ast, symtable_global, false);
             shift(token, token_next, stack, input_terminal_id);
             break;
          case PT_L:
-            error = semantic((*token), nonterminal_flag, false, ast, symtable_global);
+            error = semantic((*token), nonterminal_flag, false, ast, symtable_global, false);
             add_operator_and_shift(token, token_next, stack, help_stack, input_terminal_id, stack_top_terminal_id);
             break;
          case PT_G:
@@ -852,7 +852,7 @@ void parse(astnode_generic_t* ast_root, bintree_t* symtable) {
       } else if (stack_top->is_terminal) {
          if ((tokenid_e)stack_top->id == token->id) {
             eol_flag = (token->id == TOKENID_NEWLINE) ? true : false;
-            error = semantic(token, nonterminal_flag, eol_flag, ast, symtable_global);
+            error = semantic(token, nonterminal_flag, eol_flag, ast, symtable_global, false);
             //token_dtor(token);
             ntsymbol_dtor(ntsymstack_pop(stack));
             token = token_next;
@@ -870,12 +870,17 @@ void parse(astnode_generic_t* ast_root, bintree_t* symtable) {
    }
    ntsymstack_dtor(stack);
 
+   //free semantic static variables and structs
+   semantic(NULL, nonterminal_flag, eol_flag, ast, symtable_global, true);
+   if(!error){
+      error = semantic_check_undeclared_func(symtable_global);
+      error = semantic_return_in_func(ast, symtable_global);
+   }
    if (error == ERRCODE_SYNTAX_ERROR) {
       token_dtor(token);
       token_dtor(token_next);
       exit(error);
    } else if (error) {
-      printf("err %d", error);
       exit(error);
    }
 

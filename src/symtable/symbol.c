@@ -38,7 +38,7 @@ void symbol_print(symbol_t* symbol) {
    guard(symbol != NULL);
    if (symbol->type == ST_VARIABLE) {
       symbolvalvar_t* val = symbol->value.var;
-      fprintf(stderr, "id: %s, type: VARIABLE, value type: %d\n", symbol->identifier, val->type);
+      fprintf(stderr, "id: %s, type: VARIABLE, value type: %d", symbol->identifier, val->type);
    } else {
       symbolvalfn_t* val = symbol->value.fn;
       fprintf(stderr, "id: %s, type: FUNCTION, args: %d, rets: %d, def: %d\n", symbol->identifier, val->arg_count, val->ret_count, val->defined);

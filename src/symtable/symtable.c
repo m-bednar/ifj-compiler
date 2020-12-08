@@ -60,6 +60,23 @@ symbol_t* bintree_find(bintree_t* tree, const char* identifier) {
    return NULL;
 }
 
+symbol_t** bintree_to_array(bintree_t* tree, int* length) {
+   guard(tree != NULL);
+
+   symbol_t** array = NULL;
+   *length = 0;
+   if (tree->root != NULL) {
+      binitem_to_array(tree->root, &array, length);
+   }
+   
+   return array;
+}
+
 void bintree_print(bintree_t* tree) {
-   binitem_print(tree->root);
+   guard(tree != NULL);
+   if (tree->root == NULL) {
+      fprintf(stderr, "(empty symtable)");
+   } else {
+      binitem_print(tree->root);
+   }
 }

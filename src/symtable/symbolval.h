@@ -9,6 +9,7 @@
 #include "../scanner/token.h"
 
 typedef enum vartype_e {
+   VT_UNDEFINED,
    VT_BOOL,
    VT_INT,
    VT_FLOAT,
@@ -26,8 +27,6 @@ typedef struct symbolvalfn_t {
 
 typedef struct symbolvalvar_t {
    vartype_e type;         // Type of the variable
-   bool is_const;
-   token_value_u const_val;
 } symbolvalvar_t;
 
 typedef union symbolval_u {
