@@ -696,10 +696,14 @@ int semantic_function_decl(tokenvector_t* token_vector, bintreestack_t* symtable
    else{
       if(symbol->value.fn->defined){
          //function was already declared
+         free(arg_types);
+         free(ret_types);
          return ERRCODE_VAR_UNDEFINED_ERROR;
       }
       if(symbol->value.fn->arg_count != arg_count || symbol->value.fn->ret_count != ret_count){
          //pre declaration doesnt match
+         free(arg_types);
+         free(ret_types);
          return ERRCODE_ARGS_OR_RETURN_ERROR;
       }
       //check arg types
@@ -802,12 +806,13 @@ int semantic_if(tokenvector_t* token_vector, astnode_generic_t** ast_node, bintr
       return err;
    }
    if(type != VT_BOOL){
+      tokenvector_dtor(condition);
       return ERRCODE_GENERAL_SEMANTIC_ERROR;
    }
    condition_array = tokenvector_get_array(condition, &size);
 
    (*ast_node) = astnode_if_ctor(astnode_exp_ctor(condition_array, size));
-
+   tokenvector_dtor(condition);
    return 0;
 }
 
@@ -864,12 +869,18 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
          return err;
       }
       if(type != VT_BOOL){
+         tokenvector_dtor(assign);
+         tokenvector_dtor(def);
+         tokenvector_dtor(condition);
          return ERRCODE_GENERAL_SEMANTIC_ERROR;
       }
       condition_array = tokenvector_get_array(condition, &size);
       condition_node = astnode_exp_ctor(condition_array, size);
    }
    else{
+      tokenvector_dtor(assign);
+      tokenvector_dtor(def);
+      tokenvector_dtor(condition);
       return ERRCODE_GENERAL_SEMANTIC_ERROR; //missing condition
    }
 
