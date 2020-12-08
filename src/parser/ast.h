@@ -138,3 +138,5 @@ void astnode_assign_add_funccall(astnode_assign_t* ast_node, astnode_funccall_t*
 astnode_funccall_t* astnode_funccall_ctor(char* name, token_t** params, int params_count);
 
 astnode_generic_t* astnode_generic_funccall_ctor(astnode_funccall_t* funccall);
+
+void astnode_exp_dtor(astnode_exp_t* ast_node);
