@@ -13,7 +13,7 @@
 #include "../generator/postfix.h"
 #include "../error.h"
 
-/*
+/**
  * converts tokenid type keyword to vartype
  */
 vartype_e tokenid_to_vartype(tokenid_e tokenid){
@@ -35,7 +35,7 @@ vartype_e tokenid_to_vartype(tokenid_e tokenid){
    }
 }
 
-/*
+/**
  * converts vartype to tokenid
  */
 tokenid_e vartype_to_tokenid(vartype_e vartype){
@@ -57,7 +57,7 @@ tokenid_e vartype_to_tokenid(vartype_e vartype){
    }
 }
 
-/*
+/**
  * returns true if type1 and type2 are same or if type1 is NULL
  * if type1 is -1 then type1 = type2
  */
@@ -135,7 +135,7 @@ void expression_replace_two_tokens(astnode_exp_t* exp, token_t* token, int i){
    exp->tokens_count -= 1;
 }
 
-/*
+/**
  * returns type result of operation or NULL if operation is not valid
  */
 token_t* expression_eval_operation_not(token_t* t1, bintreestack_t* symtable_stack){
@@ -155,7 +155,7 @@ token_t* expression_eval_operation_not(token_t* t1, bintreestack_t* symtable_sta
    return token_ctor(TOKENID_BOOL_LITERAL, value);
 }
 
-/*
+/**
  * returns type result of operation or NULL if operation is not valid
  */
 token_t* expression_eval_operation(token_t* t1, token_t* t2, token_t* t3, bintreestack_t* symtable_stack){
@@ -319,7 +319,6 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
    int size;
    int i;
    i=2;
-   
    token = tokenvector_get(token_vector, i);
    while(tokenvector_get_length(token_vector) > i){
       tokenvector_push(expression, token_copy(token));
@@ -351,7 +350,6 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
    }
    new_symbol = symbol_ctor(token->value.string_value, ST_VARIABLE, symbolval_var_ctor(type));
    bintree_add(bintreestack_peek(symtable_stack), new_symbol);
-
    // create ast node
    expression_array = tokenvector_get_array(expression, &size);
    (*def_node) = astnode_defvar_ctor(token_copy(tokenvector_get(token_vector,0)), astnode_exp_ctor(expression_array, size));
@@ -902,6 +900,47 @@ int semantic_package(tokenvector_t* token_vector, bool was_main){
    return 0;
 }
 
+/**
+ * 
+ */
+bool semantic_find_return(astnode_codeblock_t* func){
+   for(int i = 0; i < func->children_count; i++){
+      if(func->children[i]->type == ANT_RET){
+         return true;
+      }
+      if(func->children[i]->type == ANT_IF){
+         if(semantic_find_return(func->children[i]->value.ifval->true_body)){
+            return true;
+         }
+         if(func->children[i]->value.ifval->else_body != NULL){
+            if(semantic_find_return(func->children[i]->value.ifval->else_body)){
+               return true;
+            }
+         }
+      }
+      if(func->children[i]->type == ANT_FOR){
+         if(semantic_find_return(func->children[i]->value.forval->body)){
+            return true;
+         }
+      }
+   }
+   return false;
+}
+
+/**
+ * returns error if function missing return
+ */
+int semantic_return_in_func(astnode_generic_t* ast, bintree_t* symtable_global){
+   symbol_t* function;
+   for(int i = 0; i < ast->value.globalval->functions_count; i++){
+      function = bintree_find(symtable_global, ast->value.globalval->functions[0]->name);
+      if(function->value.fn->ret_count != 0 && !semantic_find_return(ast->value.globalval->functions[0]->body)){
+         return ERRCODE_GENERAL_SEMANTIC_ERROR;
+      }
+   }
+   return 0;
+}
+
 int semantic_check_undeclared_func(bintree_t* symtable_global){
    int functions_count = 0;
    symbol_t** functions = bintree_to_array(symtable_global, &functions_count);
@@ -928,7 +967,7 @@ vartype_e* vartype_arr_static_to_dyn(vartype_e static_arr[], int count){
    for(int i = 0; i < count; i++){
       dynamic[i] = static_arr[i];
    }
-   return static_arr;
+   return dynamic;
 }
 
 void add_buildin_funcs(bintree_t* symtable_global){
@@ -946,6 +985,11 @@ void add_buildin_funcs(bintree_t* symtable_global){
    //func inputf() (float64,int)
    vartype_e inputf_rets_types[] = {VT_FLOAT, VT_INT};
    symbol = symbol_ctor("inputf", ST_FUNCTION, symbolval_fn_ctor(0, 2, NULL, NULL, vartype_arr_static_to_dyn(inputf_rets_types, 2), true));
+   bintree_add(symtable_global, symbol);
+
+   //func inputb() (bool,int)
+   vartype_e inputb_rets_types[] = {VT_BOOL, VT_INT};
+   symbol = symbol_ctor("inputb", ST_FUNCTION, symbolval_fn_ctor(0, 2, NULL, NULL, vartype_arr_static_to_dyn(inputb_rets_types, 2), true));
    bintree_add(symtable_global, symbol);
 
    //func print (term1,term2,...,term𝑛)
@@ -1013,7 +1057,7 @@ void add_buildin_funcs(bintree_t* symtable_global){
    bintree_add(symtable_global, symbol);
 }
 
-int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic_t* ast, bintree_t* symtable_global){
+int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic_t* ast, bintree_t* symtable_global, bool free_static_variables){
    static astnode_funcdecl_t* function;
    static bintreestack_t* symtable_stack = NULL;
    static tokenvector_t* token_vector = NULL;
@@ -1023,6 +1067,21 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    static bool was_right_bracket = false;
    static bool was_main = false;
    int err = 0;
+
+   //free all static variables
+   if(free_static_variables){
+      if(token_vector != NULL){
+         tokenvector_dtor(token_vector);
+      }
+      if(symtable_stack != NULL){
+         bintreestack_dtor(symtable_stack);
+      }
+      if(ast_parents != NULL){
+         astnodestack_dtor(ast_parents);
+      }
+      return 0;
+   }
+
    if(symtable_stack == NULL){
       symtable_stack = bintreestack_ctor();
    }
@@ -1080,8 +1139,8 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    astnode_generic_t* ast_node_generic = NULL;
    token_t* token_tmp = NULL;
    symbol_t* symbol = NULL;
-   //ast insert
 
+   //ast insert
    if(current_flag != NONTERMINAL_PACKAGE && !was_main){
       return ERRCODE_SYNTAX_ERROR;
    }
@@ -1094,7 +1153,6 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
          break;
       // FUNCTION DECLARATION
       case NONTERMINAL_FUNCTION:
-         //TODO: if function has return
          token = tokenvector_get(token_vector, 1);
          function = astnode_funcdecl_ctor(token->value.string_value);
          ast_global_add_func(ast, function);

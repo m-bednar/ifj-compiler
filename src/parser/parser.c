@@ -700,11 +700,11 @@ int precedence_parser(token_t** token, token_t** token_next, nonterminalid_e non
 
       switch (precedence_table[stack_top_terminal_id][input_terminal_id]) {
          case PT_E:
-            error = semantic((*token), nonterminal_flag, false, ast, symtable_global);
+            error = semantic((*token), nonterminal_flag, false, ast, symtable_global, false);
             shift(token, token_next, stack, input_terminal_id);
             break;
          case PT_L:
-            error = semantic((*token), nonterminal_flag, false, ast, symtable_global);
+            error = semantic((*token), nonterminal_flag, false, ast, symtable_global, false);
             add_operator_and_shift(token, token_next, stack, help_stack, input_terminal_id, stack_top_terminal_id);
             break;
          case PT_G:
@@ -852,7 +852,7 @@ void parse(astnode_generic_t* ast_root, bintree_t* symtable) {
       } else if (stack_top->is_terminal) {
          if ((tokenid_e)stack_top->id == token->id) {
             eol_flag = (token->id == TOKENID_NEWLINE) ? true : false;
-            error = semantic(token, nonterminal_flag, eol_flag, ast, symtable_global);
+            error = semantic(token, nonterminal_flag, eol_flag, ast, symtable_global, false);
             //token_dtor(token);
             ntsymbol_dtor(ntsymstack_pop(stack));
             token = token_next;
@@ -870,15 +870,19 @@ void parse(astnode_generic_t* ast_root, bintree_t* symtable) {
    }
    ntsymstack_dtor(stack);
 
+   //free semantic static variables and structs
+   semantic(NULL, nonterminal_flag, eol_flag, ast, symtable_global, true);
    if(!error){
       error = semantic_check_undeclared_func(symtable_global);
+      error = semantic_return_in_func(ast, symtable_global);
    }
    if (error == ERRCODE_SYNTAX_ERROR) {
-      //printf("err %d", error);
+      printf("err %d", error);
       token_dtor(token);
       token_dtor(token_next);
       exit(error);
    } else if (error) {
+      printf("err %d", error);
       exit(error);
    }
 
