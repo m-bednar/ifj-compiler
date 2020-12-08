@@ -877,12 +877,10 @@ void parse(astnode_generic_t* ast_root, bintree_t* symtable) {
       error = semantic_return_in_func(ast, symtable_global);
    }
    if (error == ERRCODE_SYNTAX_ERROR) {
-      printf("err %d", error);
       token_dtor(token);
       token_dtor(token_next);
       exit(error);
    } else if (error) {
-      printf("err %d", error);
       exit(error);
    }
 
