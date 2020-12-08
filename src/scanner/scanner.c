@@ -232,7 +232,7 @@ token_t* get_next_token() {
             }
             break;
          case STATE_IDENTIFIER_KEYWORD:
-            if ((isalpha(c) != 0) || c == '_' || (isdigit(c) != 0)) {
+            if ((isalpha(c)) || c == '_' || (isdigit(c))) {
                buffer = append((char) c, buffer);
             } else {
                prev = c;
@@ -249,7 +249,7 @@ token_t* get_next_token() {
             }
             break;
          case STATE_NUM:
-            if (isdigit(c) != 0) { // digit
+            if (isdigit(c)) { // digit
                buffer = append((char) c, buffer);
             } else if (c == '.') { // decimal
                buffer = append((char) c, buffer);
