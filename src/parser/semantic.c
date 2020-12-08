@@ -874,6 +874,16 @@ int semantic_check_undeclared_func(bintree_t* symtable_global){
          return ERRCODE_VAR_UNDEFINED_ERROR;
       }
    }
+   symbol_t* main = bintree_find(symtable_global, "main");
+   if(main == NULL){
+      return ERRCODE_VAR_UNDEFINED_ERROR;
+   }
+   else{
+      if(main->value.fn->arg_count != 0 || main->value.fn->ret_count != 0){
+         return ERRCODE_ARGS_OR_RETURN_ERROR;
+      }
+   }
+
    return 0;
 }
 
