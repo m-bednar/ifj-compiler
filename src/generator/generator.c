@@ -19,7 +19,6 @@ void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* 
  * Generates stack pops of return variables after function call.
  */
 void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
-   dprint("%d", node->ids_count);
    int clears_from = node->ids_count;
    for (int i = node->ids_count - 1; i >= 0; i--) {
       if (streq(node->left_ids[i]->value.string_value, "_")) {
