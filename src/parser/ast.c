@@ -247,8 +247,12 @@ void astnode_ret_dtor(astnode_ret_t* ast_node){
 void astnode_for_dtor(astnode_for_t* ast_node){
    guard(ast_node != NULL);
    astnode_exp_dtor(ast_node->condition);
-   astnode_assign_dtor(ast_node->assign);
-   astnode_defvar_dtor(ast_node->defvar);
+   if(ast_node->assign != NULL){
+      astnode_assign_dtor(ast_node->assign);
+   }
+   if(ast_node->defvar != NULL){
+      astnode_defvar_dtor(ast_node->defvar);
+   }
    astnode_codeblock_dtor(ast_node->body);
    free(ast_node);
 }
