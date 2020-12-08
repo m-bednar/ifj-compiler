@@ -87,7 +87,6 @@ int op_precedence(token_t* token) {
       case TOKENID_OPERATOR_NOT: 
          return 6; 
       default:
-         printf(" %d ",token->id);
          error("Invalid operator.");
    }
 }
