@@ -219,8 +219,10 @@ void builtin_substr(vartable_t* vartable, token_t** params) {
          char* sub = safe_alloc(sizeof(char) * (n->value.int_value + 1));
          strncpy(sub, s->value.string_value + i->value.int_value, n->value.int_value);
          sub[n->value.int_value] = '\0';
-         printcm("PUSHS string@%s", sub);
+         char* res = convert_string(sub);
+         printcm("PUSHS string@%s", res);
          printcm("PUSHS int@0");
+         free(res);
          free(sub);
       }
    } else if (is_const_tokenid(i->id) && is_const_tokenid(n->id)) {
