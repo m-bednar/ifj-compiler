@@ -3,7 +3,7 @@
  * @file ast.h
  * @authors Michal Trlica (xtrlic02)
  */
-
+#include <inttypes.h>
 #include "tokenvector.h"
 #include "../memory.h"
 #include "../error.h"
@@ -21,9 +21,14 @@ tokenvector_t* tokenvector_ctor(){
 void tokenvector_dtor(tokenvector_t* vector){
    guard(vector != NULL);
    if(vector->memory == NULL){
+      free(vector);
+      vector = NULL;
       return;
    }
-   
+   for(int i = 0; i< vector->length; i++){
+      token_dtor(vector->memory[i]);
+      vector->memory[i]=NULL;
+   }
    free(vector->memory);
    vector->length = 0;
    vector->capacity = 0;
@@ -53,7 +58,7 @@ void tokenvector_push(tokenvector_t* vector, token_t* token){
    vector->length++;
 }
 
-int tokenvector_get_lenght(tokenvector_t* vector){
+int tokenvector_get_length(tokenvector_t* vector){
    return vector->length;
 }
 
@@ -68,10 +73,13 @@ void tokenvector_print(tokenvector_t* vector){
             printf("if ");
             break;
          case TOKENID_NUM:
-            printf("%ld ", vector->memory[i]->value.int_value);
+            printf("%" PRId64 " ", vector->memory[i]->value.int_value);
             break;
          case TOKENID_NUM_DECIMAL:
             printf("%f ", vector->memory[i]->value.decimal_value);
+            break;
+         case TOKENID_STRING_LITERAL:
+            printf("\"%s\" ", vector->memory[i]->value.string_value);
             break;
          case TOKENID_LEFT_PARENTHESES:
             printf("( ");
@@ -94,7 +102,21 @@ void tokenvector_print(tokenvector_t* vector){
          case TOKENID_OPERATOR_DECLARE:
             printf(":= ");
             break;
-         
+         case TOKENID_COMMA:
+            printf(", ");
+            break;
+         case TOKENID_SEMICOLON:
+            printf("; ");
+            break;
+         case TOKENID_KEYWORD_FOR:
+            printf("for ");
+            break;
+         case TOKENID_KEYWORD_ELSE:
+            printf("else ");
+            break;
+         case TOKENID_KEYWORD_PACKAGE:
+            printf("package ");
+            break;
          default:
          break;
       }
@@ -104,6 +126,16 @@ void tokenvector_print(tokenvector_t* vector){
 }
 
 token_t** tokenvector_get_array(tokenvector_t* vector, int* size){
-   (*size) = vector->length;
-   return vector->memory;
+   if(vector->length != 0){
+      token_t** array = safe_alloc(sizeof(token_t*) * (vector->length));
+      for(int i = 0; i < vector->length; i++){
+         array[i] = token_copy(vector->memory[i]);
+      }
+      (*size) = vector->length;
+      return array;
+   }
+   else{
+      (*size) = vector->length;
+      return NULL;
+   }
 }

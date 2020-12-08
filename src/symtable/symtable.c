@@ -74,5 +74,9 @@ symbol_t** bintree_to_array(bintree_t* tree, int* length) {
 
 void bintree_print(bintree_t* tree) {
    guard(tree != NULL);
-   binitem_print(tree->root);
+   if (tree->root == NULL) {
+      fprintf(stderr, "(empty symtable)");
+   } else {
+      binitem_print(tree->root);
+   }
 }

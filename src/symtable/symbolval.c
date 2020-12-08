@@ -33,7 +33,6 @@ symbolval_u symbolval_var_ctor(vartype_e type) {
    
    var->type = type;
    symbolval.var = var;
-   symbolval.var->is_const = false;
    
    return symbolval;
 }
@@ -43,7 +42,11 @@ void symbolval_fn_dtor(symbolval_u symbolval) {
    
    if (symbolval.fn->arg_count > 0 && symbolval.fn->arg_types != NULL) {
       free(symbolval.fn->arg_types);
+      for (int i = 0; i < symbolval.fn->arg_count; i++) {
+         free(symbolval.fn->arg_names[i]);
+      }
       symbolval.fn->arg_types = NULL;
+      symbolval.fn->arg_names = NULL;
    }
    if (symbolval.fn->ret_count > 0 && symbolval.fn->ret_types != NULL) {
       free(symbolval.fn->arg_types);
@@ -60,9 +63,6 @@ void symbolval_fn_dtor(symbolval_u symbolval) {
 
 void symbolval_var_dtor(symbolval_u symbolval) {
    guard(symbolval.var != NULL);
-   if (symbolval.var->type == VT_STRING && symbolval.var->is_const) {
-      free(symbolval.var->const_val.string_value);
-   }
    free(symbolval.var);
    symbolval.var = NULL;
 }

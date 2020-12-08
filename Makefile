@@ -3,7 +3,7 @@
 #	Date: 06/10/2020
 #
 
-GCC_ARGS = -std=c99 -Wall -Wextra -Werror
+GCC_ARGS = -std=c99 -Wall -Wno-format -Wextra -Werror
 
 MAIN_FILENAME = main
 SOURCE_DIR = src/
