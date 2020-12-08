@@ -199,13 +199,13 @@ void astnode_exp_dtor(astnode_exp_t* ast_node){
    ast_node->tokens_count = 0;
    free(ast_node->tokens);
    free(ast_node);
-   ast_node = NULL;
 }
 
 void astnode_defvar_dtor(astnode_defvar_t* ast_node){
    guard(ast_node != NULL);
    token_dtor(ast_node->variable);
    astnode_exp_dtor(ast_node->expression);
+   free(ast_node);
 }
 
 void astnode_assign_dtor(astnode_assign_t* ast_node){
@@ -250,6 +250,7 @@ void astnode_for_dtor(astnode_for_t* ast_node){
    astnode_assign_dtor(ast_node->assign);
    astnode_defvar_dtor(ast_node->defvar);
    astnode_codeblock_dtor(ast_node->body);
+   free(ast_node);
 }
 
 void astnode_if_dtor(astnode_if_t* ast_node){
