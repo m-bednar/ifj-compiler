@@ -13,7 +13,9 @@
 #include "../generator/postfix.h"
 #include "../error.h"
 
-// converts tokenid type keyword to vartype
+/*
+ * converts tokenid type keyword to vartype
+ */
 vartype_e tokenid_to_vartype(tokenid_e tokenid){
    switch(tokenid){
       case TOKENID_KEYWORD_FLOAT64:
@@ -29,14 +31,36 @@ vartype_e tokenid_to_vartype(tokenid_e tokenid){
          return VT_BOOL;
       break;
       default:
+         error("invalid tokenid");
+   }
+}
+
+/*
+ * converts vartype to tokenid
+ */
+tokenid_e vartype_to_tokenid(vartype_e vartype){
+   switch(vartype){
+      case VT_FLOAT:
+         return TOKENID_NUM_DECIMAL;
+      break;
+      case VT_INT:
+         return TOKENID_NUM;
+      break;
+      case VT_STRING:
+         return TOKENID_STRING_LITERAL;
+      break;
+      case VT_BOOL:
+         return TOKENID_BOOL_LITERAL;
+      break;
+      default:
          error("invalid vartype");
    }
 }
+
 /*
  * returns true if type1 and type2 are same or if type1 is NULL
  * if type1 is -1 then type1 = type2
  */
-
 vartype_e get_const_type(token_t* token){
    switch(token->id){
       case TOKENID_STRING_LITERAL:
@@ -84,13 +108,11 @@ bool is_binary_operator(token_t* token){
 }
 
 void expression_replace_tree_tokens(astnode_exp_t* exp, token_t* token, int i){
-   token_t* new = token_copy(token);
-
    token_dtor(exp->tokens[i]);
    token_dtor(exp->tokens[i + 1]);
    token_dtor(exp->tokens[i + 2]);
 
-   exp->tokens[i] = new;
+   exp->tokens[i] = token;
 
    for (int j = i + 3; j < exp->tokens_count; j++) {
       exp->tokens[j - 2] = exp->tokens[j];
@@ -100,12 +122,11 @@ void expression_replace_tree_tokens(astnode_exp_t* exp, token_t* token, int i){
 }
 
 void expression_replace_two_tokens(astnode_exp_t* exp, token_t* token, int i){
-   token_t* new = token_copy(token);
 
    token_dtor(exp->tokens[i]);
    token_dtor(exp->tokens[i + 1]);
 
-   exp->tokens[i] = new;
+   exp->tokens[i] = token;
 
    for (int j = i + 2; j < exp->tokens_count; j++) {
       exp->tokens[j - 1] = exp->tokens[j];
@@ -114,131 +135,178 @@ void expression_replace_two_tokens(astnode_exp_t* exp, token_t* token, int i){
    exp->tokens_count -= 1;
 }
 
-
-/*int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintreestack_t* symtable_stack){
-   (*ret_type)=VT_INT;
-   symtable_stack=symtable_stack;
-   int expression_size = 0;
-   bool reduced = false;
-   tokenvector_print(token_vector);
-   token_t** expression_array = tokenvector_get_array(token_vector, &expression_size);
-   astnode_exp_t* node_exp = astnode_exp_ctor(expression_array, expression_size);
-   infix_to_postfix(node_exp);
-   
-   do{
-      for(int i = 0; i < node_exp->tokens_count && !reduced; i++){
-         if(is_operator(node_exp->tokens[i])){
-
-         }
-      }
-   }while(reduced);
-   
-   return 0;
-}*/
-
-int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintreestack_t* symtable_stack){
-   token_t* token;
-   token_t* next_token;
+/*
+ * returns type result of operation or NULL if operation is not valid
+ */
+token_t* expression_eval_operation_not(token_t* t1, bintreestack_t* symtable_stack){
    symbol_t* symbol;
-   vartype_e next_type;
-   vartype_e type;
-   tokenvector_t* operators;
-   int level;
-   
-   token = tokenvector_get(token_vector, 0);
-   if(token->id == TOKENID_OPERATOR_NOT){
-      token = tokenvector_get(token_vector, 1);
-   }
-
-   if(token->id == TOKENID_IDENTIFIER){
-      symbol = bintreestack_find(symtable_stack, token->value.string_value, &level);
-      if(symbol == NULL){
-         return ERRCODE_VAR_UNDEFINED_ERROR;
-      }
-      else{
-         type = symbol->value.var->type;
-         next_type = type;
-      }
+   tokenid_e tokenid_type_t1;
+   if(t1->id == TOKENID_IDENTIFIER){
+      symbol = bintreestack_find(symtable_stack, t1->value.string_value, NULL);
+      tokenid_type_t1 = vartype_to_tokenid(symbol->value.var->type);
    }
    else{
-      type = get_const_type(token);
-      next_type = type;
+      tokenid_type_t1 = vartype_to_tokenid(get_const_type(t1));
    }
+   if(tokenid_type_t1 != TOKENID_BOOL_LITERAL){
+      return NULL;
+   }
+   token_value_u value;
+   return token_ctor(TOKENID_BOOL_LITERAL, value);
+}
 
-   operators = tokenvector_ctor();
+/*
+ * returns type result of operation or NULL if operation is not valid
+ */
+token_t* expression_eval_operation(token_t* t1, token_t* t2, token_t* t3, bintreestack_t* symtable_stack){
+   symbol_t* symbol;
+   tokenid_e tokenid_type_t1;
+   tokenid_e tokenid_type_t2;
+   if(t1->id == TOKENID_IDENTIFIER){
+      symbol = bintreestack_find(symtable_stack, t1->value.string_value, NULL);
+      tokenid_type_t1 = vartype_to_tokenid(symbol->value.var->type);
+   }
+   else{
+      tokenid_type_t1 = vartype_to_tokenid(get_const_type(t1));
+   }
+   if(t2->id == TOKENID_IDENTIFIER){
+      symbol = bintreestack_find(symtable_stack, t2->value.string_value, NULL);
+      tokenid_type_t2 = vartype_to_tokenid(symbol->value.var->type);
+   }
+   else{
+      tokenid_type_t2 = vartype_to_tokenid(get_const_type(t2));
+   }
+   
+   if(tokenid_type_t1 != tokenid_type_t2){
+      return NULL;
+   }
+   
+   token_value_u value;
+   value.string_value=NULL;
+   switch(tokenid_type_t1){
+      case TOKENID_NUM_DECIMAL:
+         if(t3->id == TOKENID_OPERATOR_LESS || t3->id == TOKENID_OPERATOR_LESS_OR_EQUAL || t3->id == TOKENID_OPERATOR_GREATER || t3->id == TOKENID_OPERATOR_GREATER_OR_EQUAL || t3->id == TOKENID_OPERATOR_EQUALS || t3->id == TOKENID_OPERATOR_NOT_EQUAL){
+            return token_ctor(TOKENID_BOOL_LITERAL, value);
+         }
+         else if(t3->id == TOKENID_OPERATOR_ADD || t3->id == TOKENID_OPERATOR_SUB || t3->id == TOKENID_OPERATOR_MUL || t3->id == TOKENID_OPERATOR_DIV){
+            return token_ctor(TOKENID_NUM_DECIMAL, value);
+         }
+         else{
+            return NULL;
+         }
+         break;
+      case TOKENID_NUM:
+         if(t3->id == TOKENID_OPERATOR_LESS || t3->id == TOKENID_OPERATOR_LESS_OR_EQUAL || t3->id == TOKENID_OPERATOR_GREATER || t3->id == TOKENID_OPERATOR_GREATER_OR_EQUAL || t3->id == TOKENID_OPERATOR_EQUALS || t3->id == TOKENID_OPERATOR_NOT_EQUAL){
+            return token_ctor(TOKENID_BOOL_LITERAL, value);
+         }
+         else if(t3->id == TOKENID_OPERATOR_ADD || t3->id == TOKENID_OPERATOR_SUB || t3->id == TOKENID_OPERATOR_MUL || t3->id == TOKENID_OPERATOR_DIV){
+            return token_ctor(TOKENID_NUM, value);
+         }
+         else{
+            return NULL;
+         }
+      case TOKENID_STRING_LITERAL:
+         if(t3->id == TOKENID_OPERATOR_ADD){
+            value.string_value = safe_alloc(sizeof(char));
+            strcpy(value.string_value, ""); //string must be set
+            return token_ctor(TOKENID_STRING_LITERAL, value);
+         }
+         else if(t3->id == TOKENID_OPERATOR_EQUALS || t3->id == TOKENID_OPERATOR_NOT_EQUAL){
+            return token_ctor(TOKENID_BOOL_LITERAL, value);
+         }
+         else{
+            return NULL;
+         }
+         return NULL;
+         break;
+      case TOKENID_BOOL_LITERAL:
+         if(t3->id == TOKENID_OPERATOR_EQUALS || t3->id == TOKENID_OPERATOR_NOT_EQUAL || t3->id == TOKENID_OPERATOR_AND || t3->id == TOKENID_OPERATOR_OR){
+            return token_ctor(TOKENID_BOOL_LITERAL, value);
+         }
+         else{
+            return NULL;
+         }
+         break;
+      default:
+         error("invalid type");
+         break;
+   }
+   return NULL;
+}
+
+int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintreestack_t* symtable_stack){
+   int expression_size = 0;
+   bool reduced = false;
+   symbol_t* symbol;
+
+   //check if all variables was defined and if devide by zero may occure
    for(int i = 0; i < tokenvector_get_lenght(token_vector); i++){
-      token =  tokenvector_get(token_vector, i);
-
-      // check type
-      if(token->id == TOKENID_IDENTIFIER){
-         // check if var was declared
-         symbol = bintreestack_find(symtable_stack, token->value.string_value, &level);
+      token_t* token = tokenvector_get(token_vector, i);
+      if (token->id == TOKENID_IDENTIFIER) {
+         symbol = bintreestack_find(symtable_stack, token->value.string_value, NULL);
          if(symbol == NULL){
             return ERRCODE_VAR_UNDEFINED_ERROR;
          }
-         else{
-            next_type = symbol->value.var->type;
+      }
+      if(token->id == TOKENID_OPERATOR_DIV){
+         token_t* token_next = tokenvector_get(token_vector, i + 1);
+         if(token_next->id == TOKENID_NUM && token_next->value.int_value == 0){
+            return ERRCODE_ZERO_DIVISION_ERROR;
+         }
+         if(token_next->id == TOKENID_NUM_DECIMAL && token_next->value.decimal_value == 0.0){
+            return ERRCODE_ZERO_DIVISION_ERROR;
          }
       }
-      else if(token->id == TOKENID_STRING_LITERAL || token->id == TOKENID_BOOL_LITERAL || token->id == TOKENID_NUM || token->id == TOKENID_NUM_DECIMAL){
-         next_type = get_const_type(token);
+   }
+
+   token_t** expression_array = tokenvector_get_array(token_vector, &expression_size);
+   astnode_exp_t* node_exp = astnode_exp_ctor(expression_array, expression_size);
+   infix_to_postfix(node_exp);
+
+   if(node_exp->tokens_count == 1){
+      if(node_exp->tokens[0]->id == TOKENID_IDENTIFIER){
+         symbol = bintreestack_find(symtable_stack, node_exp->tokens[0]->value.string_value, NULL);
+         (*ret_type) = symbol->value.var->type;
       }
       else{
-         tokenvector_push(operators, token_copy(token));
-      }
-
-      if(type == VT_FLOAT || type == VT_INT){
-         
-         // zero division check
-         if(token->id == TOKENID_OPERATOR_DIV){
-            next_token = tokenvector_get(token_vector, i + 1);
-            if(next_token->id == TOKENID_NUM && next_token->value.int_value == 0){
-               return ERRCODE_ZERO_DIVISION_ERROR;
-            }
-            else if(next_token->id == TOKENID_NUM_DECIMAL && next_token->value.decimal_value == 0.0){
-               return ERRCODE_ZERO_DIVISION_ERROR;
-            }
-         }
-      }
-      if(type != next_type){
-         return ERRCODE_TYPE_INCOMPATIBLE_ERROR;
-      }
-
-   }
-
-   
-   if(tokenvector_get_lenght(operators) != 0){
-      for(int i = 0; i < tokenvector_get_lenght(operators); i++){
-         token =  tokenvector_get(operators, i);
-         if(is_relational_operator(token)){
-            type = VT_BOOL;
-         }
-         switch(type){
-            case VT_BOOL:
-               if(token->id != TOKENID_OPERATOR_EQUALS && token->id != TOKENID_OPERATOR_NOT_EQUAL && token->id != TOKENID_OPERATOR_NOT && token->id != TOKENID_OPERATOR_AND && token->id != TOKENID_OPERATOR_OR){
-                  return ERRCODE_GENERAL_SEMANTIC_ERROR;
-               }
-               break;
-            case VT_INT:
-
-               break;
-            case VT_FLOAT:
-               break;
-            case VT_STRING:
-               if(token->id == TOKENID_OPERATOR_SUB || token->id == TOKENID_OPERATOR_MUL || token->id == TOKENID_OPERATOR_LESS || token->id == TOKENID_OPERATOR_GREATER || token->id == TOKENID_OPERATOR_GREATER_OR_EQUAL){
-                  return ERRCODE_GENERAL_SEMANTIC_ERROR;
-               }
-               break;
-            default:
-               break;
-         }
+         (*ret_type) = get_const_type(node_exp->tokens[0]);
       }
    }
-
-   (*ret_type) = type;
-   tokenvector_dtor(operators);
+   else{
+      do{
+         reduced = false;
+         for(int i = 0; i < node_exp->tokens_count && !reduced; i++){
+            if(is_operator(node_exp->tokens[i])){
+               if(node_exp->tokens[i]->id == TOKENID_OPERATOR_NOT){
+                  token_t* t1 = node_exp->tokens[i -1];
+                  token_t* token_eval = expression_eval_operation_not(t1, symtable_stack);
+                  if(token_eval == NULL){
+                     astnode_exp_dtor(node_exp);
+                     return ERRCODE_TYPE_INCOMPATIBLE_ERROR;
+                  }
+                  expression_replace_two_tokens(node_exp, token_eval, i-1);
+               }
+               else{
+                  token_t* t1 = node_exp->tokens[i - 2];
+                  token_t* t2 = node_exp->tokens[i - 1];
+                  token_t* t3 = node_exp->tokens[i];
+                  token_t* token_eval = expression_eval_operation(t1, t2, t3, symtable_stack);
+                  if(token_eval == NULL){
+                     astnode_exp_dtor(node_exp);
+                     return ERRCODE_TYPE_INCOMPATIBLE_ERROR;
+                  }
+                  expression_replace_tree_tokens(node_exp, token_eval, i-2);
+               }
+               reduced = true;
+            }
+         }
+      }while(node_exp->tokens_count != 1);
+      (*ret_type)= get_const_type(node_exp->tokens[0]);
+   }
+   astnode_exp_dtor(node_exp);
    return 0;
 }
+
 
 int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_stack, astnode_defvar_t** def_node){
    tokenvector_t* expresion = tokenvector_ctor();
@@ -335,6 +403,7 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
    }
 
    variables_array = tokenvector_get_array(variables, &size);
+   printf("%p %d",variables_array, size);
    astnode_assign_add_ids((*assign_node), variables_array, size);
 
    i++;
@@ -379,8 +448,8 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
       bintree_add(symtable_global, symbol_ctor(token->value.string_value, ST_FUNCTION, new_symbolval));
    }
 
-   tokenvector_dtor(funccall);
-   tokenvector_dtor(variables);
+   //tokenvector_dtor(funccall);
+   //tokenvector_dtor(variables);
    return err;
 }
 
