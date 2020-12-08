@@ -22,7 +22,7 @@ void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
    int clears_to = 0;
    for (int i = 0; i < node->ids_count; i++) {
       if (streq(node->left_ids[i]->value.string_value, "_")) {
-         clears_to = i;
+         clears_to++;
       } else {
          break;
       }
