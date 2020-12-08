@@ -479,10 +479,19 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
       bintree_add(symtable_global, symbol_ctor(token->value.string_value, ST_FUNCTION, new_symbolval));
    }
    else{
-      if(symbol->value.fn->arg_count != funccall_node->params_count || symbol->value.fn->ret_count != tokenvector_get_length(variables)){
-         tokenvector_dtor(funccall);
-         tokenvector_dtor(variables);
-         return ERRCODE_ARGS_OR_RETURN_ERROR;
+      if(strcmp(symbol->identifier, "print")){
+         if(symbol->value.fn->arg_count != funccall_node->params_count || symbol->value.fn->ret_count != tokenvector_get_length(variables)){
+            tokenvector_dtor(funccall);
+            tokenvector_dtor(variables);
+            return ERRCODE_ARGS_OR_RETURN_ERROR;
+         }
+      }
+      else{
+         if(symbol->value.fn->ret_count != tokenvector_get_length(variables)){
+            tokenvector_dtor(funccall);
+            tokenvector_dtor(variables);
+            return ERRCODE_ARGS_OR_RETURN_ERROR;
+         }
       }
       //check return types
       for(int i = 0; i < tokenvector_get_length(variables); i++){
@@ -500,16 +509,18 @@ int semantic_assign_funccall(tokenvector_t* token_vector, bintreestack_t* symtab
          }
       }
       //check arg types
-      for(int i = 0 ; i < funccall_node->params_count; i++){
-         token = funccall_node->params[i];
-         if(token->id == TOKENID_IDENTIFIER){
-            if(bintreestack_find(symtable_stack, token->value.string_value, NULL)->value.var->type != symbol->value.fn->arg_types[i]){
-               return ERRCODE_ARGS_OR_RETURN_ERROR;
+      if(strcmp(symbol->identifier, "print")){
+         for(int i = 0 ; i < funccall_node->params_count; i++){
+            token = funccall_node->params[i];
+            if(token->id == TOKENID_IDENTIFIER){
+               if(bintreestack_find(symtable_stack, token->value.string_value, NULL)->value.var->type != symbol->value.fn->arg_types[i]){
+                  return ERRCODE_ARGS_OR_RETURN_ERROR;
+               }
             }
-         }
-         else{
-            if(get_const_type(token) != symbol->value.fn->arg_types[i]){
-               return ERRCODE_ARGS_OR_RETURN_ERROR;
+            else{
+               if(get_const_type(token) != symbol->value.fn->arg_types[i]){
+                  return ERRCODE_ARGS_OR_RETURN_ERROR;
+               }
             }
          }
       }
@@ -1043,6 +1054,7 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
    astnode_funccall_t* ast_funccall = NULL;
    astnode_generic_t* ast_node_generic = NULL;
    token_t* token_tmp = NULL;
+   symbol_t* symbol = NULL;
    //ast insert
 
    if(current_flag != NONTERMINAL_PACKAGE && !was_main){
@@ -1214,10 +1226,10 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
                }
             }
          }
-         //TODO: check returns, update pre declare
          //add to symtable if its not yet declared
          token_tmp = tokenvector_get(token_vector,0);
-         if(bintree_find(symtable_global ,token_tmp->value.string_value) == NULL){
+         symbol = bintree_find(symtable_global ,token_tmp->value.string_value);
+         if(symbol == NULL){
             //expected arguments for yet undefined function
             vartype_e* arg_types = NULL;
             if(ast_funccall->params_count != 0){
@@ -1236,6 +1248,26 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
             token_tmp = tokenvector_get(token_vector, 0);
             symbolval_u new_symbolval = symbolval_fn_ctor(ast_funccall->params_count, 0, NULL, arg_types, NULL, false);
             bintree_add(symtable_global, symbol_ctor(token_tmp->value.string_value, ST_FUNCTION, new_symbolval));
+         }
+         else{
+            if(symbol->value.fn->ret_count != 0){
+               return ERRCODE_ARGS_OR_RETURN_ERROR;
+            }
+            if(strcmp(symbol->identifier, "print")){
+               for(int i = 0 ; i < ast_funccall->params_count; i++){
+                  token = ast_funccall->params[i];
+                  if(token->id == TOKENID_IDENTIFIER){
+                     if(bintreestack_find(symtable_stack, token->value.string_value, NULL)->value.var->type != symbol->value.fn->arg_types[i]){
+                        return ERRCODE_ARGS_OR_RETURN_ERROR;
+                     }
+                  }
+                  else{
+                     if(get_const_type(token) != symbol->value.fn->arg_types[i]){
+                        return ERRCODE_ARGS_OR_RETURN_ERROR;
+                     }
+                  }
+               }
+            }
          }
 
          break;
