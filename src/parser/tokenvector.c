@@ -21,9 +21,14 @@ tokenvector_t* tokenvector_ctor(){
 void tokenvector_dtor(tokenvector_t* vector){
    guard(vector != NULL);
    if(vector->memory == NULL){
+      free(vector);
+      vector = NULL;
       return;
    }
-   
+   for(int i = 0; i< vector->length; i++){
+      token_dtor(vector->memory[i]);
+      vector->memory[i]=NULL;
+   }
    free(vector->memory);
    vector->length = 0;
    vector->capacity = 0;
