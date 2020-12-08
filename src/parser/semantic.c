@@ -308,8 +308,8 @@ int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintre
 }
 
 int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_stack, astnode_defvar_t** def_node){
-   tokenvector_t* expresion = tokenvector_ctor();
-   token_t** expresion_array;
+   tokenvector_t* expression = tokenvector_ctor();
+   token_t** expression_array;
    token_t* token;
    vartype_e type;
    symbol_t* new_symbol;
@@ -322,7 +322,7 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
    
    token = tokenvector_get(token_vector, i);
    while(tokenvector_get_length(token_vector) > i){
-      tokenvector_push(expresion, token_copy(token));
+      tokenvector_push(expression, token_copy(token));
 
       i++;
       if(tokenvector_get_length(token_vector) == i){
@@ -331,9 +331,10 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
       token = tokenvector_get(token_vector, i);
    }
 
-   err = semantic_expression(expresion, &type, symtable_stack);
+   err = semantic_expression(expression, &type, symtable_stack);
 
    if(err){
+      tokenvector_dtor(expression);
       return err; //error occured in expression
    }
 
@@ -341,20 +342,21 @@ int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_st
 
    symbol = bintreestack_find(symtable_stack, token->value.string_value, &level);
    if(level == (bintreestack_get_length(symtable_stack) - 1) && symbol != NULL){
-      tokenvector_dtor(expresion);
+      tokenvector_dtor(expression);
       return ERRCODE_VAR_UNDEFINED_ERROR; //variable was already declared in this scope 
    }
    if(!strcmp(token->value.string_value, "_")){
-      tokenvector_dtor(expresion);
+      tokenvector_dtor(expression);
       return ERRCODE_VAR_UNDEFINED_ERROR; //variable "_" cant be defined
    }
    new_symbol = symbol_ctor(token->value.string_value, ST_VARIABLE, symbolval_var_ctor(type));
    bintree_add(bintreestack_peek(symtable_stack), new_symbol);
 
    // create ast node
-   expresion_array = tokenvector_get_array(expresion, &size);
-   (*def_node) = astnode_defvar_ctor(tokenvector_get(token_vector,0), astnode_exp_ctor(expresion_array, size));
+   expression_array = tokenvector_get_array(expression, &size);
+   (*def_node) = astnode_defvar_ctor(token_copy(tokenvector_get(token_vector,0)), astnode_exp_ctor(expression_array, size));
    
+   tokenvector_dtor(expression);
    return 0;
 }
 
@@ -373,11 +375,13 @@ int semantic_funcall(tokenvector_t* token_vector, bintreestack_t* symtable_stack
          tokenvector_push(args, token_copy(token));
          if(token->id == TOKENID_IDENTIFIER){
             if(!strcmp(token->value.string_value, "_")){
+               tokenvector_dtor(args);
                return ERRCODE_VAR_UNDEFINED_ERROR;
             }
             else{
                symbol = bintreestack_find(symtable_stack, token->value.string_value, NULL);
                if(symbol == NULL){
+                  tokenvector_dtor(args);
                   return ERRCODE_VAR_UNDEFINED_ERROR;
                }
             }
@@ -757,7 +761,6 @@ int semantic_if(tokenvector_t* token_vector, astnode_generic_t** ast_node, bintr
    token_t* token;
    int i;
    int size;
-   symtable_stack=symtable_stack;
    int err;
    vartype_e type;
    if(tokenvector_get(token_vector,0)->id == TOKENID_KEYWORD_ELSE){
