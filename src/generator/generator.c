@@ -30,7 +30,9 @@ void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
    for (int i = 0; i < clears_from; i++) {
       if (!streq(node->left_ids[i]->value.string_value, "_")) {
          int depth = vartable_depth(vartable, node->left_ids[i]->value.string_value);
-         printcm("POPS %s", generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth));
+         char* var = generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth);
+         printcm("POPS %s", var);
+         free(var);
       } else {
          printcm("POPS GF@$tmp0");
       }
@@ -90,7 +92,7 @@ void generate_assign(astnode_assign_t* node, vartable_t* vartable, bintree_t* fn
 /**
  * Generates defvar statement and adds variable to the vartable if necessary.
  */
-void generate_defvar(astnode_defvar_t* node, vartable_t* vartable) {
+void generate_defvar(astnode_defvar_t* node, vartable_t* vartable, bool assign) {
    guard(node != NULL);
    guard(vartable != NULL);
    vartype_e exptype = determine_expression_type(node->expression, vartable);
@@ -99,7 +101,9 @@ void generate_defvar(astnode_defvar_t* node, vartable_t* vartable) {
       vartable_add(vartable, node->variable->value.string_value, exptype);
       printcm("DEFVAR %s", var);
    }
-   generate_assign_expression(var, node->expression, vartable);
+   if (assign) {
+      generate_assign_expression(var, node->expression, vartable);
+   }
    free(var);
 }
 
@@ -109,7 +113,7 @@ void generate_defvar(astnode_defvar_t* node, vartable_t* vartable) {
 void defvar_all_vars(astnode_codeblock_t* node, vartable_t* vartable) {
    for (int i = 0; i < node->children_count; i++) {
       if (node->children[i]->type == ANT_DEFVAR) {
-         generate_defvar(node->children[i]->value.defvarval, vartable);
+         generate_defvar(node->children[i]->value.defvarval, vartable, false);
       }
       if (node->children[i]->type == ANT_IF) {
          vartable_descent(vartable);
@@ -122,7 +126,7 @@ void defvar_all_vars(astnode_codeblock_t* node, vartable_t* vartable) {
       if (node->children[i]->type == ANT_FOR) {
          vartable_descent(vartable);
          if (node->children[i]->value.forval->defvar != NULL) {
-            generate_defvar(node->children[i]->value.defvarval, vartable);
+            generate_defvar(node->children[i]->value.defvarval, vartable, false);
          }
          vartable_descent(vartable);
          defvar_all_vars(node->children[i]->value.forval->body, vartable);
@@ -150,7 +154,7 @@ void generate_condition(astnode_exp_t* cond, vartable_t* vartable, char* label, 
       printcm("PUSHS bool@%s", jump_on ? "true" : "false");
       printcm("JUMPIFEQS %s", label);
    } else {
-      printcm("JUMPIFEQ %s GF@$tmp0 bool@f%s", label, jump_on ? "true" : "false");
+      printcm("JUMPIFEQ %s GF@$tmp0 bool@%s", label, jump_on ? "true" : "false");
    }
 }
 
@@ -160,19 +164,21 @@ void generate_condition(astnode_exp_t* cond, vartable_t* vartable, char* label, 
 void generate_for(astnode_for_t* node, vartable_t* vartable, bintree_t* fntable) {
    vartable_descent(vartable);
    if (node->defvar != NULL) {
-      generate_defvar(node->defvar, vartable);
+      generate_defvar(node->defvar, vartable, true);
    }
    char* l1 = labelgen_new();
    char* l2 = labelgen_new();
    generate_condition(node->condition, vartable, l1, false);
    vartable_descent(vartable);
    defvar_all_vars(node->body, vartable);
-   printlb("LABEL %s", l2);
+   printjl("LABEL %s", l2);
    generate_codeblock(node->body, vartable, fntable);
    vartable_ascent(vartable);
-   generate_assign(node->assign, vartable, fntable);
+   if (node->assign != NULL) {
+      generate_assign(node->assign, vartable, fntable);
+   }
    generate_condition(node->condition, vartable, l2, true);
-   printlb("LABEL %s", l1);
+   printjl("LABEL %s", l1);
    vartable_ascent(vartable);
    free(l1);
    free(l2);
@@ -192,10 +198,10 @@ void generate_if(astnode_if_t* node, vartable_t* vartable, bintree_t* fntable) {
       l2 = labelgen_new();
       printcm("JUMP %s", l2);
    }
-   printlb("LABEL %s", l1);
+   printjl("LABEL %s", l1);
    if (node->else_body != NULL) {
       generate_codeblock(node->else_body, vartable, fntable);
-      printlb("LABEL %s", l2);
+      printjl("LABEL %s", l2);
       free(l2);
    }
    free(l1);
@@ -210,6 +216,7 @@ void generate_ret(astnode_ret_t* node, vartable_t* vartable) {
          printcm("PUSHS GF@$tmp0");
       }
    }
+   printcm("RETURN");
 }
 
 /**
@@ -220,6 +227,10 @@ void generate_funcdecl(astnode_funcdecl_t* node, bintree_t* fntable) {
    guard(fntable != NULL);
    printlb("LABEL %s", node->name);
    vartable_t* vartable = vartable_ctor();
+   symbolvalfn_t* fn = bintree_find(fntable, node->name)->value.fn;
+   for (int i = 0; i < fn->arg_count; i++) {
+      vartable_add(vartable, fn->arg_names[i], fn->arg_types[i]);
+   }
    generate_codeblock(node->body, vartable, fntable);
    vartable_dtor(vartable);
    printcm("RETURN");
@@ -240,7 +251,7 @@ void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* 
          break;
       case ANT_DEFVAR:
          pcomment("Defvar start");
-         generate_defvar(node->value.defvarval, vartable);
+         generate_defvar(node->value.defvarval, vartable, true);
          pcomment("Defvar end");
          break;
       case ANT_FOR:

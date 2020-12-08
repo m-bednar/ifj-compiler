@@ -185,59 +185,59 @@ void generate_stack_expression(astnode_exp_t* exp, vartable_t* vartable) {
 
 /**
  * For simple expressions, containing 2-3 tokens, this will generate operation(s) with
- * ouput to given asignee.
+ * ouput to given assignee.
  */
-void generate_local_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
+void generate_local_expression(char* assignee, astnode_exp_t* exp, vartable_t* vartable) {
    if (exp->tokens_count == 2) {
       guard(exp->tokens[0]->id == TOKENID_IDENTIFIER && exp->tokens[1]->id == TOKENID_OPERATOR_NOT);
       char* op1 = generate_op_str(exp->tokens[0], vartable);
-      printcm("NOT %s %s", asignee, op1);
+      printcm("NOT %s %s", assignee, op1);
       free(op1);
    } else {
       char* op1 = generate_op_str(exp->tokens[0], vartable); 
       char* op2 = generate_op_str(exp->tokens[1], vartable); 
       switch (exp->tokens[2]->id) {
          case TOKENID_OPERATOR_ADD:
-            printcm("%s %s %s %s", is_string_value(exp->tokens[0], vartable)? "CONCAT" : "ADD", asignee, op1, op2);
+            printcm("%s %s %s %s", is_string_value(exp->tokens[0], vartable)? "CONCAT" : "ADD", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_SUB:
-            printcm("SUB %s %s %s", asignee, op1, op2);
+            printcm("SUB %s %s %s", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_MUL:
-            printcm("MUL %s %s %s", asignee, op1, op2);
+            printcm("MUL %s %s %s", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_DIV:
-            printcm("%s %s %s %s", should_use_float_ops(exp, vartable) ? "IDIV" : "DIV", asignee, op1, op2);
+            printcm("%s %s %s %s", should_use_float_ops(exp, vartable) ? "IDIV" : "DIV", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_AND:
-            printcm("AND %s %s %s", asignee, op1, op2);
+            printcm("AND %s %s %s", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_OR:
-            printcm("OR %s %s %s", asignee, op1, op2);
+            printcm("OR %s %s %s", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_NOT:
-            printcm("NOT %s %s %s", asignee, op1, op2);
+            printcm("NOT %s %s %s", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_EQUALS:
-            printcm("EQ %s %s %s", asignee, op1, op2);
+            printcm("EQ %s %s %s", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_NOT_EQUAL:
-            printcm("EQ %s %s %s", asignee, op1, op2);
-            printcm("NOT %s %s", asignee, asignee);
+            printcm("EQ %s %s %s", assignee, op1, op2);
+            printcm("NOT %s %s", assignee, assignee);
             break;
          case TOKENID_OPERATOR_LESS:
-            printcm("LT %s %s %s", asignee, op1, op2);
+            printcm("LT %s %s %s", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_GREATER:
-            printcm("GT %s %s %s", asignee, op1, op2);
+            printcm("GT %s %s %s", assignee, op1, op2);
             break;
          case TOKENID_OPERATOR_LESS_OR_EQUAL:
-            printcm("GT %s %s %s", asignee, op1, op2);
-            printcm("NOT %s %s", asignee, asignee);
+            printcm("GT %s %s %s", assignee, op1, op2);
+            printcm("NOT %s %s", assignee, assignee);
             break;
          case TOKENID_OPERATOR_GREATER_OR_EQUAL:
-            printcm("LT %s %s %s", asignee, op1, op2);
-            printcm("NOT %s %s", asignee, asignee);
+            printcm("LT %s %s %s", assignee, op1, op2);
+            printcm("NOT %s %s", assignee, assignee);
             break;
          default:
             exit(ERRCODE_INTERNAL_ERROR);
@@ -247,13 +247,18 @@ void generate_local_expression(char* asignee, astnode_exp_t* exp, vartable_t* va
    }
 }
 
+bool can_generate_local_exp(astnode_exp_t* exp) {
+   return exp->tokens_count <= 3 && (is_const_tokenid(exp->tokens[0]->id) || exp->tokens[0]->id == TOKENID_IDENTIFIER)
+      && (is_const_tokenid(exp->tokens[1]->id) || exp->tokens[0]->id == TOKENID_IDENTIFIER);
+}
+
 /**
  * For expression that is single variable/const, this will generate assign
  * to appropriate variable.
  */
-void generate_const_assign_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
+void generate_const_assign_expression(char* assignee, astnode_exp_t* exp, vartable_t* vartable) {
    char* val = generate_op_str(exp->tokens[0], vartable);
-   printcm("MOVE %s %s", asignee, val);
+   printcm("MOVE %s %s", assignee, val);
    free(val);
 }
 
@@ -264,7 +269,7 @@ void generate_const_assign_expression(char* asignee, astnode_exp_t* exp, vartabl
 bool generate_const_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_stack) {
    char* var = generate_op_str(exp->tokens[0], vartable);
    if (prefer_stack) {
-      printcm("PUSH %s", var);
+      printcm("PUSHS %s", var);
    } else {
       printcm("MOVE GF@$tmp0 %s", var);
    }
@@ -277,7 +282,7 @@ bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_s
    optimize_postfix(exp);
    if (exp->tokens_count == 1) { 
       return generate_const_expression(exp, vartable, prefer_stack);
-   } else if (exp->tokens_count <= 3 && !prefer_stack) {
+   } else if (can_generate_local_exp(exp) && !prefer_stack) {
       generate_local_expression("GF@$tmp0", exp, vartable);
       return false;
    } else {
@@ -286,15 +291,15 @@ bool generate_expression(astnode_exp_t* exp, vartable_t* vartable, bool prefer_s
    }
 }
 
-void generate_assign_expression(char* asignee, astnode_exp_t* exp, vartable_t* vartable) {
+void generate_assign_expression(char* assignee, astnode_exp_t* exp, vartable_t* vartable) {
    infix_to_postfix(exp);
    optimize_postfix(exp);
    if (exp->tokens_count == 1) {
-      generate_const_assign_expression(asignee, exp, vartable);
-   } else if (exp->tokens_count <= 3) {
-      generate_local_expression(asignee, exp, vartable);
+      generate_const_assign_expression(assignee, exp, vartable);
+   } else if (can_generate_local_exp(exp)) {
+      generate_local_expression(assignee, exp, vartable);
    } else {
       generate_stack_expression(exp, vartable);
-      printcm("POPS %s", asignee);
+      printcm("POPS %s", assignee);
    }
 }
