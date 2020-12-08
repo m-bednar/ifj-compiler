@@ -73,6 +73,9 @@ void tokenvector_print(tokenvector_t* vector){
          case TOKENID_NUM_DECIMAL:
             printf("%f ", vector->memory[i]->value.decimal_value);
             break;
+         case TOKENID_STRING_LITERAL:
+            printf("\"%s\" ", vector->memory[i]->value.string_value);
+            break;
          case TOKENID_LEFT_PARENTHESES:
             printf("( ");
             break;
@@ -118,6 +121,10 @@ void tokenvector_print(tokenvector_t* vector){
 }
 
 token_t** tokenvector_get_array(tokenvector_t* vector, int* size){
+   token_t** array = safe_alloc(sizeof(token_t*) * (vector->length));
+   for(int i = 0; i < vector->length; i++){
+      array[i] = token_copy(vector->memory[i]);
+   }
    (*size) = vector->length;
-   return vector->memory;
+   return array;
 }
