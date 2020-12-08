@@ -307,7 +307,6 @@ int semantic_expression(tokenvector_t* token_vector, vartype_e* ret_type, bintre
    return 0;
 }
 
-
 int semantic_definition(tokenvector_t* token_vector, bintreestack_t* symtable_stack, astnode_defvar_t** def_node){
    tokenvector_t* expresion = tokenvector_ctor();
    token_t** expresion_array;
@@ -716,6 +715,7 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    astnode_exp_t* condition_node = NULL;
    astnode_defvar_t* def_node = NULL;
    astnode_assign_t* assign_node = NULL;
+   vartype_e type;
    int err;
    int i;
    int size;
@@ -752,8 +752,18 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
    }
 
    if(tokenvector_get_lenght(condition) != 0){
+      err = semantic_expression(condition, &type, symtable_stack);
+      if(err){
+         return err;
+      }
+      if(type != VT_BOOL){
+         return ERRCODE_GENERAL_SEMANTIC_ERROR;
+      }
       condition_array = tokenvector_get_array(condition, &size);
       condition_node = astnode_exp_ctor(condition_array, size);
+   }
+   else{
+      return ERRCODE_GENERAL_SEMANTIC_ERROR; //missing condition
    }
 
    if(tokenvector_get_lenght(assign) != 0){
@@ -764,7 +774,7 @@ int semantic_for(tokenvector_t* token_vector, bintreestack_t* symtable_stack, as
 
    tokenvector_dtor(assign);
    tokenvector_dtor(def);
-   //tokenvector_dtor(condition);
+   tokenvector_dtor(condition);
    if(err){
       return err;
    }
@@ -1024,8 +1034,8 @@ int semantic(token_t* token, nonterminalid_e flag, int eol_flag, astnode_generic
                   astnode_if_add_elsebody(astnodestack_peek(ast_parents)->astnode, ast_node_generic);
                }
             }
+            astnodestack_push(ast_parents, ast_node_generic, AP_FOR);
          }
-         astnodestack_push(ast_parents, ast_node_generic, AP_FOR);
          break;
       case NONTERMINAL_CALL:
          function_call = false;
