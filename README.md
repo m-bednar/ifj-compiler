@@ -19,8 +19,8 @@
 - [x] Tabulka symbolů
 - [x] Lexikální analyzátor (scanner)
 - [x] Syntaktický analyzátor (parser)
-- [ ] Sémantický analyzátor (Generátor vnitřního kódu)
-- [ ] Generátor konečného kódu
+- [x] Sémantický analyzátor (Generátor vnitřního kódu)
+- [x] Generátor konečného kódu
 
 ### Rozdělení práce
 - **Martin**
@@ -65,6 +65,3 @@ Možnost zápisu celých čísel v binární, hexadecimální a octalové sousta
 ##### BOOLTHEN (1.5b)
 Podpora boolenovských typů a literálů true, false. 
 Podpora zjednodušeného podmíněného příkaz if bez části else.
-
-##### ~~UNARY (0.5b)~~
-Operátory +=, -=, *=, /=, unární - a +.
