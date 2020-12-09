@@ -19,15 +19,15 @@ void generate_generic(astnode_generic_t* node, vartable_t* vartable, bintree_t* 
  * Generates stack pops of return variables after function call.
  */
 void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
-   int clears_from = node->ids_count;
-   for (int i = node->ids_count - 1; i >= 0; i--) {
+   int clears_to = 0;
+   for (int i = 0; i < node->ids_count; i++) {
       if (streq(node->left_ids[i]->value.string_value, "_")) {
-         clears_from = i;
+         clears_to++;
       } else {
          break;
       }
    }
-   for (int i = 0; i < clears_from; i++) {
+   for (int i = node->ids_count - 1; i >= clears_to; i--) {
       if (!streq(node->left_ids[i]->value.string_value, "_")) {
          int depth = vartable_depth(vartable, node->left_ids[i]->value.string_value);
          char* var = generate_var_str(node->left_ids[i]->value.string_value, FT_TF, depth);
@@ -37,7 +37,7 @@ void generate_returns_pops(astnode_assign_t* node, vartable_t* vartable) {
          printcm("POPS GF@$tmp0");
       }
    }
-   if (clears_from != node->ids_count) {
+   if (clears_to != 0) {
       printcm("CLEARS");
    }
 }

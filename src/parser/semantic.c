@@ -803,6 +803,10 @@ int semantic_ret(tokenvector_t* token_vector, astnode_funcdecl_t* function, bint
    if(function_symbol->value.fn->ret_count != expressions_count){
       return ERRCODE_ARGS_OR_RETURN_ERROR; // too few return values
    }
+   if(function_symbol->value.fn->ret_count != expressions_count){
+      return ERRCODE_ARGS_OR_RETURN_ERROR; // too few return values
+   }
+
 
 
    return 0;
